@@ -1,0 +1,14 @@
+# eclipse
+.classpath
+.project
+.settings/
+# eclipse plugins
+.checkstyle
+.pmd
+.ruleset
+
+# maven
+target/
+
+# test deepl connection
+src/test/resources/*.local.properties

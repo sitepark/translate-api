@@ -1,0 +1,19 @@
+name: (▶) Create Release
+
+on: workflow_dispatch
+
+jobs:
+  release:
+    uses: sitepark-com/github-project-workflow/.github/workflows/maven-release.yml@main
+    with:
+      botName: "sitepark-bot"
+      botEmail: "opensource@sitepark.com"
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+      GPG_KEY: ${{ secrets.GPG_KEY }}
+      MVN_REPO_SERVER_USERNAME: ${{ secrets.MVN_REPO_SERVER_USERNAME }}
+      MVN_REPO_SERVER_PASSWORD: ${{ secrets.MVN_REPO_SERVER_PASSWORD }}
+      MVN_REPO_SERVER_ID: ${{ secrets.MVN_REPO_SERVER_ID }}
+      MVN_REPO_SERVER_RELEASE_URL: ${{ secrets.MVN_REPO_SERVER_RELEASE_URL }}
+

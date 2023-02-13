@@ -1,0 +1,10 @@
+name: (📡) Publish Release
+
+on:
+   release:
+      types: [published]
+
+jobs:
+  publish-release:
+    uses: sitepark-com/github-project-workflow/.github/workflows/maven-publish-release.yml@main
+
