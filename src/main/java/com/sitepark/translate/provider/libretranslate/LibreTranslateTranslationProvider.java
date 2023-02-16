@@ -1,8 +1,6 @@
 package com.sitepark.translate.provider.libretranslate;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -10,16 +8,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.nio.charset.StandardCharsets;
 import java.security.ProviderException;
+import java.util.Arrays;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedLanguages;
+import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
-import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationProvider;
-import com.sitepark.translate.translator.placeholder.PlaceholderDecoder;
-import com.sitepark.translate.translator.placeholder.PlaceholderEncoder;
+import com.sitepark.translate.translator.entity.Decoder;
+import com.sitepark.translate.translator.entity.Encoder;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -48,10 +47,10 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 				.q(encodedSourceText)
 				.build();
 
-
 		HttpRequest request = HttpRequest.newBuilder(uri)
 				.header("Content-Type", "application/json")
 				.header("Accept", "application/json")
+				.header("Origin", this.getProviderConfiguration().getUri().toString())
 				.POST(this.toPostBody(req))
 				.build();
 
@@ -77,6 +76,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 			});
 
 			String[] translated = response.getTranslatedText();
+
 			return this.decodePlacerholder(translated);
 
 		} catch (InterruptedException | IOException e) {
@@ -89,7 +89,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 			return q;
 		}
 
-		return PlaceholderEncoder.encode(q);
+		return Encoder.encode(q);
 	}
 
 	private String[] decodePlacerholder(String... q) {
@@ -98,7 +98,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 			return q;
 		}
 
-		return PlaceholderDecoder.decode(q);
+		return Decoder.decode(q);
 	}
 
 	private int byteCount(String... array) {
@@ -151,7 +151,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 	private HttpClient createHttpClient() {
 		HttpClient.Builder builder = HttpClient.newBuilder();
 		if (this.getProviderConfiguration().getProxy().isPresent()) {
-			builder.proxy(ProxySelector.of(new InetSocketAddress("localhost", 8889)));
+			builder.proxy(this.getProviderConfiguration().getProxy().get());
 		}
 		return builder.build();
 	}

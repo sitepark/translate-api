@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,13 +30,14 @@ public class JsonBodyHandler<W> implements HttpResponse.BodyHandler<Supplier<W>>
 
 	public static <W> Supplier<W> toSupplierOfType(InputStream inputStream, Class<W> targetType) {
 		return () -> {
+			String text = null;
 			try (InputStream stream = inputStream) {
+				text = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 				ObjectMapper objectMapper = new ObjectMapper();
-				return objectMapper.readValue(stream, targetType);
+				return objectMapper.readValue(text, targetType);
 			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				throw new UncheckedIOException(text, e);
 			}
 		};
 	}
-
 }

@@ -21,8 +21,8 @@ import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderException;
-import com.sitepark.translate.translator.placeholder.PlaceholderDecoder;
-import com.sitepark.translate.translator.placeholder.PlaceholderEncoder;
+import com.sitepark.translate.translator.entity.Decoder;
+import com.sitepark.translate.translator.entity.Encoder;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -32,12 +32,8 @@ public class DeeplTranslationProvider implements TranslationProvider {
 
 	private final TranslationConfiguration translatorConfiguration;
 
-	private final DeeplTranslationProviderConfiguration providerConfiguration;
-
-	public DeeplTranslationProvider(TranslationConfiguration translatorConfiguration,
-			DeeplTranslationProviderConfiguration providerConfiguration) {
+	public DeeplTranslationProvider(TranslationConfiguration translatorConfiguration) {
 		this.translatorConfiguration = translatorConfiguration;
-		this.providerConfiguration = providerConfiguration;
 	}
 
 	public String[] translate(TranslationLanguage language, final String... sourceText) {
@@ -56,7 +52,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		}
 
 		HttpRequest request = HttpRequest.newBuilder(uri)
-				.header("Authorization", "DeepL-Auth-Key " + this.providerConfiguration.getAuthKey())
+				.header("Authorization", "DeepL-Auth-Key " + this.getProviderConfiguration().getAuthKey())
 				.header("Accept", "application/json")
 				.header("Content-Type", "application/x-www-form-urlencoded")
 				.POST(this.buildBody(params))
@@ -92,6 +88,12 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		}
 	}
 
+	private DeeplTranslationProviderConfiguration getProviderConfiguration() {
+		return this.translatorConfiguration.getTranslationProviderConfiguration(
+				DeeplTranslationProviderConfiguration.class);
+	}
+
+
 	private HttpRequest.BodyPublisher buildBody(List<String[]> params) {
 		var builder = new StringBuilder();
 		for (String[] param : params) {
@@ -112,7 +114,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 			return q;
 		}
 
-		return PlaceholderEncoder.encode(q);
+		return Encoder.encode(q);
 	}
 
 	private String[] decodePlacerholder(String... q) {
@@ -121,7 +123,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 			return q;
 		}
 
-		return PlaceholderDecoder.decode(q);
+		return Decoder.decode(q);
 	}
 
 	private int byteCount(String... array) {
@@ -167,7 +169,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		URI uri = this.buildUri("/languages?type=" + type);
 
 		HttpRequest request = HttpRequest.newBuilder(uri)
-				.header("Authorization", "DeepL-Auth-Key " + this.providerConfiguration.getAuthKey())
+				.header("Authorization", "DeepL-Auth-Key " + this.getProviderConfiguration().getAuthKey())
 				.header("Accept", "application/json")
 				.build();
 
@@ -183,7 +185,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 
 	private URI buildUri(String path) {
 		try {
-			return new URI(this.providerConfiguration.getUri() + path);
+			return new URI(this.getProviderConfiguration().getUri() + path);
 		} catch (URISyntaxException e) {
 			throw new TranslationProviderException(e.getMessage(), e);
 		}
@@ -191,8 +193,8 @@ public class DeeplTranslationProvider implements TranslationProvider {
 
 	private HttpClient createHttpClient() {
 		HttpClient.Builder builder = HttpClient.newBuilder();
-		if (this.providerConfiguration.getProxy().isPresent()) {
-			builder.proxy(ProxySelector.of(new InetSocketAddress("localhost", 8889)));
+		if (this.getProviderConfiguration().getProxy().isPresent()) {
+			builder.proxy(this.getProviderConfiguration().getProxy().get());
 		}
 		return builder.build();
 	}

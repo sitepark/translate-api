@@ -1,7 +1,6 @@
 package com.sitepark.translate;
 
 import com.sitepark.translate.provider.deepl.DeeplTranslationProvider;
-import com.sitepark.translate.provider.deepl.DeeplTranslationProviderConfiguration;
 import com.sitepark.translate.provider.libretranslate.LibreTranslateTranslationProvider;
 
 public class TranslationProviderFactory {
@@ -27,10 +26,7 @@ public class TranslationProviderFactory {
 	}
 
 	private DeeplTranslationProvider createDeeplTranslationProvider() {
-		DeeplTranslationProviderConfiguration config =
-				this.translatorConfiguration.getTranslationProviderConfiguration(
-						DeeplTranslationProviderConfiguration.class);
-		return new DeeplTranslationProvider(this.translatorConfiguration, config);
+		return new DeeplTranslationProvider(this.translatorConfiguration);
 	}
 
 }
