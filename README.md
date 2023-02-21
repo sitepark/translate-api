@@ -36,6 +36,7 @@ Maven-Dependency
 	<artifactId>translate-api</artifactId>
 	<version>1.0-SNAPSHOT</version>
 </dependency>
+```
 
 ## Select language and provider
 
