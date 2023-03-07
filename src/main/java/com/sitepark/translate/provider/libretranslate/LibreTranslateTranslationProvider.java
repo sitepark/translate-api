@@ -8,7 +8,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.nio.charset.StandardCharsets;
 import java.security.ProviderException;
-import java.util.Arrays;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.translate.Format;
@@ -17,6 +16,7 @@ import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
+import com.sitepark.translate.translator.UnifiedSourceText;
 import com.sitepark.translate.translator.entity.Decoder;
 import com.sitepark.translate.translator.entity.Encoder;
 
@@ -36,6 +36,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 
 		String[] encodedSourceText = this.encodePlacerholder(sourceText);
 
+		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(encodedSourceText);
 
 		URI uri = this.buildUri("/translate");
 
@@ -44,7 +45,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 				.source(language.getSource())
 				.target(language.getTarget())
 				.format(Format.HTML)
-				.q(encodedSourceText)
+				.q(unifiedSourceText.getSourceText())
 				.build();
 
 		HttpRequest request = HttpRequest.newBuilder(uri)
@@ -65,19 +66,21 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 					.body()
 					.get();
 
+			String[] translated = response.getTranslatedText();
+
 			this.translatorConfiguration.getTranslationListener().ifPresent(listener -> {
 				listener.translated(TranslationEvent.builder()
 						.translationTime(System.currentTimeMillis() - start)
 						.translationLanguage(language)
 						.chunks(encodedSourceText.length)
-						.sourceBytes(this.byteCount(encodedSourceText))
-						.targetBytes(this.byteCount(response.getTranslatedText()))
+						.sourceBytes(this.byteCount(unifiedSourceText.getSourceText()))
+						.targetBytes(this.byteCount(translated))
 						.build());
 			});
 
-			String[] translated = response.getTranslatedText();
+			String[] decodedTranslation = this.decodePlacerholder(translated);
 
-			return this.decodePlacerholder(translated);
+			return unifiedSourceText.expandTranslation(decodedTranslation);
 
 		} catch (InterruptedException | IOException e) {
 			throw new ProviderException(e.getMessage(), e);

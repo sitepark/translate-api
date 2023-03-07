@@ -21,6 +21,7 @@ import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderException;
+import com.sitepark.translate.translator.UnifiedSourceText;
 import com.sitepark.translate.translator.entity.Decoder;
 import com.sitepark.translate.translator.entity.Encoder;
 
@@ -40,6 +41,8 @@ public class DeeplTranslationProvider implements TranslationProvider {
 
 		String[] encodedSourceText = this.encodePlacerholder(sourceText);
 
+		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(encodedSourceText);
+
 		URI uri = this.buildUri("/translate");
 
 
@@ -47,7 +50,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		params.add(new String[] {"source_lang", language.getSource()});
 		params.add(new String[] {"target_lang", language.getTarget()});
 		params.add(new String[] {"tag_handling", Format.HTML.toString().toLowerCase()});
-		for (String text : encodedSourceText) {
+		for (String text : unifiedSourceText.getSourceText()) {
 			params.add(new String[] {"text", text});
 		}
 
@@ -76,12 +79,14 @@ public class DeeplTranslationProvider implements TranslationProvider {
 						.translationTime(System.currentTimeMillis() - start)
 						.translationLanguage(language)
 						.chunks(encodedSourceText.length)
-						.sourceBytes(this.byteCount(encodedSourceText))
+						.sourceBytes(this.byteCount(unifiedSourceText.getSourceText()))
 						.targetBytes(this.byteCount(translated))
 						.build());
 			});
 
-			return this.decodePlacerholder(translated);
+			String[] decodedTranslation = this.decodePlacerholder(translated);
+
+			return unifiedSourceText.expandTranslation(decodedTranslation);
 
 		} catch (InterruptedException | IOException e) {
 			throw new TranslationProviderException(e.getMessage(), e);
