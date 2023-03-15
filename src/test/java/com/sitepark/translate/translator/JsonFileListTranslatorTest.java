@@ -5,9 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,13 +42,9 @@ class JsonFileListTranslatorTest {
 		dictionary.put("Welt", "World");
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(), any())).thenAnswer(invocationOnMock -> {
-			Object[] arguments = invocationOnMock.getArguments();
-			String[] translations = new String[arguments.length];
-			for (int i = 0; i < arguments.length; i++) {
-				translations[i] = dictionary.get(arguments[i].toString());
-			}
-			return translations;
+		when(transporter.translate(any(), any())).thenReturn(new String[] {
+				"Hello",
+				"World"
 		});
 		when(transporter.getSupportedLanguages()).thenReturn(supportedLanguages);
 
@@ -57,6 +57,7 @@ class JsonFileListTranslatorTest {
 
 		Path dir = Paths.get("src/test/resources/JsonFileListTranslator");
 		Path output = Paths.get("target/test/JsonFileListTranslator/translations");
+		this.cleanCache(output);
 
 		JsonFileListTranslator jsonFileListTranslator = JsonFileListTranslator.builder()
 				.dir(dir)
@@ -79,5 +80,15 @@ class JsonFileListTranslatorTest {
 				+ "  \"d\" : \"Hello\"\n"
 				+ "}", Files.readString(resultC),
 				"wrong content in en/b/c.json");
+	}
+
+	private void cleanCache(Path dir) throws IOException {
+		if (!Files.exists(dir)) {
+			return;
+		}
+		Files.walk(dir)
+				.sorted(Comparator.reverseOrder())
+				.map(Path::toFile)
+				.forEach(File::delete);
 	}
 }
