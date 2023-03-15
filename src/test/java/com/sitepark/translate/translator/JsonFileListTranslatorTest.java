@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,10 +33,18 @@ class JsonFileListTranslatorTest {
 				)
 				.build();
 
+		Map<String, String> dictionary = new HashMap<>();
+		dictionary.put("Hallo", "Hello");
+		dictionary.put("Welt", "World");
+
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(), any())).thenReturn(new String[] {
-				"Hello",
-				"World"
+		when(transporter.translate(any(), any())).thenAnswer(invocationOnMock -> {
+			Object[] arguments = invocationOnMock.getArguments();
+			String[] translations = new String[arguments.length];
+			for (int i = 0; i < arguments.length; i++) {
+				translations[i] = dictionary.get(arguments[i].toString());
+			}
+			return translations;
 		});
 		when(transporter.getSupportedLanguages()).thenReturn(supportedLanguages);
 
