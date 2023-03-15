@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +26,7 @@ import com.sitepark.translate.TranslationProviderFactory;
 class JsonFileListTranslatorTest {
 
 	@Test
+	@SuppressWarnings({"PMD.UseConcurrentHashMap"})
 	void test() throws Exception {
 
 		SupportedLanguages supportedLanguages = SupportedLanguages.builder()
@@ -42,9 +42,13 @@ class JsonFileListTranslatorTest {
 		dictionary.put("Welt", "World");
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(), any())).thenReturn(new String[] {
-				"Hello",
-				"World"
+		when(transporter.translate(any(), any())).thenAnswer(invocationOnMock -> {
+			Object[] arguments = invocationOnMock.getArguments();
+			String[] translations = new String[arguments.length - 1];
+			for (int i = 0; i < (arguments.length - 1); i++) {
+				translations[i] = dictionary.get(arguments[i + 1].toString());
+			}
+			return translations;
 		});
 		when(transporter.getSupportedLanguages()).thenReturn(supportedLanguages);
 
@@ -71,13 +75,13 @@ class JsonFileListTranslatorTest {
 
 		Path resultA = output.resolve("en/a.json");
 		assertEquals("{\n"
-				+ "  \"text\" : \"World\"\n"
+				+ "  \"text\" : \"Hello\"\n"
 				+ "}", Files.readString(resultA),
 				"wrong content in en/a.json");
 
 		Path resultC = output.resolve("en/b/c.json");
 		assertEquals("{\n"
-				+ "  \"d\" : \"Hello\"\n"
+				+ "  \"d\" : \"World\"\n"
 				+ "}", Files.readString(resultC),
 				"wrong content in en/b/c.json");
 	}
