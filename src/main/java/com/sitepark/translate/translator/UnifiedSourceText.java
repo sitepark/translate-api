@@ -45,7 +45,7 @@ public class UnifiedSourceText {
 		for (int i = 0; i < unifiedTranslation.length; i++) {
 			String text = unifiedTranslation[i];
 
-			List<Integer> indexList = this.index.get(this.sourceText[i]);
+			List<Integer> indexList = this.index.get(this.unifiedText[i]);
 			for (Integer index : indexList) {
 				translation[index] = text;
 			}

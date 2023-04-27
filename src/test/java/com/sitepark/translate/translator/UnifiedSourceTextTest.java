@@ -42,14 +42,42 @@ class UnifiedSourceTextTest {
 
 	@Test
 	void testExpandTranslationWithEqualsText() {
-		String[] sourceText = new String[] {"Hallo", "Welt", "Hallo", "Welt"};
+		String[] sourceText = new String[] {
+				"Eins",
+				"Eins",
+				"Zwei",
+				"Eins",
+				"Zwei",
+				"Zwei",
+				"Drei",
+				"Vier",
+				"Fünf",
+				"Zwei",
+				"Fünf",
+				"Drei",
+		};
 		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(sourceText);
 
-		String[] translationText = new String[] {"Hello", "world"};
-		String[] expectedTranslationText = new String[] {"Hello", "world", "Hello", "world"};
+		String[] translationText = new String[] {"One", "Two", "Three", "Four", "Five"};
+		String[] expectedTranslationText = new String[] {
+				"One",
+				"One",
+				"Two",
+				"One",
+				"Two",
+				"Two",
+				"Three",
+				"Four",
+				"Five",
+				"Two",
+				"Five",
+				"Three",
+		};
+
 		assertArrayEquals(
 				expectedTranslationText,
 				unifiedSourceText.expandTranslation(translationText),
 				"wrong expanded");
 	}
+
 }
