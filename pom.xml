@@ -22,6 +22,7 @@
 		<spotbugs.version>4.6.0</spotbugs.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>
+		<gpg.skip>true</gpg.skip>
 	</properties>
 
 	<scm>
