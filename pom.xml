@@ -9,6 +9,7 @@
 	<version>1.1.0-SNAPSHOT</version>
 	<name>Translate Java API</name>
 	<description>Java API for translating texts across different providers</description>
+	<url>https://github.com/sitepark/translate-api</url>
 
 	<licenses>
 		<license>
