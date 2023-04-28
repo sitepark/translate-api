@@ -17,6 +17,26 @@
 		</license>
 	</licenses>
 
+	<organization>
+		<name>Sitepark</name>
+		<url>https://www.sitepark.com</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>veltrup@sitepark</id>
+			<name>Holger Veltrup</name>
+			<email>veltrup@sitepark.com</email>
+			<url>https://github.com/sitepark-veltrup</url>
+			<organization>Sitepark</organization>
+			<organizationUrl>https://www.sitepark.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>Europe/Berlin</timezone>
+		</developer>
+	</developers>
+
 	<properties>
 		<junit.version>5.8.2</junit.version>
 		<spotbugs.version>4.6.0</spotbugs.version>
@@ -29,8 +49,8 @@
 		<connection>scm:git:git@github.com:sitepark/translate-api.git</connection>
 		<developerConnection>scm:git:git@github.com:sitepark/translate-api.git</developerConnection>
 		<url>https://github.com/sitepark/translate-api</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<dependencyManagement>
 		<dependencies>
