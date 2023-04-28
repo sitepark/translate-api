@@ -34,7 +34,7 @@ Maven-Dependency
 <dependency>
 	<groupId>com.sitepark</groupId>
 	<artifactId>translate-api</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 </dependency>
 ```
 
