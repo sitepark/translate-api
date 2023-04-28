@@ -179,6 +179,14 @@
 					</execution>
 				</executions>
 			</plugin>
+			                        <plugin>
+                                <artifactId>maven-release-plugin</artifactId>
+                                <version>3.0.0</version>
+                                <configuration>
+                                        <scmCommentPrefix>ci(release): </scmCommentPrefix>
+                                        <tagNameFormat>@{project.version}</tagNameFormat>
+                                </configuration>
+                        </plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
