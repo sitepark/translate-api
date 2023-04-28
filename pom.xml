@@ -6,7 +6,7 @@
 	<groupId>com.sitepark</groupId>
 	<artifactId>translate-api</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Translate Java API</name>
 	<description>Java API for translating texts across different providers</description>
 
@@ -28,7 +28,8 @@
 		<connection>scm:git:git@github.com:sitepark/translate-api.git</connection>
 		<developerConnection>scm:git:git@github.com:sitepark/translate-api.git</developerConnection>
 		<url>https://github.com/sitepark/translate-api</url>
-	</scm>
+	  <tag>translate-api-1.0.0</tag>
+  </scm>
 
 	<dependencyManagement>
 		<dependencies>
