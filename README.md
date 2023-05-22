@@ -1,5 +1,5 @@
 [![codecov](https://codecov.io/gh/sitepark/translate-api/branch/main/graph/badge.svg?token=68Mk5j1BY3)](https://codecov.io/gh/sitepark/translate-api)
-
+[![Known Vulnerabilities](https://snyk.io/test/github/sitepark/translate-api/badge.svg)](https://snyk.io/test/github/sitepark-com/github-maven-release-test)
 # Translate Java API
 
 A Java API to translate texts with various translation services. The following services are supported
