@@ -1,4 +1,4 @@
-package com.sitepark.translate.translator;
+package com.sitepark.translate.translator; // NOPMD by veltrup on 24.05.23, 15:37
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +21,7 @@ import com.sitepark.translate.TranslationProvider;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+@SuppressWarnings({"PMD.GuardLogStatement"})
 public final class JsonFileListTranslator extends Translator {
 
 	private final Path dir;
@@ -73,10 +74,13 @@ public final class JsonFileListTranslator extends Translator {
 				continue;
 			}
 			long t = System.currentTimeMillis();
-			this.logger.info("translate " + this.sourceLang + " -> " + targetLanguage);
+
+			this.logger.info(
+					"translate " + this.sourceLang + " -> " + targetLanguage);
 			this.translate(provider, targetLanguage);
 			long duration = (System.currentTimeMillis() - t) / 1000;
-			this.logger.info("translated " + this.sourceLang + " -> " + targetLanguage +
+			this.logger.info(
+					"translated " + this.sourceLang + " -> " + targetLanguage +
 					" in " + duration + " seconds.");
 			this.write(targetLanguage);
 		}
@@ -150,7 +154,9 @@ public final class JsonFileListTranslator extends Translator {
 		try {
 			cache.store();
 		} catch (Exception e) {
-			this.logger.error("Unable to store cache " + cache.getFile() + ": " + e.getMessage(), e);
+			this.logger.error(
+					"Unable to store cache " + cache.getFile() + ": " + e.getMessage(),
+					e);
 		}
 	}
 
@@ -177,7 +183,9 @@ public final class JsonFileListTranslator extends Translator {
 		try {
 			cache.load();
 		} catch (Exception e) {
-			this.logger.error("Unalbe to load cache " + cacheFile + ": " + e.getMessage(), e);
+			this.logger.error(
+					"Unalbe to load cache " + cacheFile + ": " + e.getMessage(),
+					e);
 		}
 		return cache;
 	}
@@ -191,7 +199,7 @@ public final class JsonFileListTranslator extends Translator {
 		void error(String msg, Throwable t);
 	}
 
-	private static class JsonFile {
+	private final static class JsonFile {
 		private final Path sourceFile;
 		private final JsonNode node;
 		private JsonFile(Path sourceFile, JsonNode node) {
@@ -200,7 +208,7 @@ public final class JsonFileListTranslator extends Translator {
 		}
 	}
 
-	public static class Builder extends Translator.Builder<Builder> {
+	public final static class Builder extends Translator.Builder<Builder> {
 
 		private Path dir;
 
@@ -267,7 +275,7 @@ public final class JsonFileListTranslator extends Translator {
 		}
 	}
 
-	private static class NullLogger implements Logger {
+	private final static class NullLogger implements Logger {
 		@Override
 		public void info(String msg) {
 			// null logger

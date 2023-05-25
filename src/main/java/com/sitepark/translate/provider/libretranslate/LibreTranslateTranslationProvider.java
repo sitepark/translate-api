@@ -38,33 +38,13 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 
 		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(encodedSourceText);
 
-		URI uri = this.buildUri("/translate");
-
-
-		TransportRequest req = TransportRequest.builder()
-				.source(language.getSource())
-				.target(language.getTarget())
-				.format(Format.HTML)
-				.q(unifiedSourceText.getSourceText())
-				.build();
-
-		HttpRequest request = HttpRequest.newBuilder(uri)
-				.header("Content-Type", "application/json")
-				.header("Accept", "application/json")
-				.header("Origin", this.getProviderConfiguration().getUri().toString())
-				.POST(this.toPostBody(req))
-				.build();
-
-		HttpClient client = this.createHttpClient();
-
 		try {
 
 			long start = System.currentTimeMillis();
 
-			TransportResponse response = client
-					.send(request, new JsonBodyHandler<>(TransportResponse.class))
-					.body()
-					.get();
+			TransportResponse response = this.translationRequest(
+					language,
+					unifiedSourceText);
 
 			String[] translated = response.getTranslatedText();
 
@@ -85,6 +65,33 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 		} catch (InterruptedException | IOException e) {
 			throw new ProviderException(e.getMessage(), e);
 		}
+	}
+
+	protected TransportResponse translationRequest(TranslationLanguage language, UnifiedSourceText unifiedSourceText)
+			throws IOException, InterruptedException {
+
+		URI uri = this.buildUri("/translate");
+
+		TransportRequest req = TransportRequest.builder()
+				.source(language.getSource())
+				.target(language.getTarget())
+				.format(Format.HTML)
+				.q(unifiedSourceText.getSourceText())
+				.build();
+
+		HttpRequest request = HttpRequest.newBuilder(uri)
+				.header("Content-Type", "application/json")
+				.header("Accept", "application/json")
+				.header("Origin", this.getProviderConfiguration().getUri().toString())
+				.POST(this.toPostBody(req))
+				.build();
+
+		HttpClient client = this.createHttpClient();
+
+		return client
+					.send(request, new JsonBodyHandler<>(TransportResponse.class))
+					.body()
+					.get();
 	}
 
 	private String[] encodePlacerholder(String... q) {

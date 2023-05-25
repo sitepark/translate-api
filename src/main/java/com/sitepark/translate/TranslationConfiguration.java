@@ -71,7 +71,7 @@ public final class TranslationConfiguration {
 	}
 
 	@SuppressWarnings("PMD.TooManyMethods")
-	public static class Builder {
+	public final static class Builder {
 
 		private TranslationCache translationCache;
 
@@ -107,7 +107,7 @@ public final class TranslationConfiguration {
 			return this;
 		}
 
-		public Builder transporterFactory(TranslationProviderFactory translatorProviderFactory) {
+		public Builder translationProviderFactory(TranslationProviderFactory translatorProviderFactory) {
 			assert translatorProviderFactory != null : "translatorProviderFactory is null";
 			this.translationProviderFactory = translatorProviderFactory;
 			return this;

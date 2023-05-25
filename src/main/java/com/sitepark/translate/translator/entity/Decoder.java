@@ -20,8 +20,9 @@ public final class Decoder {
 		int start = 0;
 		StringBuilder decoded = new StringBuilder();
 		while (matcher.find()) {
-			decoded.append(text.substring(start, matcher.start(1)));
-			decoded.append(matcher.group(2));
+			decoded
+				.append(text.substring(start, matcher.start(1)))
+				.append(matcher.group(2));
 			start = matcher.end();
 		}
 		decoded.append(text.substring(start, text.length()));

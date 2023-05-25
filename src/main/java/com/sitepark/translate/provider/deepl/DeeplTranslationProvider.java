@@ -1,8 +1,6 @@
 package com.sitepark.translate.provider.deepl;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -43,34 +41,11 @@ public class DeeplTranslationProvider implements TranslationProvider {
 
 		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(encodedSourceText);
 
-		URI uri = this.buildUri("/translate");
-
-
-		List<String[]> params = new ArrayList<>();
-		params.add(new String[] {"source_lang", language.getSource()});
-		params.add(new String[] {"target_lang", language.getTarget()});
-		params.add(new String[] {"tag_handling", Format.HTML.toString().toLowerCase()});
-		for (String text : unifiedSourceText.getSourceText()) {
-			params.add(new String[] {"text", text});
-		}
-
-		HttpRequest request = HttpRequest.newBuilder(uri)
-				.header("Authorization", "DeepL-Auth-Key " + this.getProviderConfiguration().getAuthKey())
-				.header("Accept", "application/json")
-				.header("Content-Type", "application/x-www-form-urlencoded")
-				.POST(this.buildBody(params))
-				.build();
-
-		HttpClient client = this.createHttpClient();
-
 		try {
 
 			long start = System.currentTimeMillis();
 
-			TransportResponse response = client
-					.send(request, new JsonBodyHandler<>(TransportResponse.class))
-					.body()
-					.get();
+			TransportResponse response = translationRequest(language, unifiedSourceText);
 
 			String[] translated = response.getTranslations();
 
@@ -91,6 +66,34 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		} catch (InterruptedException | IOException e) {
 			throw new TranslationProviderException(e.getMessage(), e);
 		}
+	}
+
+	protected TransportResponse translationRequest(TranslationLanguage language, UnifiedSourceText unifiedSourceText)
+			throws IOException, InterruptedException {
+
+		URI uri = this.buildUri("/translate");
+
+		List<String[]> params = new ArrayList<>();
+		params.add(new String[] {"source_lang", language.getSource()});
+		params.add(new String[] {"target_lang", language.getTarget()});
+		params.add(new String[] {"tag_handling", Format.HTML.toString().toLowerCase()});
+		for (String text : unifiedSourceText.getSourceText()) {
+			params.add(new String[] {"text", text});
+		}
+
+		HttpRequest request = HttpRequest.newBuilder(uri)
+				.header("Authorization", "DeepL-Auth-Key " + this.getProviderConfiguration().getAuthKey())
+				.header("Accept", "application/json")
+				.header("Content-Type", "application/x-www-form-urlencoded")
+				.POST(this.buildBody(params))
+				.build();
+
+		HttpClient client = this.createHttpClient();
+
+		return client
+				.send(request, new JsonBodyHandler<>(TransportResponse.class))
+				.body()
+				.get();
 	}
 
 	private DeeplTranslationProviderConfiguration getProviderConfiguration() {
@@ -162,14 +165,14 @@ public class DeeplTranslationProvider implements TranslationProvider {
 	}
 
 	private List<TransportLanguage> getSourceLanguages() {
-		return this.getLanguages("source");
+		return this.getLanguages(LanguageType.SOURCE);
 	}
 
 	private List<TransportLanguage> getTargetLanguages() {
-		return this.getLanguages("source");
+		return this.getLanguages(LanguageType.TARGET);
 	}
 
-	private List<TransportLanguage> getLanguages(String type) {
+	protected List<TransportLanguage> getLanguages(LanguageType type) {
 
 		URI uri = this.buildUri("/languages?type=" + type);
 
@@ -186,7 +189,6 @@ public class DeeplTranslationProvider implements TranslationProvider {
 			throw new TranslationProviderException(e.getMessage(), e);
 		}
 	}
-
 
 	private URI buildUri(String path) {
 		try {

@@ -54,7 +54,7 @@ public final class TransportRequest {
 		return new Builder(this);
 	}
 
-	public static class Builder {
+	public final static class Builder {
 
 		private String[] q;
 
@@ -80,6 +80,9 @@ public final class TransportRequest {
 			assert q != null : "q is null";
 			assert q.length > 0 : "q is empty";
 			this.q = Arrays.copyOf(q, q.length);
+			for (String item : q) {
+				assert item != null : "q item is null";
+			}
 			return this;
 		}
 

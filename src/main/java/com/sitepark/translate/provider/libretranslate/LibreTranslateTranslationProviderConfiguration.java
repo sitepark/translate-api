@@ -49,7 +49,7 @@ public final class LibreTranslateTranslationProviderConfiguration implements Tra
 	}
 
 	@SuppressWarnings("PMD.TooManyMethods")
-	public static class Builder {
+	public final static class Builder {
 
 		private URI uri;
 

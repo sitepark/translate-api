@@ -34,7 +34,7 @@ public final class TranslationLanguage {
 		return new Builder(this);
 	}
 
-	public static class Builder {
+	public final static class Builder {
 
 		private SupportedProvider providerType;
 

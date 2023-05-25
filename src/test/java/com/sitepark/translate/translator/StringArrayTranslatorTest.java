@@ -27,7 +27,7 @@ class StringArrayTranslatorTest {
 		when(transporterFactory.create(any())).thenReturn(transporter);
 
 		TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder()
-				.transporterFactory(transporterFactory)
+				.translationProviderFactory(transporterFactory)
 				.build();
 
 		StringArrayTranslator translator = StringArrayTranslator.builder()

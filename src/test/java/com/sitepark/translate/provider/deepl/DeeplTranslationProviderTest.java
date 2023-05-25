@@ -1,84 +1,41 @@
 package com.sitepark.translate.provider.deepl;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
-import com.sitepark.translate.TranslationProvider;
-import com.sitepark.translate.translator.TranslatableText;
-import com.sitepark.translate.translator.TranslatableTextListTranslator;
+import com.sitepark.translate.translator.UnifiedSourceText;
 
-@Disabled
-@SuppressWarnings("PMD")
 class DeeplTranslationProviderTest {
 
-	private TranslationProvider createProvider() throws IOException, URISyntaxException {
-		return new DeeplTranslationProvider(this.createConfiguration());
-	}
-
-	private TranslationConfiguration createConfiguration() throws IOException, URISyntaxException {
-
-		DeeplTestConnection con = DeeplTestConnection.get();
-
-		DeeplTranslationProviderConfiguration.Builder builder =
-				DeeplTranslationProviderConfiguration.builder()
-				.url(con.getUrl())
-				.authKey(con.getAuthKey());
-
-		return TranslationConfiguration.builder()
-				.translationProviderConfiguration(builder.build())
-				.encodePlaceholder(true)
-				.build();
-	}
-
 	@Test
-	void testSupportedLanguages() throws URISyntaxException, IOException, InterruptedException {
+	void testTranslation() {
 
-		TranslationProvider translator = this.createProvider();
+		TranslationConfiguration config = Mockito.mock(TranslationConfiguration.class);
+		when(config.isEncodePlaceholder()).thenReturn(true);
+		TransportResponse response = Mockito.mock(TransportResponse.class);
+		when(response.getTranslations()).thenReturn(new String[] {"Hello", "World"});
 
-		SupportedLanguages supportedLanguages = translator.getSupportedLanguages();
-
-		assertTrue(supportedLanguages.getAll().size() > 0, "supportedLanguages should not be empty");
-	}
-
-	@Test
-	void testTranslate() throws URISyntaxException, IOException, InterruptedException {
-
-		TranslationProvider translator = this.createProvider();
-
-		TranslationLanguage translationLanguage = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
-				.source("de")
-				.target("en")
-				.build();
-
-		String[] res = translator.translate(translationLanguage, new String[] {
-				"Hallo", "Welt"
-		});
-
-		assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
-	}
-
-	@Test
-	void testTranslateHtml() throws URISyntaxException, IOException, InterruptedException {
-
-		TranslationConfiguration translatorConfiguration = this.createConfiguration();
-
-		List<TranslatableText> translatableTextList = new ArrayList<>();
-		translatableTextList.add(new TranslatableText("Hallo Welt & <test>  \"Universum\""));
-		translatableTextList.add(new TranslatableText("Hallo Welt &amp; &lt;test&gt; \"Universum\"", Format.HTML));
+		DeeplTranslationProvider provider = new DeeplTranslationProvider(config) {
+			@Override
+			protected TransportResponse translationRequest(
+					TranslationLanguage language,
+					UnifiedSourceText unifiedSourceText)
+					throws IOException, InterruptedException {
+				return response;
+			}
+		};
 
 		TranslationLanguage language = TranslationLanguage.builder()
 				.providerType(SupportedProvider.DEEPL)
@@ -86,18 +43,50 @@ class DeeplTranslationProviderTest {
 				.target("en")
 				.build();
 
-		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
-				.translatorConfiguration(translatorConfiguration)
-				.build();
+		String[] translated = provider.translate(language, new String[] {"Hallo", "Welt"});
 
-		translator.translate(language, translatableTextList);
-
-		translator.translate(language, translatableTextList);
-
-		System.out.println(translatableTextList.get(0).getTargetText());
-		System.out.println(translatableTextList.get(1).getTargetText());
-
-		//assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
+		assertArrayEquals(
+				new String[] {"Hello", "World"},
+				translated,
+				"unexpected translation");
 	}
 
+	@Test
+	void testGetSupportedLanguages() {
+
+		TranslationConfiguration config = Mockito.mock(TranslationConfiguration.class);
+		when(config.isEncodePlaceholder()).thenReturn(true);
+		TransportResponse response = Mockito.mock(TransportResponse.class);
+		when(response.getTranslations()).thenReturn(new String[] {"Hello", "World"});
+
+		TransportLanguage de = Mockito.mock(TransportLanguage.class);
+		when(de.getLanguage()).thenReturn("de");
+		when(de.getName()).thenReturn("deutsch");
+		TransportLanguage en = Mockito.mock(TransportLanguage.class);
+		when(en.getLanguage()).thenReturn("en");
+		when(en.getName()).thenReturn("english");
+
+		DeeplTranslationProvider provider = new DeeplTranslationProvider(config) {
+			@Override
+			protected List<TransportLanguage> getLanguages(LanguageType type) {
+				if (type == LanguageType.SOURCE) {
+					return Arrays.asList(de, en);
+				} else if (type == LanguageType.TARGET) {
+					return Arrays.asList(en);
+				}
+				throw new IllegalArgumentException("Unsupported type: '" + type + "'");
+			}
+		};
+
+		SupportedLanguages supportedLanguages = provider.getSupportedLanguages();
+
+		assertEquals(
+				"de",
+				supportedLanguages.getSourceLanguage("de").get().getCode(),
+				"unexpected source language");
+		assertEquals(
+				"en",
+				supportedLanguages.getTargetLanguage("de", "en").get().getCode(),
+				"unexpected source language");
+	}
 }
