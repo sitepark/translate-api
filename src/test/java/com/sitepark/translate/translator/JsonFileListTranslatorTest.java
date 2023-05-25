@@ -56,7 +56,7 @@ class JsonFileListTranslatorTest {
 		when(transporterFactory.create(any())).thenReturn(transporter);
 
 		TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder()
-				.transporterFactory(transporterFactory)
+				.translationProviderFactory(transporterFactory)
 				.build();
 
 		Path dir = Paths.get("src/test/resources/JsonFileListTranslator");

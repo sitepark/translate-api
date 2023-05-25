@@ -49,7 +49,7 @@ public final class DeeplTranslationProviderConfiguration implements TranslationP
 	}
 
 	@SuppressWarnings("PMD.TooManyMethods")
-	public static class Builder {
+	public final static class Builder {
 
 		private URI uri;
 

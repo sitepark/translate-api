@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@SuppressWarnings({"PMD.ReplaceHashtableWithMap"})
 public final class LibreTranslateTestConnection {
 
 	private final String url;

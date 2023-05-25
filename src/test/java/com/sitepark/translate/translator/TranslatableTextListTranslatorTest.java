@@ -34,7 +34,7 @@ class TranslatableTextListTranslatorTest {
 		when(transporterFactory.create(any())).thenReturn(transporter);
 
 		TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder()
-				.transporterFactory(transporterFactory)
+				.translationProviderFactory(transporterFactory)
 				.build();
 
 		List<TranslatableText> translatableTextList = new ArrayList<>();
@@ -74,7 +74,7 @@ class TranslatableTextListTranslatorTest {
 		when(transporterFactory.create(any())).thenReturn(transporter);
 
 		TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder()
-				.transporterFactory(transporterFactory)
+				.translationProviderFactory(transporterFactory)
 				.translationCache(translationCache)
 				.build();
 

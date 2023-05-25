@@ -57,7 +57,7 @@ public final class SupportedLanguages {
 		return new Builder();
 	}
 
-	public static class Builder {
+	public final static class Builder {
 
 		private final Map<String, Language> languages = new ConcurrentHashMap<>();
 

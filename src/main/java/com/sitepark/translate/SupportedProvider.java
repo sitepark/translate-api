@@ -8,7 +8,7 @@ public enum SupportedProvider {
 	DEEPL("deepl"),
 	LIBRE_TRANSLATE("libretranslate");
 
-	private String schema;
+	private final String schema;
 
 	private SupportedProvider(String schema) {
 		this.schema = schema;

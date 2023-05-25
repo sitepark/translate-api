@@ -42,7 +42,11 @@ public class TranslateJson {
 		}
 	}
 
-	private void parseArguments(String... arguments) {
+	protected JsonFileListTranslator getTranslator() {
+		return this.jsonFileListTranslator;
+	}
+
+	protected void parseArguments(String... arguments) {
 
 		if (arguments.length != 4) {
 			throw new IllegalArgumentException("<url>, <dir>, <base-lang> <output-dir> expected");
@@ -71,7 +75,7 @@ public class TranslateJson {
 				.build();
 	}
 
-	private TranslationProviderConfiguration createTranslationProviderConfigurationByUrl(String s) {
+	protected TranslationProviderConfiguration createTranslationProviderConfigurationByUrl(String s) {
 		try {
 			URI url = new URI(s);
 
@@ -125,7 +129,8 @@ public class TranslateJson {
 	}
 
 
-	private void run() throws IOException {
+	protected void run() throws IOException {
+		assert this.jsonFileListTranslator != null : "jsonFileListTranslator is null";
 		this.jsonFileListTranslator.translate(this.providerType);
 	}
 

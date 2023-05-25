@@ -59,7 +59,7 @@ public final class TranslationEvent {
 		return new Builder();
 	}
 
-	public static class Builder {
+	public final static class Builder {
 
 		private TranslationLanguage translationLanguage;
 

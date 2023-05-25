@@ -66,5 +66,5 @@ public class TranslationFileCache implements TranslationCache {
 		return text.hashCode();
 	}
 
-	private static class CacheType extends TypeReference<Map<Integer, String>> { }
+	private final static class CacheType extends TypeReference<Map<Integer, String>> { }
 }

@@ -177,6 +177,8 @@
 		[
 			count(./ClassOrInterfaceBodyDeclaration/MethodDeclaration[
 				not (
+								starts-with(@Name,'test')
+								or
 								starts-with(@Name,'get')
 								or
 								starts-with(@Name,'set')

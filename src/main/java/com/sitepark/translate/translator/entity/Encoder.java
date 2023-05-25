@@ -14,16 +14,17 @@ public final class Encoder {
 
 	public static String encode(String text) {
 
-		StringBuilder encoded = new StringBuilder();
+		StringBuilder encoded = new StringBuilder(70);
 		Scanner scanner = new Scanner(text);
 
 		for (Token token : scanner.scanTokens()) {
 			if (token.type == TokenType.STRING) {
 				encoded.append(token.lexeme);
 			} else if (token.type == TokenType.ENTITY) {
-				encoded.append("<span data-encoded-entity=\"true\" translate=\"no\">");
-				encoded.append(token.lexeme);
-				encoded.append("</span>");
+				encoded
+					.append("<span data-encoded-entity=\"true\" translate=\"no\">")
+					.append(token.lexeme)
+					.append("</span>");
 			}
 		}
 

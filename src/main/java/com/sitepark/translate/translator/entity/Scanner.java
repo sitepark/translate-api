@@ -20,7 +20,7 @@ class Scanner {
 	List<Token> scanTokens() {
 		while (!isAtEnd()) {
 			// We are at the beginning of the next lexeme.
-			start = current;
+			start = current; // NOPMD by veltrup on 24.05.23, 15:38
 			scanToken();
 		}
 

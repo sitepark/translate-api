@@ -16,7 +16,7 @@ public final class Main {
 		String[] arguments = new String[argv.length - 1];
 		System.arraycopy(argv, 1, arguments, 0, argv.length - 1);
 
-		if (command.equals(TranslateJson.COMMAND_NAME)) {
+		if (TranslateJson.COMMAND_NAME.equals(command)) {
 			TranslateJson.execute(arguments);
 		} else {
 			System.err.println("unknown command: " + command);
