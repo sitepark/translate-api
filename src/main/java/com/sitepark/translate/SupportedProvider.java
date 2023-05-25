@@ -20,7 +20,7 @@ public enum SupportedProvider {
 				return type;
 			}
 		}
-		return SupportedProvider.valueOf(name.toUpperCase(Locale.US));
+		throw new IllegalArgumentException("scheme '" + name + "' not found");
 	}
 
 	public String getSchema() {
