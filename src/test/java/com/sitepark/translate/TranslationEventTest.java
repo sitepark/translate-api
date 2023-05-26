@@ -1,6 +1,7 @@
 package com.sitepark.translate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,4 +29,22 @@ class TranslationEventTest {
 		assertEquals(346, event.getTargetBytes(), "unexpected targetBytes");
 	}
 
+	@Test
+	void testSetTranslationLanguageToNull() {
+		assertThrows(AssertionError.class, () -> {
+			TranslationEvent.builder().translationLanguage(null);
+		});
+	}
+
+	@Test
+	void testMissingTranslationLanguage() {
+		assertThrows(AssertionError.class, () -> {
+			TranslationEvent.builder()
+					.translationTime(123)
+					.chunks(12)
+					.sourceBytes(345)
+					.targetBytes(346)
+					.build();
+		});
+	}
 }

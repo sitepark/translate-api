@@ -3,11 +3,16 @@ package com.sitepark.translate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SuppressWarnings({
 	"PMD.JUnitTestContainsTooManyAsserts",
@@ -137,6 +142,25 @@ class SupportedLanguagesTest {
 				Optional.empty(),
 				supportedLanguages.getTargetLanguage("fr", "de"),
 				"source language 'fr' should not be found");
+	}
+
+	@Test
+	void testDeserialze() throws JsonMappingException, JsonProcessingException {
+
+		String json = "[{" +
+				"\"code\":\"de\"," +
+				"\"name\":\"deutsch\"," +
+				"\"targets\":[\"en\"]" +
+		"}]";
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		SupportedLanguages supportedLanguages =
+				objectMapper.readValue(json, SupportedLanguages.class);
+
+		assertTrue(
+				supportedLanguages.getSourceLanguage("de").isPresent(),
+				"language 'de' should be present"
+		);
 	}
 
 }
