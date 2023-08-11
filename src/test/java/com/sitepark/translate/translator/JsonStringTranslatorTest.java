@@ -2,11 +2,13 @@ package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
+import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
@@ -19,7 +21,7 @@ class JsonStringTranslatorTest {
 	void test() throws Exception {
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(), any())).thenReturn(new String[] {
+		when(transporter.translate(any(TranslationLanguage.class), any(String[].class))).thenReturn(new String[] {
 				"Heading",
 				"A beautiful text",
 				"Flowers"

@@ -2,6 +2,7 @@ package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +20,7 @@ class StringArrayTranslatorTest {
 	void test() throws Exception {
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(), any())).thenReturn(new String[] {
+		when(transporter.translate(any(TranslationLanguage.class), any(String[].class))).thenReturn(new String[] {
 				"Hello",
 				"World"});
 
