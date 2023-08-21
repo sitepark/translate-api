@@ -3,11 +3,13 @@ package com.sitepark.translate.provider.libretranslate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sitepark.translate.TranslationProviderException;
 
 public class JsonBodyHandler<W> implements HttpResponse.BodyHandler<Supplier<W>> {
 
@@ -19,6 +21,9 @@ public class JsonBodyHandler<W> implements HttpResponse.BodyHandler<Supplier<W>>
 
 	@Override
 	public HttpResponse.BodySubscriber<Supplier<W>> apply(HttpResponse.ResponseInfo responseInfo) {
+		if (responseInfo.statusCode() != HttpURLConnection.HTTP_OK) {
+			throw new TranslationProviderException("HTTP-Status: " + responseInfo.statusCode());
+		}
 		return asJSON(this.wClass);
 	}
 
