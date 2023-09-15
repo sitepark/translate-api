@@ -35,25 +35,26 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		this.translatorConfiguration = translatorConfiguration;
 	}
 
-	public String[] translate(TranslationLanguage language, final String... sourceText) {
+	public String[] translate(Format format, TranslationLanguage language, final String... sourceText) {
 
-		String[] encodedSourceText = this.encodePlacerholder(sourceText);
+		String[] sourceTextToTranslate = sourceText;
+		if (format == Format.HTML) {
+			sourceTextToTranslate = this.encodePlacerholder(sourceText);
+		}
 
-		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(encodedSourceText);
+		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(sourceTextToTranslate);
 
 		try {
 
 			long start = System.currentTimeMillis();
 
-			TransportResponse response = translationRequest(language, unifiedSourceText);
-
-			String[] translated = response.getTranslations();
+			String[] translated = translationRequest(format, language, unifiedSourceText.getSourceText());
 
 			this.translatorConfiguration.getTranslationListener().ifPresent(listener -> {
 				listener.translated(TranslationEvent.builder()
 						.translationTime(System.currentTimeMillis() - start)
 						.translationLanguage(language)
-						.chunks(encodedSourceText.length)
+						.chunks(sourceText.length)
 						.sourceBytes(this.byteCount(unifiedSourceText.getSourceText()))
 						.targetBytes(this.byteCount(translated))
 						.build());
@@ -68,7 +69,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		}
 	}
 
-	protected TransportResponse translationRequest(TranslationLanguage language, UnifiedSourceText unifiedSourceText)
+	protected String[] translationRequest(Format format, TranslationLanguage language, String... source)
 			throws IOException, InterruptedException {
 
 		URI uri = this.buildUri("/translate");
@@ -76,8 +77,10 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		List<String[]> params = new ArrayList<>();
 		params.add(new String[] {"source_lang", language.getSource()});
 		params.add(new String[] {"target_lang", language.getTarget()});
-		params.add(new String[] {"tag_handling", Format.HTML.toString().toLowerCase()});
-		for (String text : unifiedSourceText.getSourceText()) {
+		if (format == Format.HTML) {
+			params.add(new String[] {"tag_handling", Format.HTML.toString().toLowerCase()});
+		}
+		for (String text : source) {
 			params.add(new String[] {"text", text});
 		}
 
@@ -90,10 +93,12 @@ public class DeeplTranslationProvider implements TranslationProvider {
 
 		HttpClient client = this.createHttpClient();
 
-		return client
+		TransportResponse response = client
 				.send(request, new JsonBodyHandler<>(TransportResponse.class))
 				.body()
 				.get();
+
+		return response.getTranslations();
 	}
 
 	private DeeplTranslationProviderConfiguration getProviderConfiguration() {

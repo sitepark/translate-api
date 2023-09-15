@@ -11,7 +11,8 @@ public class TranslatableText {
 	private String targetText;
 
 	public TranslatableText(String sourceText) {
-		this(sourceText, Format.TEXT);
+		this.sourceText = sourceText;
+		this.format = FormatDetector.detect(sourceText);
 	}
 
 	public TranslatableText(String sourceText, Format format) {

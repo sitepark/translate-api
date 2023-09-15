@@ -45,11 +45,6 @@ class Scanner {
 			case '{':
 				entity('}');
 				break;
-			/*
-			case '&':
-				entity(';');
-				break;
-			*/
 			default :
 				string();
 			break;
@@ -121,7 +116,6 @@ class Scanner {
 	}
 
 	private boolean isStringChar(char c) {
-		// return c != '$' && c != '{' && c != '&';
 		return c != '$' && c != '{';
 	}
 }

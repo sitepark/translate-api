@@ -21,7 +21,10 @@ import com.sitepark.translate.TranslationProvider;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-@SuppressWarnings({"PMD.GuardLogStatement"})
+@SuppressWarnings({
+	"PMD.GuardLogStatement",
+	"PMD.TooManyMethods"
+})
 public final class JsonFileListTranslator extends Translator {
 
 	private final Path dir;
@@ -56,6 +59,10 @@ public final class JsonFileListTranslator extends Translator {
 	}
 
 	public void translate(SupportedProvider provider) throws IOException {
+		this.translate(provider, (List<String>)null);
+	}
+
+	public void translate(SupportedProvider provider, List<String> targets) throws IOException {
 
 		this.sourceDir = this.dir.resolve(this.sourceLang);
 
@@ -66,7 +73,14 @@ public final class JsonFileListTranslator extends Translator {
 
 		long tt = System.currentTimeMillis();
 
-		for (String targetLanguage : sourceLanguage.getTargets()) {
+		List<String> targetLanguageList;
+		if (targets != null) {
+			targetLanguageList = targets;
+		} else {
+			targetLanguageList = sourceLanguage.getTargets();
+		}
+
+		for (String targetLanguage : targetLanguageList) {
 			if (this.sourceLang.equals(targetLanguage)) {
 				continue;
 			}

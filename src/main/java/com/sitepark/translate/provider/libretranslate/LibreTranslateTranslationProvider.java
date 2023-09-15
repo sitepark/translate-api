@@ -16,6 +16,7 @@ import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
+import com.sitepark.translate.provider.deepl.TransportResponse;
 import com.sitepark.translate.translator.UnifiedSourceText;
 import com.sitepark.translate.translator.entity.Decoder;
 import com.sitepark.translate.translator.entity.Encoder;
@@ -32,7 +33,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 		this.translatorConfiguration = translatorConfiguration;
 	}
 
-	public String[] translate(TranslationLanguage language, final String... sourceText) {
+	public String[] translate(Format format, TranslationLanguage language, final String... sourceText) {
 
 		String[] encodedSourceText = this.encodePlacerholder(sourceText);
 
@@ -42,11 +43,10 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 
 			long start = System.currentTimeMillis();
 
-			TransportResponse response = this.translationRequest(
+			String[] translated = this.translationRequest(
+					format,
 					language,
-					unifiedSourceText);
-
-			String[] translated = response.getTranslatedText();
+					unifiedSourceText.getSourceText());
 
 			this.translatorConfiguration.getTranslationListener().ifPresent(listener -> {
 				listener.translated(TranslationEvent.builder()
@@ -67,7 +67,10 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 		}
 	}
 
-	protected TransportResponse translationRequest(TranslationLanguage language, UnifiedSourceText unifiedSourceText)
+	protected String[] translationRequest(
+			Format format,
+			TranslationLanguage language,
+			String... source)
 			throws IOException, InterruptedException {
 
 		URI uri = this.buildUri("/translate");
@@ -75,8 +78,8 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 		TransportRequest req = TransportRequest.builder()
 				.source(language.getSource())
 				.target(language.getTarget())
-				.format(Format.HTML)
-				.q(unifiedSourceText.getSourceText())
+				.format(format)
+				.q(source)
 				.build();
 
 		HttpRequest request = HttpRequest.newBuilder(uri)
@@ -88,10 +91,12 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 
 		HttpClient client = this.createHttpClient();
 
-		return client
+		TransportResponse response = client
 					.send(request, new JsonBodyHandler<>(TransportResponse.class))
 					.body()
 					.get();
+
+		return response.getTranslations();
 	}
 
 	private String[] encodePlacerholder(String... q) {

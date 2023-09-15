@@ -13,13 +13,13 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationListener;
-import com.sitepark.translate.translator.UnifiedSourceText;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -39,11 +39,12 @@ class DeeplTranslationProviderTest {
 
 		DeeplTranslationProvider provider = new DeeplTranslationProvider(config) {
 			@Override
-			protected TransportResponse translationRequest(
+			protected String[] translationRequest(
+					Format format,
 					TranslationLanguage language,
-					UnifiedSourceText unifiedSourceText)
+					String... source)
 					throws IOException, InterruptedException {
-				return response;
+				return new String[] {"Hello", "World"};
 			}
 		};
 
@@ -53,7 +54,7 @@ class DeeplTranslationProviderTest {
 				.target("en")
 				.build();
 
-		String[] translated = provider.translate(language, new String[] {"Hallo", "Welt"});
+		String[] translated = provider.translate(Format.TEXT, language, new String[] {"Hallo", "Welt"});
 
 		assertArrayEquals(
 				new String[] {"Hello", "World"},
@@ -75,11 +76,12 @@ class DeeplTranslationProviderTest {
 
 		DeeplTranslationProvider provider = new DeeplTranslationProvider(config) {
 			@Override
-			protected TransportResponse translationRequest(
+			protected String[] translationRequest(
+					Format format,
 					TranslationLanguage language,
-					UnifiedSourceText unifiedSourceText)
+					String... source)
 					throws IOException, InterruptedException {
-				return response;
+				return new String[] {"Hello", "World"};
 			}
 		};
 
@@ -89,7 +91,7 @@ class DeeplTranslationProviderTest {
 				.target("en")
 				.build();
 
-		provider.translate(language, new String[] {"Hallo", "Welt"});
+		provider.translate(Format.TEXT, language, new String[] {"Hallo", "Welt"});
 
 		assertSame(
 				language,

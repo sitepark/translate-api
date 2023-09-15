@@ -2,7 +2,6 @@ package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +11,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationCache;
 import com.sitepark.translate.TranslationConfiguration;
@@ -26,7 +26,11 @@ class TranslatableTextListTranslatorTest {
 	void test() throws Exception {
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(TranslationLanguage.class), any(String[].class))).thenReturn(new String[] {
+		when(transporter.translate(
+				any(Format.class),
+				any(TranslationLanguage.class),
+				any(String[].class)))
+		.thenReturn(new String[] {
 				"Flowers",
 				"Blue"
 		});
@@ -62,7 +66,11 @@ class TranslatableTextListTranslatorTest {
 	void testWithCache() throws Exception {
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(), any())).thenReturn(new String[] {
+		when(transporter.translate(
+				any(Format.class),
+				any(TranslationLanguage.class),
+				any(String[].class)))
+		.thenReturn(new String[] {
 				"Blue"
 		});
 

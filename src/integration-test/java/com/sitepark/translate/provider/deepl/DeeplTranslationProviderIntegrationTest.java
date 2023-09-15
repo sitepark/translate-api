@@ -67,9 +67,13 @@ class DeeplTranslationProviderIntegrationTest {
 				.target("en")
 				.build();
 
-		String[] res = translator.translate(translationLanguage, new String[] {
-				"Hallo", "Welt"
-		});
+		String[] res = translator.translate(
+				Format.TEXT,
+				translationLanguage,
+				new String[] {
+						"Hallo", "Welt"
+				}
+		);
 
 		assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
 	}
@@ -102,5 +106,68 @@ class DeeplTranslationProviderIntegrationTest {
 
 		//assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
 	}
+
+	@Test
+	void testTranslateHtmlBroken() throws URISyntaxException, IOException, InterruptedException {
+
+		TranslationConfiguration translatorConfiguration = this.createConfiguration();
+
+		List<TranslatableText> translatableTextList = new ArrayList<>();
+		translatableTextList.add(new TranslatableText(
+				"<div class=\"SP-LinkList SP-LinkList--compact SP-Util__sectionMarginSmall\">\n"
+				+ "<ul class=\"SP-LinkList__list\">\n"
+				+ "   <li class=\"SP-LinkList__item\">\n"
+				+ "      <a data-variant=\"in-linklist\" href=\"https://www.kunstcaching.de/\" rel=\"noopener\" target=\"_blank\" data-entity-ref=\"1\">www.kunstcaching.de</a>\n"
+				+ "   </li>\n"
+				+ "   <li class=\"SP-LinkList__item\">\n"
+				+ "      <a data-variant=\"in-linklist\" href=\"https://www.pablo-zibes.de\" rel=\"noopener\" target=\"_blank\" data-entity-ref=\"2\">Website von Pablo Zibes</a>\n"
+				+ "   </li>\n"
+				+ "</ul>\n"
+				+ "</div>"));
+
+		TranslationLanguage language = TranslationLanguage.builder()
+				.providerType(SupportedProvider.DEEPL)
+				.source("de")
+				.target("en")
+				.build();
+
+		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
+				.translatorConfiguration(translatorConfiguration)
+				.build();
+
+		translator.translate(language, translatableTextList);
+
+		System.out.println(translatableTextList.get(0).getTargetText());
+
+		//assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
+	}
+
+	@Test
+	void testTranslateHtmlBrokenAmp() throws URISyntaxException, IOException, InterruptedException {
+
+		TranslationConfiguration translatorConfiguration = this.createConfiguration();
+
+		List<TranslatableText> translatableTextList = new ArrayList<>();
+		translatableTextList.add(new TranslatableText("Einrichtungen & Beteiligungen"));
+
+		TranslationLanguage language = TranslationLanguage.builder()
+				.providerType(SupportedProvider.DEEPL)
+				.source("de")
+				.target("en")
+				.build();
+
+		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
+				.translatorConfiguration(translatorConfiguration)
+				.build();
+
+		translator.translate(language, translatableTextList);
+
+		System.out.println(translatableTextList.get(0).getTargetText());
+
+		//assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
+	}
+
+
+
 
 }

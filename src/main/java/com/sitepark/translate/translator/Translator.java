@@ -1,5 +1,6 @@
 package com.sitepark.translate.translator;
 
+import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
@@ -26,9 +27,10 @@ public abstract class Translator {
 		return this.translatorConfiguration.getTranslationProviderFactory();
 	}
 
-	protected String[] translate(TranslationLanguage language, String... source) {
+	protected String[] translate(Format format, TranslationLanguage language, String... source) {
 		String[] target = this.createTransporter(language.getProviderType())
 				.translate(
+						format,
 						language,
 						source);
 		return target;

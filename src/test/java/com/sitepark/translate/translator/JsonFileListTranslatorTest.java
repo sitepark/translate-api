@@ -2,7 +2,6 @@ package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +16,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import com.sitepark.translate.Format;
 import com.sitepark.translate.Language;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
@@ -45,12 +45,14 @@ class JsonFileListTranslatorTest {
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
 		when(transporter.translate(
+				any(Format.class),
 				any(TranslationLanguage.class),
 				any(String[].class))).thenAnswer(invocationOnMock -> {
+			int argsBeforStringArray = 2;
 			Object[] arguments = invocationOnMock.getArguments();
-			String[] translations = new String[arguments.length - 1];
-			for (int i = 0; i < (arguments.length - 1); i++) {
-				translations[i] = dictionary.get(arguments[i + 1].toString());
+			String[] translations = new String[arguments.length - argsBeforStringArray];
+			for (int i = 0; i < (arguments.length - argsBeforStringArray); i++) {
+				translations[i] = dictionary.get(arguments[i + argsBeforStringArray].toString());
 			}
 			return translations;
 		});

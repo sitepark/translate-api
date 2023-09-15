@@ -8,8 +8,10 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.sitepark.translate.SupportedProvider;
@@ -25,6 +27,8 @@ public class TranslateJson {
 	private JsonFileListTranslator jsonFileListTranslator;
 
 	private SupportedProvider providerType;
+
+	private List<String> targetLanguages;
 
 	public static final String COMMAND_NAME = "translate-json";
 
@@ -48,8 +52,8 @@ public class TranslateJson {
 
 	protected void parseArguments(String... arguments) {
 
-		if (arguments.length != 4) {
-			throw new IllegalArgumentException("<url>, <dir>, <base-lang> <output-dir> expected");
+		if (arguments.length < 4) {
+			throw new IllegalArgumentException("<url>, <dir>, <base-lang> <output-dir> [target-language]... expected");
 		}
 
 		String url = arguments[0];
@@ -59,6 +63,13 @@ public class TranslateJson {
 		Path sourceDir = dir.resolve(sourceLang);
 		if (!Files.exists(sourceDir)) {
 			throw new IllegalArgumentException("source-dir " + sourceDir + " not exitst");
+		}
+
+		if (arguments.length > 4) {
+			this.targetLanguages = new ArrayList<>();
+			for (int i = 4; i < arguments.length; i++) {
+				this.targetLanguages.add(arguments[i]);
+			}
 		}
 
 		TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder()
@@ -131,7 +142,7 @@ public class TranslateJson {
 
 	protected void run() throws IOException {
 		assert this.jsonFileListTranslator != null : "jsonFileListTranslator is null";
-		this.jsonFileListTranslator.translate(this.providerType);
+		this.jsonFileListTranslator.translate(this.providerType, this.targetLanguages);
 	}
 
 	private void usage() {

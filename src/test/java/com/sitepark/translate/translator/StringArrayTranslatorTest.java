@@ -2,12 +2,12 @@ package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
+import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
@@ -20,7 +20,11 @@ class StringArrayTranslatorTest {
 	void test() throws Exception {
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(TranslationLanguage.class), any(String[].class))).thenReturn(new String[] {
+		when(transporter.translate(
+				any(Format.class),
+				any(TranslationLanguage.class),
+				any(String[].class)))
+		.thenReturn(new String[] {
 				"Hello",
 				"World"});
 
@@ -41,7 +45,10 @@ class StringArrayTranslatorTest {
 				.target("en")
 				.build();
 
-		String[] result = translator.translate(language, new String[] {"Hallo", "Welt"});
+		String[] result = translator.translate(
+				Format.TEXT,
+				language,
+				new String[] {"Hallo", "Welt"});
 
 		assertArrayEquals(new String[] {"Hello", "World"}, result, "wrong translation");
 	}

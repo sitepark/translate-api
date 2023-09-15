@@ -2,7 +2,9 @@ package com.sitepark.translate.translator;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -11,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.sitepark.translate.Format;
 
 class TranslatableTextNodeTest {
 
@@ -40,9 +43,10 @@ class TranslatableTextNodeTest {
 	}
 
 	@Test
-	void testWithObjectNode() {
+	void testWithObjectNodet() {
 		JsonNode jsonNode = Mockito.mock(ObjectNode.class);
 		TextNode textNode = Mockito.mock(TextNode.class);
+		when(textNode.asText()).thenReturn("Text");
 		TranslatableTextNode translatableTextNode =
 				TranslatableTextNode.create(jsonNode, "key", textNode);
 
@@ -56,6 +60,7 @@ class TranslatableTextNodeTest {
 	void testWithArrayNode() {
 		JsonNode jsonNode = Mockito.mock(ArrayNode.class);
 		TextNode textNode = Mockito.mock(TextNode.class);
+		when(textNode.asText()).thenReturn("Text");
 		TranslatableTextNode translatableTextNode =
 				TranslatableTextNode.create(jsonNode, 1, textNode);
 

@@ -1,5 +1,6 @@
 package com.sitepark.translate.translator;
 
+import com.sitepark.translate.Format;
 import com.sitepark.translate.TranslationLanguage;
 
 public final class StringTranslator extends Translator {
@@ -8,8 +9,8 @@ public final class StringTranslator extends Translator {
 		super(builder);
 	}
 
-	public String translate(TranslationLanguage language, String q) {
-		return super.translate(language, q)[0];
+	public String translate(Format format, TranslationLanguage language, String q) {
+		return super.translate(format, language, q)[0];
 	}
 
 	public static Builder builder() {

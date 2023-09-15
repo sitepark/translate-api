@@ -3,6 +3,7 @@ package com.sitepark.translate.translator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.sitepark.translate.Format;
 import com.sitepark.translate.TranslationCache;
@@ -23,91 +24,40 @@ public final class TranslatableTextListTranslator extends Translator {
 			return;
 		}
 
-		String[] source = untranslated.stream()
-				.map(node -> {
-					String text = node.getSourceText();
-					if (node.getFormat() == Format.TEXT) {
-						text = this.encodeHtml(text);
-					}
-					return text;
-				})
-				.toArray(String[]::new);
-
-		String[] result = super.translate(language, source);
-		for (int i = 0; i < result.length; i++) {
-			TranslatableText node = untranslated.get(i);
-			String text = result[i];
-			if (node.getFormat() == Format.TEXT) {
-				text = this.decodeHtml(text);
-			}
-			node.setTargetText(text);
-		}
+		this.translate(Format.HTML, language, untranslated);
+		this.translate(Format.TEXT, language, untranslated);
 
 		if (this.getTranslationCache() != null) {
 			this.getTranslationCache().update(translatableTextList);
 		}
 	}
 
-	@SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
-	private String encodeHtml(String s) {
+	private void translate(
+			Format format,
+			TranslationLanguage language,
+			List<? extends TranslatableText> translatableTextList) {
 
-		if (s == null) {
-			return null;
+		List<? extends TranslatableText> formatFiltered = translatableTextList.stream()
+				.filter(text -> text.getFormat() == format)
+				.collect(Collectors.toList());
+
+		if (formatFiltered.isEmpty()) {
+			return;
 		}
 
-		StringBuffer sb = new StringBuffer();
+		String[] source = formatFiltered.stream()
+				.map(node -> {
+					String text = node.getSourceText();
+					return text;
+				})
+				.toArray(String[]::new);
 
-		for (char c : s.toCharArray()) {
-			if (c == '<') {
-				sb.append("&lt;");
-			} else if (c == '>') {
-				sb.append("&gt;");
-			} else if (c == '&') {
-				sb.append("&amp;");
-			} else {
-				sb.append(c);
-			}
+		String[] result = super.translate(format, language, source);
+		for (int i = 0; i < result.length; i++) {
+			TranslatableText node = formatFiltered.get(i);
+			String text = result[i];
+			node.setTargetText(text);
 		}
-		return sb.toString();
-	}
-
-	@SuppressWarnings({
-		"PMD.CyclomaticComplexity",
-		"PMD.AvoidLiteralsInIfCondition"
-	})
-	private String decodeHtml(String s) {
-
-		if (s == null) {
-			return null;
-		}
-
-		StringBuffer sb = new StringBuffer();
-		StringBuffer eb = new StringBuffer();
-
-		for (char c : s.toCharArray()) {
-			if (c == '&') {
-				eb.setLength(0);
-				eb.append(c);
-			} else if (c == ';' && eb.length() > 0) {
-				String entity = eb.toString();
-				if ("&lt;".equals(entity)) {
-					sb.append('<');
-				} else if ("&gt;".equals(entity)) {
-					sb.append('>');
-				} else if ("&amp;".equals(entity)) {
-					sb.append('&');
-				} else {
-					sb.append(entity);
-				}
-				eb.setLength(0);
-			} else if (eb.length() > 0 && Character.isLetter(c)) {
-				eb.append(c);
-			} else {
-				eb.setLength(0);
-				sb.append(c);
-			}
-		}
-		return sb.toString();
 	}
 
 	private TranslationCache getTranslationCache() {

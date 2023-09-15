@@ -68,9 +68,13 @@ class LibreTranslateTranslationProviderIntegrationTest {
 				.target("en")
 				.build();
 
-		String[] res = translator.translate(translationLanguage, new String[] {
-				"Hallo", "Welt"
-		});
+		String[] res = translator.translate(
+				Format.TEXT,
+				translationLanguage,
+				new String[] {
+						"Hallo", "Welt"
+				}
+		);
 
 		System.out.println(Arrays.toString(res));
 
@@ -130,7 +134,7 @@ class LibreTranslateTranslationProviderIntegrationTest {
 
 		System.out.print("as string (" + bytes + " bytes) ... ");
 		start = System.currentTimeMillis();
-		res = translator.translate(translationLanguage, values);
+		res = translator.translate(Format.TEXT, translationLanguage, values);
 		duration = (System.currentTimeMillis() - start) / 1000;
 		System.out.println(duration + " seconds");
 

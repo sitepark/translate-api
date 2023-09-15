@@ -1,7 +1,6 @@
 package com.sitepark.translate;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 public enum SupportedProvider {
 

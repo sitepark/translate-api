@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
+import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
@@ -19,7 +20,12 @@ class StringTranslatorTest {
 	void test() throws Exception {
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(), any())).thenReturn(new String[] {"Hello"});
+		when(transporter.translate(
+				any(Format.class),
+				any(TranslationLanguage.class),
+				any(String[].class)
+		))
+		.thenReturn(new String[] {"Hello"});
 
 		TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
 		when(transporterFactory.create(any())).thenReturn(transporter);
@@ -38,7 +44,10 @@ class StringTranslatorTest {
 				.target("en")
 				.build();
 
-		String result = translator.translate(language, "Hallo");
+		String result = translator.translate(
+				Format.TEXT,
+				language,
+				"Hallo");
 
 		assertEquals("Hello", result, "wrong translation");
 	}
