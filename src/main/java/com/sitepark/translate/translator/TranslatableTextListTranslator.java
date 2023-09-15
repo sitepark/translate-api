@@ -68,6 +68,7 @@ public final class TranslatableTextListTranslator extends Translator {
 	/**
 	 * @return all untranslated texts
 	 */
+	@SuppressWarnings("PMD.CyclomaticComplexity")
 	private List<? extends TranslatableText> translateWithCacheIfPossible(
 			List<? extends TranslatableText> translatableTextList) {
 
