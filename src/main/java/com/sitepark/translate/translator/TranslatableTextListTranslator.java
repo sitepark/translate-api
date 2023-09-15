@@ -81,7 +81,19 @@ public final class TranslatableTextListTranslator extends Translator {
 			Optional<String> translatedText =
 					this.getTranslationCache().translate(text.getSourceText());
 			if (translatedText.isPresent()) {
-				text.setTargetText(translatedText.get());
+				String t = translatedText.get();
+				if (text.getFormat() == Format.TEXT && (
+							t.startsWith("&amp ") ||
+							t.endsWith(" &amp") ||
+							t.indexOf(" &amp ") != -1 ||
+							t.startsWith("&amp; ") ||
+							t.endsWith(" &amp;") ||
+							t.indexOf(" &amp; ") != -1)
+				) {
+					untranslated.add(text);
+				} else {
+					text.setTargetText(translatedText.get());
+				}
 			} else {
 				untranslated.add(text);
 			}
