@@ -26,4 +26,15 @@ class TranslatableTextTest {
 		assertEquals(Format.HTML, text.getFormat(), "format should be html");
 	}
 
+	@Test
+	void testToHash() {
+		String hash = TranslatableText.toHash(
+				"Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.");
+		assertEquals(
+				"06e89dcd3a965b8b6c1267fbe1daf3054424f882747aed7a56ebbb5999f8e165",
+				hash,
+				"unexprected hash");
+	}
+
+
 }
