@@ -68,7 +68,6 @@ public final class TranslatableTextListTranslator extends Translator {
 	/**
 	 * @return all untranslated texts
 	 */
-	@SuppressWarnings("PMD.CyclomaticComplexity")
 	private List<? extends TranslatableText> translateWithCacheIfPossible(
 			List<? extends TranslatableText> translatableTextList) {
 
@@ -82,19 +81,7 @@ public final class TranslatableTextListTranslator extends Translator {
 			Optional<String> translatedText =
 					this.getTranslationCache().translate(text.getSourceText());
 			if (translatedText.isPresent()) {
-				String t = translatedText.get();
-				if (text.getFormat() == Format.TEXT && (
-							t.startsWith("&amp ") ||
-							t.endsWith(" &amp") ||
-							t.indexOf(" &amp ") != -1 ||
-							t.startsWith("&amp; ") ||
-							t.endsWith(" &amp;") ||
-							t.indexOf(" &amp; ") != -1)
-				) {
-					untranslated.add(text);
-				} else {
-					text.setTargetText(translatedText.get());
-				}
+				text.setTargetText(translatedText.get());
 			} else {
 				untranslated.add(text);
 			}
