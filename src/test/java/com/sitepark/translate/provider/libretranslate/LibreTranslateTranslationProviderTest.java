@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,9 @@ import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationListener;
+import com.sitepark.translate.provider.deepl.DeeplTranslationProvider;
+import com.sitepark.translate.provider.deepl.LanguageType;
+import com.sitepark.translate.provider.deepl.TransportLanguage;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -33,16 +38,7 @@ class LibreTranslateTranslationProviderTest {
 		TranslationConfiguration config = Mockito.mock(TranslationConfiguration.class);
 		when(config.isEncodePlaceholder()).thenReturn(true);
 
-		LibreTranslateTranslationProvider provider = new LibreTranslateTranslationProvider(config) {
-			@Override
-			protected String[] translationRequest(
-					Format format,
-					TranslationLanguage language,
-					String... source)
-					throws IOException, InterruptedException {
-				return new String[] {"Hello", "World"};
-			}
-		};
+		LibreTranslateTranslationProvider provider = new HelloWorldLibreTranslateTranslationProvider(config);
 
 		TranslationLanguage language = TranslationLanguage.builder()
 				.providerType(SupportedProvider.LIBRE_TRANSLATE)
@@ -71,16 +67,7 @@ class LibreTranslateTranslationProviderTest {
 		when(config.getTranslationListener()).thenReturn(Optional.of(listener));
 		when(config.isEncodePlaceholder()).thenReturn(true);
 
-		LibreTranslateTranslationProvider provider = new LibreTranslateTranslationProvider(config) {
-			@Override
-			protected String[] translationRequest(
-					Format format,
-					TranslationLanguage language,
-					String... source)
-					throws IOException, InterruptedException {
-				return new String[] {"Hello", "World"};
-			}
-		};
+		LibreTranslateTranslationProvider provider = new HelloWorldLibreTranslateTranslationProvider(config);
 
 		TranslationLanguage language = TranslationLanguage.builder()
 				.providerType(SupportedProvider.LIBRE_TRANSLATE)
@@ -108,6 +95,22 @@ class LibreTranslateTranslationProviderTest {
 		@Override
 		public void translated(TranslationEvent event) {
 			this.event = event;
+		}
+	}
+
+	private static final class HelloWorldLibreTranslateTranslationProvider extends LibreTranslateTranslationProvider {
+
+		public HelloWorldLibreTranslateTranslationProvider(TranslationConfiguration translatorConfiguration) {
+			super(translatorConfiguration);
+		}
+
+		@Override
+		protected String[] translationRequest(
+				Format format,
+				TranslationLanguage language,
+				String... source)
+				throws IOException, InterruptedException {
+			return new String[] {"Hello", "World"};
 		}
 	}
 

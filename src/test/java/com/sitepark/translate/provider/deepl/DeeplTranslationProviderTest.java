@@ -37,16 +37,7 @@ class DeeplTranslationProviderTest {
 		TransportResponse response = Mockito.mock(TransportResponse.class);
 		when(response.getTranslations()).thenReturn(new String[] {"Hello", "World"});
 
-		DeeplTranslationProvider provider = new DeeplTranslationProvider(config) {
-			@Override
-			protected String[] translationRequest(
-					Format format,
-					TranslationLanguage language,
-					String... source)
-					throws IOException, InterruptedException {
-				return new String[] {"Hello", "World"};
-			}
-		};
+		DeeplTranslationProvider provider = new HelloWorldDeeplTranslationProvider(config);
 
 		TranslationLanguage language = TranslationLanguage.builder()
 				.providerType(SupportedProvider.DEEPL)
@@ -74,16 +65,7 @@ class DeeplTranslationProviderTest {
 		TransportResponse response = Mockito.mock(TransportResponse.class);
 		when(response.getTranslations()).thenReturn(new String[] {"Hello", "World"});
 
-		DeeplTranslationProvider provider = new DeeplTranslationProvider(config) {
-			@Override
-			protected String[] translationRequest(
-					Format format,
-					TranslationLanguage language,
-					String... source)
-					throws IOException, InterruptedException {
-				return new String[] {"Hello", "World"};
-			}
-		};
+		DeeplTranslationProvider provider = new HelloWorldDeeplTranslationProvider(config);
 
 		TranslationLanguage language = TranslationLanguage.builder()
 				.providerType(SupportedProvider.DEEPL)
@@ -117,17 +99,7 @@ class DeeplTranslationProviderTest {
 		when(en.getLanguage()).thenReturn("en");
 		when(en.getName()).thenReturn("english");
 
-		DeeplTranslationProvider provider = new DeeplTranslationProvider(config) {
-			@Override
-			protected List<TransportLanguage> getLanguages(LanguageType type) {
-				if (type == LanguageType.SOURCE) {
-					return Arrays.asList(de, en);
-				} else if (type == LanguageType.TARGET) {
-					return Arrays.asList(en);
-				}
-				throw new IllegalArgumentException("Unsupported type: '" + type + "'");
-			}
-		};
+		DeeplTranslationProvider provider = new GetLanguagesDeeplTranslationProvider(config);
 
 		SupportedLanguages supportedLanguages = provider.getSupportedLanguages();
 
@@ -148,4 +120,47 @@ class DeeplTranslationProviderTest {
 			this.event = event;
 		}
 	}
+
+	private static final class HelloWorldDeeplTranslationProvider extends DeeplTranslationProvider {
+
+		public HelloWorldDeeplTranslationProvider(TranslationConfiguration translatorConfiguration) {
+			super(translatorConfiguration);
+		}
+
+		@Override
+		protected String[] translationRequest(
+				Format format,
+				TranslationLanguage language,
+				String... source)
+				throws IOException, InterruptedException {
+			return new String[] {"Hello", "World"};
+		}
+	}
+
+	private static final class GetLanguagesDeeplTranslationProvider extends DeeplTranslationProvider {
+
+		public GetLanguagesDeeplTranslationProvider(TranslationConfiguration translatorConfiguration) {
+			super(translatorConfiguration);
+		}
+
+		@Override
+		protected List<TransportLanguage> getLanguages(LanguageType type) {
+
+			TransportLanguage de = Mockito.mock(TransportLanguage.class);
+			when(de.getLanguage()).thenReturn("de");
+			when(de.getName()).thenReturn("deutsch");
+			TransportLanguage en = Mockito.mock(TransportLanguage.class);
+			when(en.getLanguage()).thenReturn("en");
+			when(en.getName()).thenReturn("english");
+
+			if (type == LanguageType.SOURCE) {
+				return Arrays.asList(de, en);
+			} else if (type == LanguageType.TARGET) {
+				return Arrays.asList(en);
+			}
+			throw new IllegalArgumentException("Unsupported type: '" + type + "'");
+		}
+
+	}
+
 }
