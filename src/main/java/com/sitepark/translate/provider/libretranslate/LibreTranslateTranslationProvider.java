@@ -8,9 +8,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.nio.charset.StandardCharsets;
 import java.security.ProviderException;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.translate.Format;
+import com.sitepark.translate.Glossary;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationEvent;
@@ -169,5 +171,24 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 			builder.proxy(this.getProviderConfiguration().getProxy().get());
 		}
 		return builder.build();
+	}
+
+	@Override
+	public Optional<Glossary> getGlossary(String id) {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<String> getGlossaryId(String sourceLanguage, String targetLanguage) {
+		return Optional.empty();
+	}
+
+	@Override
+	public String recreate(Glossary glossar) {
+		throw new UnsupportedOperationException("LibreTranslate not yet support a glossary.");
+	}
+
+	@Override
+	public void removeGlossary(String id) {
 	}
 }

@@ -7,17 +7,22 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.sitepark.translate.Format;
+import com.sitepark.translate.Glossary;
+import com.sitepark.translate.GlossaryEntry;
+import com.sitepark.translate.GlossaryManager;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
+import com.sitepark.translate.TranslationProviderFactory;
 import com.sitepark.translate.translator.TranslatableText;
 import com.sitepark.translate.translator.TranslatableTextListTranslator;
 
@@ -168,6 +173,41 @@ class DeeplTranslationProviderIntegrationTest {
 	}
 
 
+	@Test
+	void testGlossarManagement() throws URISyntaxException, IOException, InterruptedException {
 
+		TranslationConfiguration translatorConfiguration = this.createConfiguration();
+		TranslationProviderFactory factory = new TranslationProviderFactory(translatorConfiguration);
 
+		TranslationProvider provider = factory.create(SupportedProvider.DEEPL);
+
+		GlossaryManager glossarManager = new GlossaryManager(provider);
+
+		Optional<String> id = glossarManager.getGlossaryId("de", "en");
+		System.out.println("exists glossary: " + id.orElse("not found"));
+
+		Glossary glossary = Glossary.builder()
+				.sourceLanguage("de")
+				.targetLanguage("en")
+				.entry(GlossaryEntry.builder()
+						.source("Hallo")
+						.target("Hey")
+						.build()
+				)
+				.entry(GlossaryEntry.builder()
+						.source("Foo")
+						.target("Bar")
+						.build()
+				)
+				.build();
+
+		String newId = glossarManager.recreate(glossary);
+
+		System.out.println("new glossary: " + newId);
+
+		Glossary loaded = glossarManager.getGlossary(newId).get();
+		for (GlossaryEntry entry : loaded.getEntryList()) {
+			System.out.println(entry.getSource() + ", " + entry.getTarget());
+		}
+	}
 }
