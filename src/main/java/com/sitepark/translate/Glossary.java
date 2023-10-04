@@ -77,6 +77,23 @@ public final class Glossary {
 		return Objects.equals(glossar.getEntryList(), this.entryList);
 	}
 
+	@Override
+	public String toString() {
+
+		StringBuilder b = new StringBuilder();
+		b.append("sourceLanguage:");
+		b.append(this.sourceLanguage);
+		b.append(", targetLanguage:");
+		b.append(this.targetLanguage);
+		b.append("\n");
+		for (GlossaryEntry entity : this.entryList) {
+			b.append(entity);
+			b.append("\n");
+		}
+
+		return b.toString();
+	}
+
 	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
 	public final static class Builder {
 

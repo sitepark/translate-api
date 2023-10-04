@@ -57,6 +57,12 @@ public final class GlossaryEntry {
 				Objects.equals(entry.getTarget(), this.target);
 	}
 
+	@Override
+	public String toString() {
+		return this.source + ": " + this.target;
+	}
+
+
 	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
 	public final static class Builder {
 
