@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +39,7 @@ class DeeplTranslationProviderTest {
 	private static final Dispatcher DISPATCHER = new DeeplTranslationProviderTestDispatcher();
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() throws URISyntaxException {
 		this.mockWebServer = new MockWebServer();
 		this.mockWebServer.setDispatcher(DISPATCHER);
 		String baseUrl = this.mockWebServer.url("").toString();
@@ -58,7 +61,7 @@ class DeeplTranslationProviderTest {
 	}
 
 	@AfterEach
-	void tearDown() throws Exception {
+	void tearDown() throws IOException {
 		this.mockWebServer.shutdown();
 	}
 

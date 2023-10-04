@@ -80,15 +80,14 @@ public final class Glossary {
 	@Override
 	public String toString() {
 
-		StringBuilder b = new StringBuilder();
-		b.append("sourceLanguage:");
-		b.append(this.sourceLanguage);
-		b.append(", targetLanguage:");
-		b.append(this.targetLanguage);
-		b.append("\n");
+		StringBuilder b = new StringBuilder(50)
+				.append("sourceLanguage:")
+				.append(this.sourceLanguage)
+				.append(", targetLanguage:")
+				.append(this.targetLanguage)
+				.append('\n');
 		for (GlossaryEntry entity : this.entryList) {
-			b.append(entity);
-			b.append("\n");
+			b.append(entity).append('\n');
 		}
 
 		return b.toString();
