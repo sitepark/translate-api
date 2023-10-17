@@ -2,6 +2,7 @@ package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,6 +31,9 @@ class TranslationFileCacheTest {
 		cache.store();
 
 		String expected = "{\"-972308576\":\"Hello World\"}";
-		assertEquals(expected, Files.readString(file), "unexpected file content");
+		assertEquals(
+				expected,
+				Files.readString(file, StandardCharsets.UTF_8),
+				"unexpected file content");
 	}
 }

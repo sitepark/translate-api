@@ -29,7 +29,7 @@ class JsonResultTest {
 	@Test
 	@SuppressWarnings("PMD.GuardLogStatement")
 	void testNullErrorValue() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			JsonResult.error(400, null);
 		}, "null error not allowed");
 	}
@@ -49,7 +49,7 @@ class JsonResultTest {
 
 	@Test
 	void testNullSuccessValue() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			JsonResult.success(400, null);
 		}, "null error not allowed");
 	}

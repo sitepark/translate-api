@@ -4,9 +4,9 @@ import java.util.Optional;
 
 public interface TranslationProvider {
 	SupportedLanguages getSupportedLanguages();
-	String[] translate(Format format, TranslationLanguage language, final String... sourceText);
+	TranslationResult translate(TranslationRequest req);
 	Optional<Glossary> getGlossary(String id);
-	Optional<String> getGlossaryId(String sourceLanguage, String targetLanguage);
+	Optional<String> getGlossaryId(TranslationLanguage language);
 	String recreate(Glossary glossar);
 	void removeGlossary(String id);
 }

@@ -11,21 +11,29 @@ import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 
 class StringTranslatorTest {
 
 	@Test
 	void test() throws Exception {
 
+		TranslationResult translationResult = TranslationResult.builder()
+				.request(mock(TranslationRequest.class))
+				.text(new String[] {
+						"Hello"
+				})
+				.statistic(TranslationResultStatistic.EMPTY)
+				.build();
+
+
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(
-				any(Format.class),
-				any(TranslationLanguage.class),
-				any(String[].class)
-		))
-		.thenReturn(new String[] {"Hello"});
+		when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
 
 		TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
 		when(transporterFactory.create(any())).thenReturn(transporter);
@@ -39,16 +47,19 @@ class StringTranslatorTest {
 				.build();
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.LIBRE_TRANSLATE)
 				.source("de")
 				.target("en")
 				.build();
 
-		String result = translator.translate(
-				Format.TEXT,
-				language,
-				"Hallo");
+		TranslationParameter parameter = TranslationParameter.builder()
+				.format(Format.TEXT)
+				.language(language)
+				.providerType(SupportedProvider.LIBRE_TRANSLATE)
+				.build();
+
+		String result = translator.translate(parameter, "Hallo");
 
 		assertEquals("Hello", result, "wrong translation");
 	}
 }
+

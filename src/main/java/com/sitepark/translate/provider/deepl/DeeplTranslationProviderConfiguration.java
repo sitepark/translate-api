@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.sitepark.translate.SupportedProvider;
@@ -66,39 +67,45 @@ public final class DeeplTranslationProviderConfiguration implements TranslationP
 		}
 
 		public Builder url(String url) throws URISyntaxException {
-			assert url != null : "url is null";
+			Objects.requireNonNull(url, "url is null");
 			this.uri = new URI(url);
 			return this;
 		}
 
 		public Builder authKey(String authKey) {
-			assert authKey != null : "authKey is null";
+			Objects.requireNonNull(authKey, "authKey is null");
 			this.authKey = authKey;
 			return this;
 		}
 
 		public Builder proxy(ProxySelector proxy) {
-			assert proxy != null : "proxy is null";
+			Objects.requireNonNull(proxy, "proxy is null");
 			this.proxy = proxy;
 			return this;
 		}
 
 		public Builder proxy(InetSocketAddress proxy) {
-			assert proxy != null : "proxy is null";
+			Objects.requireNonNull(proxy, "proxy is null");
 			this.proxy = ProxySelector.of(proxy);
 			return this;
 		}
 
 		public Builder proxy(String host, int port) {
-			assert host != null : "host is null";
-			assert port > 0 : "port <= 0";
+			Objects.requireNonNull(host, "host is null");
+			if (port <= 0) {
+				throw new IllegalArgumentException("port should be greater than 0");
+			}
 			this.proxy = ProxySelector.of(new InetSocketAddress(host, port));
 			return this;
 		}
 
 		public DeeplTranslationProviderConfiguration build() {
-			assert this.uri != null : "uri is null";
-			assert this.authKey != null : "authKey is null";
+			if (this.uri == null) {
+				throw new IllegalStateException("uri not set");
+			}
+			if (this.authKey == null) {
+				throw new IllegalStateException("authKey not set");
+			}
 			return new DeeplTranslationProviderConfiguration(this);
 		}
 	}

@@ -1,5 +1,7 @@
 package com.sitepark.translate.translator;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,9 +24,11 @@ public abstract class TranslatableTextNode extends TranslatableText {
 	}
 
 	public static TranslatableTextNode create(JsonNode parent, Object key, TextNode node) {
-		assert parent != null : "parent is null";
-		assert key != null : "key is null";
-		assert node != null : "node is null";
+
+		Objects.requireNonNull(parent, "parent is null");
+		Objects.requireNonNull(key, "key is null");
+		Objects.requireNonNull(node, "node is null");
+
 		if (parent instanceof ObjectNode && key instanceof String) {
 			return new TranslatableTextNodeInObject((ObjectNode)parent, (String)key, node);
 		} else if (parent instanceof ArrayNode && key instanceof Integer) {

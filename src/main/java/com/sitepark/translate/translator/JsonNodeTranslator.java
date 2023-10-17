@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -22,13 +22,13 @@ public final class JsonNodeTranslator extends Translator {
 		this.copy = builder.copy;
 	}
 
-	public JsonNode translate(TranslationLanguage language, JsonNode json) {
-		List<JsonNode> jsonList = this.translate(language, Arrays.asList(json));
+	public JsonNode translate(TranslationParameter parameter, JsonNode json) {
+		List<JsonNode> jsonList = this.translate(parameter, Arrays.asList(json));
 		return jsonList.get(0);
 	}
 
 	@SuppressFBWarnings({"EI_EXPOSE_REP2", "EI_EXPOSE_REP"})
-	public List<JsonNode> translate(TranslationLanguage language, List<JsonNode> jsonList) {
+	public List<JsonNode> translate(TranslationParameter parameter, List<JsonNode> jsonList) {
 
 		if (this.copy) {
 			this.jsonList = this.deepCopy(jsonList);
@@ -42,7 +42,7 @@ public final class JsonNodeTranslator extends Translator {
 				.translatorConfiguration(this.getTranslatorConfiguration())
 				.build();
 
-		translatableTextListTranslator.translate(language, this.translatableTextNodeList);
+		translatableTextListTranslator.translate(parameter, this.translatableTextNodeList);
 
 		return this.jsonList;
 	}

@@ -13,24 +13,17 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @JsonDeserialize(builder = Glossary.Builder.class)
 public final class Glossary {
 
-	private final String sourceLanguage;
-
-	private final String targetLanguage;
+	private final TranslationLanguage language;
 
 	private final List<GlossaryEntry> entryList;
 
 	private Glossary(Builder builder) {
-		this.sourceLanguage = builder.sourceLanguage;
-		this.targetLanguage = builder.targetLanguage;
+		this.language = builder.language;
 		this.entryList = Collections.unmodifiableList(builder.entryList);
 	}
 
-	public String getSourceLanguage() {
-		return this.sourceLanguage;
-	}
-
-	public String getTargetLanguage() {
-		return this.targetLanguage;
+	public TranslationLanguage getLanguage() {
+		return this.language;
 	}
 
 	@SuppressFBWarnings("EI_EXPOSE_REP")
@@ -49,11 +42,8 @@ public final class Glossary {
 	@Override
 	public int hashCode() {
 		int hashCode = 0;
-		if (this.sourceLanguage != null) {
-			hashCode += this.sourceLanguage.hashCode();
-		}
-		if (this.targetLanguage != null) {
-			hashCode += this.targetLanguage.hashCode();
+		if (this.language != null) {
+			hashCode += this.language.hashCode();
 		}
 		if (this.entryList != null) {
 			hashCode += this.entryList.hashCode();
@@ -68,23 +58,17 @@ public final class Glossary {
 			return false;
 		}
 		Glossary glossar = (Glossary)o;
-		if (!Objects.equals(glossar.getSourceLanguage(), this.sourceLanguage)) {
-			return false;
-		} else if (!Objects.equals(glossar.getTargetLanguage(), this.targetLanguage)) {
-				return false;
-		}
-
-		return Objects.equals(glossar.getEntryList(), this.entryList);
+		return
+				Objects.equals(glossar.getLanguage(), this.language) &&
+				Objects.equals(glossar.getEntryList(), this.entryList);
 	}
 
 	@Override
 	public String toString() {
 
 		StringBuilder b = new StringBuilder(50)
-				.append("sourceLanguage:")
-				.append(this.sourceLanguage)
-				.append(", targetLanguage:")
-				.append(this.targetLanguage)
+				.append("language:")
+				.append(this.language)
 				.append('\n');
 		for (GlossaryEntry entity : this.entryList) {
 			b.append(entity).append('\n');
@@ -96,9 +80,7 @@ public final class Glossary {
 	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
 	public final static class Builder {
 
-		private String sourceLanguage;
-
-		private String targetLanguage;
+		private TranslationLanguage language;
 
 		private final List<GlossaryEntry> entryList = new ArrayList<>();
 
@@ -106,20 +88,18 @@ public final class Glossary {
 		}
 
 		private Builder(Glossary glossar) {
-			this.sourceLanguage = glossar.sourceLanguage;
-			this.targetLanguage = glossar.targetLanguage;
+			this.language = glossar.language;
 			this.entryList.addAll(glossar.entryList);
 		}
 
-		public Builder sourceLanguage(String sourceLanguage) {
-			assert sourceLanguage != null : "sourceLanguage is null";
-			assert !sourceLanguage.isBlank() : "sourceLanguage is blank";
-			this.sourceLanguage = sourceLanguage;
+		public Builder language(TranslationLanguage language) {
+			Objects.requireNonNull(language, "language is null");
+			this.language = language;
 			return this;
 		}
 
 		public Builder entryList(GlossaryEntry... entryList) {
-			assert entryList != null : "entryList is null";
+			Objects.requireNonNull(entryList, "entryList is null");
 			for (GlossaryEntry entry : entryList) {
 				this.entry(entry);
 			}
@@ -127,7 +107,7 @@ public final class Glossary {
 		}
 
 		public Builder entryList(List<GlossaryEntry> entryList) {
-			assert entryList != null : "entryList is null";
+			Objects.requireNonNull(entryList, "entryList is null");
 			for (GlossaryEntry entry : entryList) {
 				this.entry(entry);
 			}
@@ -135,21 +115,15 @@ public final class Glossary {
 		}
 
 		public Builder entry(GlossaryEntry entry) {
-			assert entry != null : "entry is null";
+			Objects.requireNonNull(entry, "entry is null");
 			this.entryList.add(entry);
 			return this;
 		}
 
-		public Builder targetLanguage(String targetLanguage) {
-			assert targetLanguage != null : "targetLanguage is null";
-			assert !targetLanguage.isBlank() : "targetLanguage is blank";
-			this.targetLanguage = targetLanguage;
-			return this;
-		}
-
 		public Glossary build() {
-			assert sourceLanguage != null : "sourceLanguage is null";
-			assert targetLanguage != null : "targetLanguage is null";
+			if (this.language == null) {
+				throw new IllegalStateException("language not set");
+			}
 			return new Glossary(this);
 		}
 	}

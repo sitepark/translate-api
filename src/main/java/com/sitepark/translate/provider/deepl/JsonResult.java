@@ -1,14 +1,16 @@
 package com.sitepark.translate.provider.deepl;
 
+import java.util.Objects;
+
 public final class JsonResult<T, U> {
 
 	public static <T, U> JsonResult<T, U> success(int statusCode, T successValue) {
-		assert successValue != null : "successValue is null";
+		Objects.requireNonNull(successValue, "successValue is null");
 		return new JsonResult<>(statusCode, successValue, null);
 	}
 
 	public static <T, U> JsonResult<T, U> error(int statusCode, U errorValue) {
-		assert errorValue != null : "errorValue is null";
+		Objects.requireNonNull(errorValue, "errorValue is null");
 		return new JsonResult<>(statusCode, null, errorValue);
 	}
 

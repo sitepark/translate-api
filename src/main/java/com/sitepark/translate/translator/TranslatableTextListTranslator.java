@@ -7,7 +7,10 @@ import java.util.stream.Collectors;
 
 import com.sitepark.translate.Format;
 import com.sitepark.translate.TranslationCache;
-import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 
 public final class TranslatableTextListTranslator extends Translator {
 
@@ -15,26 +18,37 @@ public final class TranslatableTextListTranslator extends Translator {
 		super(builder);
 	}
 
-	public void translate(TranslationLanguage language, List<? extends TranslatableText> translatableTextList) {
+	public TranslationResultStatistic translate(
+			TranslationParameter parameter,
+			List<? extends TranslatableText> translatableTextList) {
 
 		List<? extends TranslatableText> untranslated =
 				this.translateWithCacheIfPossible(translatableTextList);
 
 		if (untranslated.isEmpty()) {
-			return;
+			return TranslationResultStatistic.EMPTY;
 		}
 
-		this.translate(Format.HTML, language, untranslated);
-		this.translate(Format.TEXT, language, untranslated);
+		TranslationResultStatistic htmlStatistic = this.translate(
+				Format.HTML,
+				parameter,
+				untranslated);
+
+		TranslationResultStatistic textStatistic = this.translate(
+				Format.TEXT,
+				parameter,
+				untranslated);
 
 		if (this.getTranslationCache() != null) {
 			this.getTranslationCache().update(translatableTextList);
 		}
+
+		return htmlStatistic.add(textStatistic);
 	}
 
-	private void translate(
+	private TranslationResultStatistic translate(
 			Format format,
-			TranslationLanguage language,
+			TranslationParameter parameter,
 			List<? extends TranslatableText> translatableTextList) {
 
 		List<? extends TranslatableText> formatFiltered = translatableTextList.stream()
@@ -42,7 +56,7 @@ public final class TranslatableTextListTranslator extends Translator {
 				.collect(Collectors.toList());
 
 		if (formatFiltered.isEmpty()) {
-			return;
+			return TranslationResultStatistic.EMPTY;
 		}
 
 		String[] source = formatFiltered.stream()
@@ -52,12 +66,23 @@ public final class TranslatableTextListTranslator extends Translator {
 				})
 				.toArray(String[]::new);
 
-		String[] result = super.translate(format, language, source);
-		for (int i = 0; i < result.length; i++) {
+		TranslationParameter parameterWithFormat = parameter.toBuilder()
+				.format(format)
+				.build();
+
+		TranslationRequest req = TranslationRequest.builder()
+				.parameter(parameterWithFormat)
+				.sourceText(source)
+				.build();
+
+		TranslationResult result = super.translate(req);
+		for (int i = 0; i < result.getText().length; i++) {
 			TranslatableText node = formatFiltered.get(i);
-			String text = result[i];
+			String text = result.getText()[i];
 			node.setTargetText(text);
 		}
+
+		return result.getStatistic();
 	}
 
 	private TranslationCache getTranslationCache() {

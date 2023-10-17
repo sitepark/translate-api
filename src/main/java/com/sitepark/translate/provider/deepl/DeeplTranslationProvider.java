@@ -20,10 +20,12 @@ import com.sitepark.translate.GlossaryEntry;
 import com.sitepark.translate.Language;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.TranslationConfiguration;
-import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderException;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 import com.sitepark.translate.translator.UnifiedSourceText;
 import com.sitepark.translate.translator.entity.Decoder;
 import com.sitepark.translate.translator.entity.Encoder;
@@ -40,54 +42,64 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		this.translatorConfiguration = translatorConfiguration;
 	}
 
-	public String[] translate(Format format, TranslationLanguage language, final String... sourceText) {
+	public TranslationResult translate(TranslationRequest req) {
 
-		String[] sourceTextToTranslate = sourceText;
-		if (format == Format.HTML) {
-			sourceTextToTranslate = this.encodePlacerholder(sourceText);
+		String[] sourceTextToTranslate = req.getSourceText();
+		if (req.getParameter().getFormat().isPresent() &&
+				req.getParameter().getFormat().get() == Format.HTML) {
+			sourceTextToTranslate = this.encodePlacerholder(req.getSourceText());
 		}
 
 		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(sourceTextToTranslate);
 
+		TranslationRequest modifiedReq = req.toBuilder()
+				.sourceText(unifiedSourceText.getSourceText())
+				.build();
 		try {
 
 			long start = System.currentTimeMillis();
 
-			String[] translated = translationRequest(format, language, unifiedSourceText.getSourceText());
-
-			this.translatorConfiguration.getTranslationListener().ifPresent(listener -> {
-				listener.translated(TranslationEvent.builder()
-						.translationTime(System.currentTimeMillis() - start)
-						.translationLanguage(language)
-						.chunks(sourceText.length)
-						.sourceBytes(this.byteCount(unifiedSourceText.getSourceText()))
-						.targetBytes(this.byteCount(translated))
-						.build());
-			});
+			String[] translated = translationRequest(modifiedReq);
 
 			String[] decodedTranslation = this.decodePlacerholder(translated);
 
-			return unifiedSourceText.expandTranslation(decodedTranslation);
+			return TranslationResult.builder()
+				.request(req)
+				.text(unifiedSourceText.expandTranslation(decodedTranslation))
+				.statistic(TranslationResultStatistic.builder()
+						.chunks(req.getSourceText().length)
+						.translationTime(System.currentTimeMillis() - start)
+						.sourceBytes(this.byteCount(unifiedSourceText.getSourceText()))
+						.targetBytes(this.byteCount(translated))
+						.build()
+				)
+				.build();
 
 		} catch (InterruptedException | IOException e) {
 			throw new TranslationProviderException(e.getMessage(), e);
 		}
 	}
 
-	protected String[] translationRequest(Format format, TranslationLanguage language, String... source)
+	protected String[] translationRequest(TranslationRequest req)
 			throws IOException, InterruptedException {
 
 		URI uri = this.buildUri("/translate");
 
+		TranslationLanguage language = req.getParameter().getLanguage();
+
 		List<String[]> params = new ArrayList<>();
 		params.add(new String[] {"source_lang", language.getSource()});
 		params.add(new String[] {"target_lang", language.getTarget()});
-		if (format == Format.HTML) {
+		if (req.getParameter().getFormat().isPresent() &&
+				req.getParameter().getFormat().get() == Format.HTML) {
 			params.add(new String[] {"tag_handling", Format.HTML.toString().toLowerCase()});
 		}
-		for (String text : source) {
+		for (String text : req.getSourceText()) {
 			params.add(new String[] {"text", text});
 		}
+		req.getParameter().getGlossaryId().ifPresent(glossarId -> {
+			params.add(new String[] {"glossary_id", glossarId});
+		});
 
 		HttpRequest request = HttpRequest.newBuilder(uri)
 				.header("Authorization", "DeepL-Auth-Key " + this.getProviderConfiguration().getAuthKey())
@@ -230,27 +242,30 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		}
 
 		return Optional.of(Glossary.builder()
-				.sourceLanguage(response.get().sourceLang)
-				.targetLanguage(response.get().targetLang)
+				.language(TranslationLanguage.builder()
+						.source(response.get().sourceLang)
+						.target(response.get().targetLang)
+						.build()
+				)
 				.entryList(this.getGlossaryEntries(id))
 				.build());
 	}
 
 	@Override
-	public Optional<String> getGlossaryId(String sourceLanguage, String targetLanguage) {
-		List<GlossaryResponse> glossaries = this.getGlossaries(sourceLanguage, targetLanguage);
+	public Optional<String> getGlossaryId(TranslationLanguage language) {
+		List<GlossaryResponse> glossaries = this.getGlossaries(language);
 		return glossaries.stream().map(res -> res.glossaryId).findFirst();
 	}
 
-	private List<GlossaryResponse> getGlossaries(String sourceLanguage, String targetLanguage) {
+	private List<GlossaryResponse> getGlossaries(TranslationLanguage language) {
 
 		List<GlossaryResponse> glossaries = new ArrayList<>();
 
 		for (GlossaryResponse glossary : this.getGlossaries()) {
-			if (!glossary.sourceLang.equals(sourceLanguage)) {
+			if (!glossary.sourceLang.equals(language.getSource())) {
 				continue;
 			}
-			if (!glossary.targetLang.equals(targetLanguage)) {
+			if (!glossary.targetLang.equals(language.getTarget())) {
 				continue;
 			}
 			glossaries.add(glossary);
@@ -393,10 +408,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 	@Override
 	public String recreate(Glossary glossary) {
 
-		List<GlossaryResponse> glossaries = this.getGlossaries(
-				glossary.getSourceLanguage(),
-				glossary.getTargetLanguage());
-
+		List<GlossaryResponse> glossaries = this.getGlossaries(glossary.getLanguage());
 
 		for (GlossaryResponse res : glossaries) {
 			this.removeGlossary(res.glossaryId);

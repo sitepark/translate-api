@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class GlossaryResponse {
 	@JsonProperty("glossary_id")
 	public String glossaryId;
+	@JsonProperty("name")
 	public String name;
+	@JsonProperty("ready")
 	public boolean ready;
 	@JsonProperty("source_lang")
 	public String sourceLang;

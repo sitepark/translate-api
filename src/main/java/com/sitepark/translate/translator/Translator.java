@@ -1,11 +1,13 @@
 package com.sitepark.translate.translator;
 
-import com.sitepark.translate.Format;
+import java.util.Objects;
+
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
-import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
 
 public abstract class Translator {
 
@@ -27,13 +29,9 @@ public abstract class Translator {
 		return this.translatorConfiguration.getTranslationProviderFactory();
 	}
 
-	protected String[] translate(Format format, TranslationLanguage language, String... source) {
-		String[] target = this.createTransporter(language.getProviderType())
-				.translate(
-						format,
-						language,
-						source);
-		return target;
+	protected TranslationResult translate(TranslationRequest req) {
+		return this.createTransporter(req.getParameter().getProviderType())
+				.translate(req);
 	}
 
 	public static abstract class Builder<B extends Builder<B>> {
@@ -48,13 +46,13 @@ public abstract class Translator {
 		}
 
 		public B translatorConfiguration(TranslationConfiguration.Builder translatorConfiguration) {
-			assert translatorConfiguration != null : "translatorConfiguration is null";
+			Objects.requireNonNull(translatorConfiguration, "translatorConfiguration is null");
 			this.translatorConfiguration = translatorConfiguration.build();
 			return this.self();
 		}
 
 		public B translatorConfiguration(TranslationConfiguration translatorConfiguration) {
-			assert translatorConfiguration != null : "translatorConfiguration is null";
+			Objects.requireNonNull(translatorConfiguration, "translatorConfiguration is null");
 			this.translatorConfiguration = translatorConfiguration;
 			return this.self();
 		}
@@ -62,5 +60,6 @@ public abstract class Translator {
 		protected abstract B self();
 
 		public abstract Translator build();
+
 	}
 }

@@ -79,25 +79,35 @@ public final class GlossaryEntry {
 		}
 
 		public Builder source(String source) {
-			assert source != null : "source is null";
-			assert !source.isBlank() : "source is blank";
+			Objects.requireNonNull(source, "source is null");
+			this.requireNotBlank(source, "source is blank");
 			this.source = source;
 			return this;
 		}
 
 		public Builder target(String target) {
-			assert target != null : "target is null";
-			assert !target.isBlank() : "target is blank";
+			Objects.requireNonNull(target, "target is null");
+			this.requireNotBlank(target, "target is blank");
 			this.target = target;
 			return this;
 		}
 
 		public GlossaryEntry build() {
 
-			assert source != null : "source is null";
-			assert target != null : "target is null";
+			if (this.source == null) {
+				throw new IllegalStateException("source not set");
+			}
+			if (this.target == null) {
+				throw new IllegalStateException("target not set");
+			}
 
 			return new GlossaryEntry(this);
+		}
+
+		private void requireNotBlank(String s, String message) {
+			if (s.isBlank()) {
+				throw new IllegalArgumentException(message);
+			}
 		}
 	}
 }

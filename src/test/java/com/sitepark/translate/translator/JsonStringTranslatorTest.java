@@ -7,28 +7,33 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
-import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 
 class JsonStringTranslatorTest {
 
 	@Test
 	void test() throws Exception {
 
+		TranslationResult translationResult = TranslationResult.builder()
+				.request(mock(TranslationRequest.class))
+				.text(new String[] {
+						"Heading",
+						"A beautiful text",
+						"Flowers"
+				})
+				.statistic(TranslationResultStatistic.EMPTY)
+				.build();
+
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(
-				any(Format.class),
-				any(TranslationLanguage.class),
-				any(String[].class)))
-		.thenReturn(new String[] {
-				"Heading",
-				"A beautiful text",
-				"Flowers"
-		});
+		when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
 
 		TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
 		when(transporterFactory.create(any())).thenReturn(transporter);
@@ -43,12 +48,17 @@ class JsonStringTranslatorTest {
 				.build();
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.LIBRE_TRANSLATE)
 				.source("de")
 				.target("en")
 				.build();
 
-		String result = translator.translate(language,
+		TranslationParameter parameter = TranslationParameter.builder()
+				.providerType(SupportedProvider.LIBRE_TRANSLATE)
+				.language(language)
+				.build();
+
+		String result = translator.translate(
+				parameter,
 				"{\n"
 				+ "    \"headline\":\"Überschrift\",\n"
 				+ "    \"text\":\"Ein schöner Text\",\n"

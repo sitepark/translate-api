@@ -1,7 +1,6 @@
 package com.sitepark.translate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -100,37 +99,50 @@ public final class Language {
 		}
 
 		public Builder code(String code) {
-			assert code != null : "code is null";
+			Objects.requireNonNull(code, "code is null");
 			this.code = code;
 			return this;
 		}
 
 		public Builder name(String name) {
-			assert name != null : "name is null";
+			Objects.requireNonNull(name, "name is null");
 			this.name = name;
 			return this;
 		}
 
 		@JsonProperty
 		public Builder targets(String... targets) {
-			assert targets != null : "targets is null";
+			Objects.requireNonNull(targets, "targets is null");
 			for (String target : targets) {
-				assert target != null : "target is null";
+				this.target(target);
 			}
-			this.targets.addAll(Arrays.asList(targets));
 			return this;
 		}
 
 		public Builder targets(List<String> targets) {
-			assert targets != null : "targets is null";
-			this.targets.addAll(targets);
+			Objects.requireNonNull(targets, "targets is null");
+			for (String target : targets) {
+				this.target(target);
+			}
+			return this;
+		}
+
+		public Builder target(String target) {
+			Objects.requireNonNull(target, "target is null");
+			this.targets.add(target);
 			return this;
 		}
 
 		public Language build() {
-			assert code != null : "code is null";
-			assert name != null : "name is null";
-			assert !targets.isEmpty() : "no targets set";
+			if (this.code == null) {
+				throw new IllegalStateException("code not set");
+			}
+			if (this.name == null) {
+				throw new IllegalStateException("name not set");
+			}
+			if (targets.isEmpty()) {
+				throw new IllegalStateException("no targets set");
+			}
 			return new Language(this);
 		}
 	}

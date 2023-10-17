@@ -2,7 +2,6 @@ package com.sitepark.translate.provider.deepl;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,11 +16,11 @@ import com.sitepark.translate.GlossaryEntry;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
-import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
-import com.sitepark.translate.TranslationListener;
+import com.sitepark.translate.TranslationParameter;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -34,7 +33,6 @@ class DeeplTranslationProviderTest {
 
 	private MockWebServer mockWebServer;
 	private DeeplTranslationProvider provider;
-	private TranslationListenerDummy listener;
 
 	private static final Dispatcher DISPATCHER = new DeeplTranslationProviderTestDispatcher();
 
@@ -50,11 +48,9 @@ class DeeplTranslationProviderTest {
 				.url(baseUrl)
 				.authKey("test")
 				.build();
-		this.listener = new TranslationListenerDummy();
 
 		TranslationConfiguration config = TranslationConfiguration.builder()
 				.translationProviderConfiguration(providerConfig)
-				.translationListener(this.listener)
 				.build();
 
 		this.provider = new DeeplTranslationProvider(config);
@@ -69,39 +65,26 @@ class DeeplTranslationProviderTest {
 	void testTranslation() {
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
 				.source("de")
 				.target("en")
 				.build();
 
-		String[] translated = this.provider.translate(Format.TEXT, language, new String[] {"Hallo", "Welt"});
+		TranslationRequest req = TranslationRequest.builder()
+				.parameter(TranslationParameter.builder()
+						.format(Format.TEXT)
+						.language(language)
+						.providerType(SupportedProvider.DEEPL)
+						.build()
+				)
+				.sourceText("Hallo", "Welt")
+				.build();
+
+		TranslationResult translated = this.provider.translate(req);
 
 		assertArrayEquals(
 				new String[] {"Hello", "World"},
-				translated,
+				translated.getText(),
 				"unexpected translation");
-	}
-
-	@Test
-	@SuppressFBWarnings("UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR")
-	void testTranslationListener() {
-
-
-		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
-				.source("de")
-				.target("en")
-				.build();
-
-		this.provider.translate(Format.TEXT, language, new String[] {"Hallo", "Welt"});
-
-		assertSame(
-				language,
-				listener.event.getTranslationLanguage(),
-				"unexpected language");
-		assertEquals(2, listener.event.getChunks(), "unexpected chunks");
-		assertEquals(9, listener.event.getSourceBytes(), "unexpected sourceBytes");
-		assertEquals(10, listener.event.getTargetBytes(), "unexpected targetBytes");
 	}
 
 	@Test
@@ -121,7 +104,11 @@ class DeeplTranslationProviderTest {
 
 	@Test
 	void testGetGlossaryId() {
-		String id = this.provider.getGlossaryId("de", "en").get();
+		TranslationLanguage language = TranslationLanguage.builder()
+				.source("de")
+				.target("en")
+				.build();
+		String id = this.provider.getGlossaryId(language).get();
 		assertEquals("ee0c28af-e9cd-4b59-9199-f114ebc0d602", id, "unexpected glossary id");
 	}
 
@@ -131,8 +118,11 @@ class DeeplTranslationProviderTest {
 		Glossary glossary = this.provider.getGlossary("ee0c28af-e9cd-4b59-9199-f114ebc0d602").get();
 
 		Glossary expected = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.entry(GlossaryEntry.builder()
 						.source("Foo")
 						.target("Bar")
@@ -160,8 +150,11 @@ class DeeplTranslationProviderTest {
 	@Test
 	void testRecreateGlossary() throws Exception {
 		Glossary glossary = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.entry(GlossaryEntry.builder()
 						.source("Foo")
 						.target("Bar")
@@ -190,14 +183,5 @@ class DeeplTranslationProviderTest {
 
 		assertEquals("POST", lastRequest.getMethod(), "unexpected request method");
 		assertEquals(expected, lastRequest.getBody().readUtf8(), "unexpected request body");
-	}
-
-
-	private static final class TranslationListenerDummy implements TranslationListener {
-		public TranslationEvent event;
-		@Override
-		public void translated(TranslationEvent event) {
-			this.event = event;
-		}
 	}
 }

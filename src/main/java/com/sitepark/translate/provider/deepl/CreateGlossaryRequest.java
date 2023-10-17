@@ -7,24 +7,32 @@ import com.sitepark.translate.TranslationProviderException;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class CreateGlossaryRequest {
+public final class CreateGlossaryRequest {
 
-	public String name;
+	public final String name;
 	@JsonProperty("source_lang")
-	public String sourceLang;
+	public final String sourceLang;
 	@JsonProperty("target_lang")
-	public String targetLang;
-	public String entries;
+	public final String targetLang;
+	public final String entries;
 	@JsonProperty("entries_format")
-	public String entriesFormat;
+	public final String entriesFormat;
+
+	private CreateGlossaryRequest(
+			String name,
+			String sourceLang,
+			String targetLang,
+			String entries,
+			String entriesFormat) {
+		this.name = name;
+		this.sourceLang = sourceLang;
+		this.targetLang = targetLang;
+		this.entries = entries;
+		this.entriesFormat = entriesFormat;
+	}
 
 	@SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
 	public static CreateGlossaryRequest build(Glossary glossary) {
-
-		CreateGlossaryRequest req = new CreateGlossaryRequest();
-		req.name = glossary.getSourceLanguage() + " - " + glossary.getTargetLanguage();
-		req.sourceLang = glossary.getSourceLanguage();
-		req.targetLang = glossary.getTargetLanguage();
 
 		StringBuilder entries = new StringBuilder();
 		for (GlossaryEntry entry : glossary.getEntryList()) {
@@ -38,10 +46,12 @@ public class CreateGlossaryRequest {
 				.append('\n');
 		}
 
-		req.entries = entries.toString();
-		req.entriesFormat = "tsv";
-
-		return req;
+		return new CreateGlossaryRequest(
+				glossary.getLanguage().toString(),
+				glossary.getLanguage().getSource(),
+				glossary.getLanguage().getTarget(),
+				entries.toString(),
+				"tsv");
 	}
 
 	private static void validateEntry(GlossaryEntry entry) {

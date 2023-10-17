@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import com.sitepark.translate.Language;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -158,12 +160,16 @@ public final class JsonFileListTranslator extends Translator {
 				.build();
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(provider)
 				.source(this.sourceLang)
 				.target(targetLang)
 				.build();
 
-		translator.translate(language, this.translatableTextNodeList);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.providerType(provider)
+				.language(language)
+				.build();
+
+		translator.translate(parameter, this.translatableTextNodeList);
 
 		try {
 			cache.store();
@@ -175,6 +181,11 @@ public final class JsonFileListTranslator extends Translator {
 	}
 
 	private JsonFile createJsonFile(Path file) {
+
+		if (this.sourceDir == null) {
+			throw new IllegalStateException("sourceDir is not set");
+		}
+
 		Path path = file.subpath(this.sourceDir.getNameCount(), file.getNameCount());
 		JsonNode node = this.parseJson(file);
 		return new JsonFile(path, node);
@@ -237,37 +248,37 @@ public final class JsonFileListTranslator extends Translator {
 		private Builder() { }
 
 		public Builder dir(Path dir) {
-			assert dir != null : "dir is null";
+			Objects.requireNonNull(dir, "dir is null");
 			this.dir = dir.toAbsolutePath();
 			return this;
 		}
 
 		public Builder output(Path output) {
-			assert output != null : "output is null";
+			Objects.requireNonNull(output, "output is null");
 			this.output = output.toAbsolutePath();
 			return this;
 		}
 
 		public Builder sourceLang(String sourceLang) {
-			assert sourceLang != null : "sourceLang is null";
+			Objects.requireNonNull(sourceLang, "sourceLang is null");
 			this.sourceLang = sourceLang;
 			return this;
 		}
 
 		public Builder targetLangList(String... targetLangList) {
-			assert targetLangList != null : "targetLangList is null";
+			Objects.requireNonNull(targetLangList, "targetLangList is null");
 			this.targetLangList.addAll(Arrays.asList(targetLangList));
 			return this;
 		}
 
 		public Builder targetLangList(Set<String> targetLangList) {
-			assert targetLangList != null : "targetLangList is null";
+			Objects.requireNonNull(targetLangList, "targetLangList is null");
 			this.targetLangList.addAll(targetLangList);
 			return this;
 		}
 
 		public Builder logger(Logger logger) {
-			assert logger != null : "logger is null";
+			Objects.requireNonNull(logger, "logger is null");
 			this.logger = logger;
 			return this;
 		}

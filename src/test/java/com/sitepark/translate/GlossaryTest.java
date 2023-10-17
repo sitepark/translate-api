@@ -20,64 +20,31 @@ class GlossaryTest {
 	}
 
 	@Test
-	public void testSetSourceLanguage() {
+	public void testSetLanguage() {
+
 		Glossary glossar = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.build();
-		assertEquals("de", glossar.getSourceLanguage(), "unexpected sourceLanguage");
+
+		TranslationLanguage expected = TranslationLanguage.builder()
+				.source("de")
+				.target("en")
+				.build();
+
+		assertEquals(expected, glossar.getLanguage(), "unexpected language");
 	}
 
 	@Test
 	public void testNullSourceLanguage() {
-		assertThrows(AssertionError.class, () -> {
-			Glossary.builder().sourceLanguage(null);
-		}, "Setting null as sourceLanguage should not be allowed");
+		assertThrows(NullPointerException.class, () -> {
+			Glossary.builder().language(null);
+		}, "Setting null as language should not be allowed");
 	}
 
-	@Test
-	public void testBlankSourceLanguage() {
-		assertThrows(AssertionError.class, () -> {
-			Glossary.builder().sourceLanguage(" ");
-		}, "Setting blank string as sourceLanguage should not be allowed");
-	}
-
-	@Test
-	public void testUnsetSourceLanguage() {
-		assertThrows(AssertionError.class, () -> {
-			Glossary.builder().targetLanguage("en").build();
-		}, "Unset sourceLanguage should not be allowed");
-	}
-
-	@Test
-	public void testSetTargetLanguage() {
-		Glossary glossar = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
-				.build();
-		assertEquals("de", glossar.getSourceLanguage(), "unexpected sourceLanguage");
-	}
-
-	@Test
-	public void testNullTargetLanguage() {
-		assertThrows(AssertionError.class, () -> {
-			Glossary.builder().targetLanguage(null);
-		}, "Setting null as targetLanguage should not be allowed");
-	}
-
-	@Test
-	public void testBlankTargetLanguage() {
-		assertThrows(AssertionError.class, () -> {
-			Glossary.builder().targetLanguage(" ");
-		}, "Setting blank string as targetLanguage should not be allowed");
-	}
-
-	@Test
-	public void testUnsetTargetLanguage() {
-		assertThrows(AssertionError.class, () -> {
-			Glossary.builder().sourceLanguage("de").build();
-		}, "Unset targetLanguage should not be allowed");
-	}
 
 	@Test
 	public void testSetEntry() {
@@ -88,8 +55,11 @@ class GlossaryTest {
 				.build();
 
 		Glossary glossar = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.entry(entry)
 				.build();
 
@@ -107,8 +77,11 @@ class GlossaryTest {
 		};
 
 		Glossary glossar = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.entryList(entryArray)
 				.build();
 
@@ -125,8 +98,11 @@ class GlossaryTest {
 					.build());
 
 		Glossary glossar = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.entryList(entryList)
 				.build();
 
@@ -135,28 +111,28 @@ class GlossaryTest {
 
 	@Test
 	public void testNullEntryList() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Glossary.builder().entryList((List<GlossaryEntry>)null);
 		});
 	}
 
 	@Test
 	public void testNullEntryInList() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Glossary.builder().entryList(Arrays.asList((GlossaryEntry)null));
 		});
 	}
 
 	@Test
 	public void testNullEntryArray() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Glossary.builder().entryList((GlossaryEntry[])null);
 		});
 	}
 
 	@Test
 	public void testNullEntry() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Glossary.builder().entry(null);
 		});
 	}
@@ -165,8 +141,11 @@ class GlossaryTest {
 	public void testToBuilder() {
 
 		Glossary glossary = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.entry(GlossaryEntry.builder()
 						.source("Hallo")
 						.target("Hey")
@@ -176,8 +155,11 @@ class GlossaryTest {
 		Glossary copy = glossary.toBuilder().build();
 
 		Glossary expected = Glossary.builder()
-				.sourceLanguage("de")
-				.targetLanguage("en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
 				.entry(GlossaryEntry.builder()
 						.source("Hallo")
 						.target("Hey")

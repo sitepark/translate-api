@@ -11,13 +11,15 @@ import java.security.ProviderException;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sitepark.translate.Format;
 import com.sitepark.translate.Glossary;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.TranslationConfiguration;
-import com.sitepark.translate.TranslationEvent;
 import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 import com.sitepark.translate.provider.deepl.TransportResponse;
 import com.sitepark.translate.translator.UnifiedSourceText;
 import com.sitepark.translate.translator.entity.Decoder;
@@ -35,9 +37,9 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 		this.translatorConfiguration = translatorConfiguration;
 	}
 
-	public String[] translate(Format format, TranslationLanguage language, final String... sourceText) {
+	public TranslationResult translate(TranslationRequest req) {
 
-		String[] encodedSourceText = this.encodePlacerholder(sourceText);
+		String[] encodedSourceText = this.encodePlacerholder(req.getSourceText());
 
 		UnifiedSourceText unifiedSourceText = new UnifiedSourceText(encodedSourceText);
 
@@ -46,23 +48,22 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 			long start = System.currentTimeMillis();
 
 			String[] translated = this.translationRequest(
-					format,
-					language,
+					req.getParameter(),
 					unifiedSourceText.getSourceText());
-
-			this.translatorConfiguration.getTranslationListener().ifPresent(listener -> {
-				listener.translated(TranslationEvent.builder()
-						.translationTime(System.currentTimeMillis() - start)
-						.translationLanguage(language)
-						.chunks(encodedSourceText.length)
-						.sourceBytes(this.byteCount(unifiedSourceText.getSourceText()))
-						.targetBytes(this.byteCount(translated))
-						.build());
-			});
 
 			String[] decodedTranslation = this.decodePlacerholder(translated);
 
-			return unifiedSourceText.expandTranslation(decodedTranslation);
+			return TranslationResult.builder()
+					.request(req)
+					.text(unifiedSourceText.expandTranslation(decodedTranslation))
+					.statistic(TranslationResultStatistic.builder()
+							.chunks(req.getSourceText().length)
+							.translationTime(System.currentTimeMillis() - start)
+							.sourceBytes(this.byteCount(unifiedSourceText.getSourceText()))
+							.targetBytes(this.byteCount(translated))
+							.build()
+					)
+					.build();
 
 		} catch (InterruptedException | IOException e) {
 			throw new ProviderException(e.getMessage(), e);
@@ -70,17 +71,16 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 	}
 
 	protected String[] translationRequest(
-			Format format,
-			TranslationLanguage language,
+			TranslationParameter parameter,
 			String... source)
 			throws IOException, InterruptedException {
 
 		URI uri = this.buildUri("/translate");
 
 		TransportRequest req = TransportRequest.builder()
-				.source(language.getSource())
-				.target(language.getTarget())
-				.format(format)
+				.source(parameter.getLanguage().getSource())
+				.target(parameter.getLanguage().getTarget())
+				.format(parameter.getFormat().get())
 				.q(source)
 				.build();
 
@@ -179,7 +179,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 	}
 
 	@Override
-	public Optional<String> getGlossaryId(String sourceLanguage, String targetLanguage) {
+	public Optional<String> getGlossaryId(TranslationLanguage language) {
 		return Optional.empty();
 	}
 

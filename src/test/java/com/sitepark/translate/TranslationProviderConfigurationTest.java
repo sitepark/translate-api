@@ -20,8 +20,6 @@ class TranslationProviderConfigurationTest {
 
 		TranslationCache translationCache =
 				Mockito.mock(TranslationCache.class);
-		TranslationListener translationListener =
-				Mockito.mock(TranslationListener.class);
 		TranslationProviderFactory translationProviderFactory =
 				Mockito.mock(TranslationProviderFactory.class);
 		TranslationProviderConfiguration translationProviderConfiguration =
@@ -30,7 +28,6 @@ class TranslationProviderConfigurationTest {
 
 		TranslationConfiguration config = TranslationConfiguration.builder()
 				.translationCache(translationCache)
-				.translationListener(translationListener)
 				.translationProviderConfiguration(translationProviderConfiguration)
 				.translationProviderFactory(translationProviderFactory)
 				.encodePlaceholder(true)
@@ -40,10 +37,6 @@ class TranslationProviderConfigurationTest {
 				translationCache,
 				config.getTranslationCache().get(),
 				"unexpected translationCache");
-		assertSame(
-				translationListener,
-				config.getTranslationListener().get(),
-				"unexpected translationListener");
 		assertSame(
 				translationProviderFactory,
 				config.getTranslationProviderFactory(),
@@ -89,8 +82,6 @@ class TranslationProviderConfigurationTest {
 
 		TranslationCache translationCache =
 				Mockito.mock(TranslationCache.class);
-		TranslationListener translationListener =
-				Mockito.mock(TranslationListener.class);
 		TranslationProviderFactory translationProviderFactory =
 				Mockito.mock(TranslationProviderFactory.class);
 		TranslationProviderConfiguration translationProviderConfiguration =
@@ -99,27 +90,15 @@ class TranslationProviderConfigurationTest {
 
 		TranslationConfiguration config = TranslationConfiguration.builder()
 				.translationCache(translationCache)
-				.translationListener(translationListener)
 				.translationProviderConfiguration(translationProviderConfiguration)
 				.translationProviderFactory(translationProviderFactory)
 				.encodePlaceholder(true)
-				.build();
-
-		TranslationListener translationListener2 =
-				Mockito.mock(TranslationListener.class);
-
-		config = config.toBuilder()
-				.translationListener(translationListener2)
 				.build();
 
 		assertSame(
 				translationCache,
 				config.getTranslationCache().get(),
 				"unexpected translationCache");
-		assertSame(
-				translationListener2,
-				config.getTranslationListener().get(),
-				"unexpected translationListener");
 		assertSame(
 				translationProviderFactory,
 				config.getTranslationProviderFactory(),
@@ -136,28 +115,21 @@ class TranslationProviderConfigurationTest {
 
 	@Test
 	void testSetTranslationCacheToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslationConfiguration.builder().translationCache(null);
 		});
 	}
 
 	@Test
-	void testSetTranslationListenerToNull() {
-		assertThrows(AssertionError.class, () -> {
-			TranslationConfiguration.builder().translationListener(null);
-		});
-	}
-
-	@Test
 	void testSetTranslationProviderFactoryToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslationConfiguration.builder().translationProviderFactory(null);
 		});
 	}
 
 	@Test
 	void testSetTranslationProviderConfigurationToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslationConfiguration.builder().translationProviderConfiguration(null);
 		});
 	}

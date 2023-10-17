@@ -12,27 +12,32 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 
 class JsonNodeTranslatorTest {
 
 	@Test
 	void test() throws Exception {
 
+		TranslationResult result = TranslationResult.builder()
+				.request(mock(TranslationRequest.class))
+				.text(new String[] {
+					"Flowers",
+					"Blue"
+				})
+				.statistic(TranslationResultStatistic.EMPTY)
+				.build();
+
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(
-				any(Format.class),
-				any(TranslationLanguage.class),
-				any(String[].class)))
-		.thenReturn(new String[] {
-				"Flowers",
-				"Blue"
-		});
+		when(transporter.translate(any(TranslationRequest.class))).thenReturn(result);
 
 		TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
 		when(transporterFactory.create(any())).thenReturn(transporter);
@@ -57,12 +62,16 @@ class JsonNodeTranslatorTest {
 				.build();
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.LIBRE_TRANSLATE)
 				.source("de")
 				.target("en")
 				.build();
 
-		JsonNode translation = translator.translate(language, array);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.providerType(SupportedProvider.LIBRE_TRANSLATE)
+				.language(language)
+				.build();
+
+		JsonNode translation = translator.translate(parameter, array);
 
 		assertEquals("Flowers", translation.get(0).get("text").asText(), "wrong translation");
 		assertEquals("Blue", translation.get(1).asText(), "wrong translation");

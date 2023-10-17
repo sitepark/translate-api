@@ -2,7 +2,7 @@ package com.sitepark.translate.translator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 
 public final class JsonStringTranslator extends Translator {
 
@@ -10,7 +10,7 @@ public final class JsonStringTranslator extends Translator {
 		super(builder);
 	}
 
-	public String translate(TranslationLanguage language, String json) {
+	public String translate(TranslationParameter parameter, String json) {
 
 		JsonNode jsonNode = this.parseJson(json);
 
@@ -19,7 +19,7 @@ public final class JsonStringTranslator extends Translator {
 				.copy(false)
 				.build();
 
-		jsonNode = jsonNodeTranslator.translate(language, jsonNode);
+		jsonNode = jsonNodeTranslator.translate(parameter, jsonNode);
 
 		return this.jsonToString(jsonNode);
 	}

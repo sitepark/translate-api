@@ -75,49 +75,49 @@ class DeeplTranslationProviderConfigurationTest {
 
 	@Test
 	void testSetUrlToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder().url(null);
 		});
 	}
 
 	@Test
 	void testSetAuthKeyToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder().authKey(null);
 		});
 	}
 
 	@Test
 	void testSetProxyHostToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder().proxy(null, 8080);
 		});
 	}
 
 	@Test
 	void testSetProxyPortToZero() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder().proxy("test.de", 0);
 		});
 	}
 
 	@Test
 	void testSetProxySelectorToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder().proxy((ProxySelector)null);
 		});
 	}
 
 	@Test
 	void testSetProxyInetSocketAddressToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder().proxy((InetSocketAddress)null);
 		});
 	}
 
 	@Test
 	void testMissingUri() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder()
 					.authKey("abc")
 					.proxy("sitepark.com", 8080)
@@ -127,7 +127,7 @@ class DeeplTranslationProviderConfigurationTest {
 
 	@Test
 	void testMissingAuthKey() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			DeeplTranslationProviderConfiguration.builder()
 					.url("https://test")
 					.proxy("sitepark.com", 8080)

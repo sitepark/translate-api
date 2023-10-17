@@ -1,5 +1,7 @@
 package com.sitepark.translate;
 
+import java.util.Objects;
+
 public final class TranslationEvent {
 
 	private final TranslationLanguage translationLanguage;
@@ -74,7 +76,7 @@ public final class TranslationEvent {
 		private Builder() {}
 
 		public Builder translationLanguage(TranslationLanguage translationLanguage) {
-			assert translationLanguage != null : "translationLanguage is null";
+			Objects.requireNonNull(translationLanguage, "translationLanguage is null");
 			this.translationLanguage = translationLanguage;
 			return this;
 		}
@@ -100,7 +102,9 @@ public final class TranslationEvent {
 		}
 
 		public TranslationEvent build() {
-			assert this.translationLanguage != null : "translationLanguage is null";
+			if (this.translationLanguage == null) {
+				throw new IllegalStateException("translationLanguage is not set");
+			}
 			return new TranslationEvent(this);
 		}
 	}

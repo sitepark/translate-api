@@ -26,21 +26,21 @@ class GlossaryEntryTest {
 
 	@Test
 	public void testNullSource() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			GlossaryEntry.builder().source(null);
 		}, "Setting null as source should not be allowed");
 	}
 
 	@Test
 	public void testBlankSource() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			GlossaryEntry.builder().source(" ");
 		}, "Setting blank string as source should not be allowed");
 	}
 
 	@Test
 	public void testUnsetSource() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			GlossaryEntry.builder().target("en").build();
 		}, "Unset source should not be allowed");
 	}
@@ -56,21 +56,21 @@ class GlossaryEntryTest {
 
 	@Test
 	public void testNullTarget() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			GlossaryEntry.builder().target(null);
 		}, "Setting null as target should not be allowed");
 	}
 
 	@Test
 	public void testBlankTarget() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			GlossaryEntry.builder().target(" ");
 		}, "Setting blank string as target should not be allowed");
 	}
 
 	@Test
 	public void testUnsetTarget() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			GlossaryEntry.builder().source("de").build();
 		}, "Unset source should not be allowed");
 	}
