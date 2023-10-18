@@ -228,10 +228,9 @@ The translations are stored in this structure
 output/
 ├─ de.translated/
 	├─ en/
-			├─ a.json
-			├─ b/
-				├─ c.json
-
+		├─ a.json
+		├─ b/
+			|- c.json
 ```
 
 ### Caching
