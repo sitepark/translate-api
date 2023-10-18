@@ -2,8 +2,11 @@ package com.sitepark.translate.provider.deepl;
 
 import java.util.Arrays;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TransportResponse {
 
+	@JsonProperty
 	private TransportTranslation[] translations;
 
 	public String[] getTranslations() {

@@ -2,7 +2,6 @@ package com.sitepark.translate.translator;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -13,14 +12,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.sitepark.translate.Format;
 
 class TranslatableTextNodeTest {
 
 	@Test
 	void testCreateWithNullParent() {
 		TextNode textNode = Mockito.mock(TextNode.class);
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslatableTextNode.create(null, "key", textNode);
 		});
 	}
@@ -29,7 +27,7 @@ class TranslatableTextNodeTest {
 	void testCreateWithNullKey() {
 		JsonNode jsonNode = Mockito.mock(JsonNode.class);
 		TextNode textNode = Mockito.mock(TextNode.class);
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslatableTextNode.create(jsonNode, null, textNode);
 		});
 	}
@@ -37,7 +35,7 @@ class TranslatableTextNodeTest {
 	@Test
 	void testCreateWithNullNode() {
 		JsonNode jsonNode = Mockito.mock(JsonNode.class);
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslatableTextNode.create(jsonNode, "key", null);
 		});
 	}

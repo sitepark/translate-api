@@ -31,14 +31,14 @@ class TranslationEventTest {
 
 	@Test
 	void testSetTranslationLanguageToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslationEvent.builder().translationLanguage(null);
 		});
 	}
 
 	@Test
 	void testMissingTranslationLanguage() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			TranslationEvent.builder()
 					.translationTime(123)
 					.chunks(12)

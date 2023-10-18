@@ -90,14 +90,14 @@ class SupportedLanguagesTest {
 
 	@Test
 	void testSetLanguageToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			SupportedLanguages.builder().language((Language)null);
 		});
 	}
 
 	@Test
 	void testSetLanguageBuilderToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			SupportedLanguages.builder().language((Language.Builder)null);
 		});
 	}

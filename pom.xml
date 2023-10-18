@@ -6,7 +6,7 @@
 	<groupId>com.sitepark</groupId>
 	<artifactId>translate-api</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<name>Translate Java API</name>
 	<description>Java API for translating texts across different providers</description>
 	<url>https://github.com/sitepark/translate-api</url>
@@ -40,7 +40,8 @@
 
 	<properties>
 		<junit.version>5.10.0</junit.version>
-		<spotbugs.version>4.7.3</spotbugs.version>
+		<jackson.version>2.15.3</jackson.version>
+		<spotbugs.version>4.8.0</spotbugs.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>
 		<gpg.skip>true</gpg.skip>
@@ -69,7 +70,12 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.15.3</version>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.spotbugs</groupId>
@@ -105,8 +111,19 @@
 			<artifactId>equalsverifier</artifactId>
 			<version>3.15.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>4.11.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -275,7 +292,7 @@
 				<version>3.3.0</version>
 				<configuration>
 					<configLocation>checkstyle.xml</configLocation>
-					<encoding>UTF-8</encoding>
+					<inputEncoding>UTF-8</inputEncoding>
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<linkXRef>false</linkXRef>

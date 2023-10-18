@@ -7,17 +7,25 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.sitepark.translate.Format;
+import com.sitepark.translate.Glossary;
+import com.sitepark.translate.GlossaryEntry;
+import com.sitepark.translate.GlossaryManager;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
+import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
 import com.sitepark.translate.translator.TranslatableText;
 import com.sitepark.translate.translator.TranslatableTextListTranslator;
 
@@ -62,20 +70,24 @@ class DeeplTranslationProviderIntegrationTest {
 		TranslationProvider translator = this.createProvider();
 
 		TranslationLanguage translationLanguage = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
 				.source("de")
 				.target("en")
 				.build();
 
-		String[] res = translator.translate(
-				Format.TEXT,
-				translationLanguage,
-				new String[] {
-						"Hallo", "Welt"
-				}
-		);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.format(Format.TEXT)
+				.language(translationLanguage)
+				.providerType(SupportedProvider.DEEPL)
+				.build();
 
-		assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
+		TranslationRequest req = TranslationRequest.builder()
+				.parameter(parameter)
+				.sourceText("Hallo", "Welt")
+				.build();
+
+		TranslationResult result = translator.translate(req);
+
+		assertArrayEquals(new String[] {"Hello", "World"}, result.getText(), "Unexpected translation");
 	}
 
 	@Test
@@ -88,7 +100,6 @@ class DeeplTranslationProviderIntegrationTest {
 		translatableTextList.add(new TranslatableText("Hallo Welt &amp; &lt;test&gt; \"Universum\"", Format.HTML));
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
 				.source("de")
 				.target("en")
 				.build();
@@ -97,9 +108,12 @@ class DeeplTranslationProviderIntegrationTest {
 				.translatorConfiguration(translatorConfiguration)
 				.build();
 
-		translator.translate(language, translatableTextList);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.language(language)
+				.providerType(SupportedProvider.DEEPL)
+				.build();
 
-		translator.translate(language, translatableTextList);
+		translator.translate(parameter, translatableTextList);
 
 		System.out.println(translatableTextList.get(0).getTargetText());
 		System.out.println(translatableTextList.get(1).getTargetText());
@@ -126,7 +140,6 @@ class DeeplTranslationProviderIntegrationTest {
 				+ "</div>"));
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
 				.source("de")
 				.target("en")
 				.build();
@@ -135,7 +148,12 @@ class DeeplTranslationProviderIntegrationTest {
 				.translatorConfiguration(translatorConfiguration)
 				.build();
 
-		translator.translate(language, translatableTextList);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.language(language)
+				.providerType(SupportedProvider.DEEPL)
+				.build();
+
+		translator.translate(parameter, translatableTextList);
 
 		System.out.println(translatableTextList.get(0).getTargetText());
 
@@ -151,7 +169,6 @@ class DeeplTranslationProviderIntegrationTest {
 		translatableTextList.add(new TranslatableText("Einrichtungen & Beteiligungen"));
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
 				.source("de")
 				.target("en")
 				.build();
@@ -160,7 +177,12 @@ class DeeplTranslationProviderIntegrationTest {
 				.translatorConfiguration(translatorConfiguration)
 				.build();
 
-		translator.translate(language, translatableTextList);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.language(language)
+				.providerType(SupportedProvider.DEEPL)
+				.build();
+
+		translator.translate(parameter, translatableTextList);
 
 		System.out.println(translatableTextList.get(0).getTargetText());
 
@@ -168,6 +190,44 @@ class DeeplTranslationProviderIntegrationTest {
 	}
 
 
+	@Test
+	void testGlossarManagement() throws URISyntaxException, IOException, InterruptedException {
 
+		TranslationConfiguration translatorConfiguration = this.createConfiguration();
+		TranslationProviderFactory factory = new TranslationProviderFactory(translatorConfiguration);
 
+		TranslationProvider provider = factory.create(SupportedProvider.DEEPL);
+
+		GlossaryManager glossarManager = new GlossaryManager(provider);
+
+		Optional<String> id = glossarManager.getGlossaryId("test:de/en");
+		System.out.println("exists glossary: " + id.orElse("not found"));
+
+		Glossary glossary = Glossary.builder()
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
+				.entry(GlossaryEntry.builder()
+						.source("Hallo")
+						.target("Hey")
+						.build()
+				)
+				.entry(GlossaryEntry.builder()
+						.source("Foo")
+						.target("Bar")
+						.build()
+				)
+				.build();
+
+		String newId = glossarManager.recreate(glossary);
+
+		System.out.println("new glossary: " + newId);
+
+		Glossary loaded = glossarManager.getGlossary(newId).get();
+		for (GlossaryEntry entry : loaded.getEntryList()) {
+			System.out.println(entry.getSource() + ", " + entry.getTarget());
+		}
+	}
 }

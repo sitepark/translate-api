@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,14 +17,15 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.sitepark.translate.Format;
 import com.sitepark.translate.Language;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
-import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 
 class JsonFileListTranslatorTest {
 
@@ -44,17 +46,20 @@ class JsonFileListTranslatorTest {
 		dictionary.put("Welt", "World");
 
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(
-				any(Format.class),
-				any(TranslationLanguage.class),
-				any(String[].class))).thenAnswer(invocationOnMock -> {
-			int argsBeforStringArray = 2;
-			Object[] arguments = invocationOnMock.getArguments();
-			String[] translations = new String[arguments.length - argsBeforStringArray];
-			for (int i = 0; i < (arguments.length - argsBeforStringArray); i++) {
-				translations[i] = dictionary.get(arguments[i + argsBeforStringArray].toString());
+		when(transporter.translate(any(TranslationRequest.class))).thenAnswer(invocationOnMock -> {
+
+			TranslationRequest req = (TranslationRequest)invocationOnMock.getArguments()[0];
+			String[] sourceText = req.getSourceText();
+			String[] translations = new String[sourceText.length];
+			for (int i = 0; i < translations.length; i++) {
+				translations[i] = dictionary.get(sourceText[i]);
 			}
-			return translations;
+
+			return TranslationResult.builder()
+					.request(req)
+					.text(translations)
+					.statistic(TranslationResultStatistic.EMPTY)
+					.build();
 		});
 		when(transporter.getSupportedLanguages()).thenReturn(supportedLanguages);
 
@@ -82,13 +87,13 @@ class JsonFileListTranslatorTest {
 		Path resultA = output.resolve("en/a.json");
 		assertEquals("{\n"
 				+ "  \"text\" : \"Hello\"\n"
-				+ "}", Files.readString(resultA),
+				+ "}", Files.readString(resultA, StandardCharsets.UTF_8),
 				"wrong content in en/a.json");
 
 		Path resultC = output.resolve("en/b/c.json");
 		assertEquals("{\n"
 				+ "  \"d\" : \"World\"\n"
-				+ "}", Files.readString(resultC),
+				+ "}", Files.readString(resultC, StandardCharsets.UTF_8),
 				"wrong content in en/b/c.json");
 	}
 

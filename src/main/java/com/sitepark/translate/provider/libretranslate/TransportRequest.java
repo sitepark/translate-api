@@ -1,6 +1,7 @@
 package com.sitepark.translate.provider.libretranslate;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sitepark.translate.Format;
@@ -77,43 +78,51 @@ public final class TransportRequest {
 		}
 
 		public Builder q(String... q) {
-			assert q != null : "q is null";
-			assert q.length > 0 : "q is empty";
+			Objects.requireNonNull(q, "q is null");
+			if (q.length == 0) {
+				throw new IllegalArgumentException("q is empty");
+			}
 			this.q = Arrays.copyOf(q, q.length);
 			for (String item : q) {
-				assert item != null : "q item is null";
+				Objects.requireNonNull(item, "q item is null");
 			}
 			return this;
 		}
 
 		public Builder source(String source) {
-			assert source != null : "source is null";
+			Objects.requireNonNull(source, "source is null");
 			this.source = source;
 			return this;
 		}
 
 		public Builder target(String target) {
-			assert target != null : "target is null";
+			Objects.requireNonNull(target, "target is null");
 			this.target = target;
 			return this;
 		}
 
 		public Builder format(Format format) {
-			assert format != null : "format is null";
+			Objects.requireNonNull(format, "format is null");
 			this.format = format;
 			return this;
 		}
 
 		public Builder apiKey(String apiKey) {
-			assert apiKey != null : "apiKey is null";
+			Objects.requireNonNull(apiKey, "apiKey is null");
 			this.apiKey = apiKey;
 			return this;
 		}
 
 		public TransportRequest build() {
-			assert this.q != null : "q is null";
-			assert this.source != null : "source is null";
-			assert this.target != null : "target is null";
+			if (this.q == null) {
+				throw new IllegalStateException("q is not set");
+			}
+			if (this.source == null) {
+				throw new IllegalStateException("source is not set");
+			}
+			if (this.target == null) {
+				throw new IllegalStateException("target is not set");
+			}
 			return new TransportRequest(this);
 		}
 	}

@@ -64,49 +64,49 @@ class TransportRequestTest {
 
 	@Test
 	void testQSetNullArray() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TransportRequest.builder().q((String[])null);
 		});
 	}
 
 	@Test
 	void testQSetEmptyArray() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			TransportRequest.builder().q(new String[] {});
 		});
 	}
 
 	@Test
 	void testQSetNullString() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TransportRequest.builder().q((String)null);
 		});
 	}
 
 	@Test
 	void testSourceSetNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TransportRequest.builder().source(null);
 		});
 	}
 
 	@Test
 	void testTargetSetNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TransportRequest.builder().target(null);
 		});
 	}
 
 	@Test
 	void testFormatSetNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TransportRequest.builder().format(null);
 		});
 	}
 
 	@Test
 	void testApiKeysSetNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TransportRequest.builder().apiKey(null);
 		});
 	}

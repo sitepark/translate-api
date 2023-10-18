@@ -2,14 +2,13 @@ package com.sitepark.translate;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class TranslationConfiguration {
 
 	private final TranslationCache translationCache;
-
-	private final TranslationListener translationListener;
 
 	private final TranslationProviderFactory translationProviderFactory;
 
@@ -20,7 +19,6 @@ public final class TranslationConfiguration {
 
 	private TranslationConfiguration(Builder builder) {
 		this.translationCache = builder.translationCache;
-		this.translationListener = builder.translationListener;
 		this.translationProviderConfigurations = Collections.unmodifiableMap(
 				builder.translationProviderConfigurations);
 		this.encodePlaceholder = builder.encodePlaceholder;
@@ -33,10 +31,6 @@ public final class TranslationConfiguration {
 
 	public Optional<TranslationCache> getTranslationCache() {
 		return Optional.ofNullable(this.translationCache);
-	}
-
-	public Optional<TranslationListener> getTranslationListener() {
-		return Optional.ofNullable(this.translationListener);
 	}
 
 	public TranslationProviderFactory getTranslationProviderFactory() {
@@ -75,8 +69,6 @@ public final class TranslationConfiguration {
 
 		private TranslationCache translationCache;
 
-		private TranslationListener translationListener;
-
 		private TranslationProviderFactory translationProviderFactory;
 
 		private final Map<Class<? extends TranslationProviderConfiguration>, TranslationProviderConfiguration>
@@ -88,7 +80,6 @@ public final class TranslationConfiguration {
 
 		private Builder(TranslationConfiguration translatorConfiguration) {
 			this.translationCache = translatorConfiguration.translationCache;
-			this.translationListener = translatorConfiguration.translationListener;
 			this.translationProviderFactory = translatorConfiguration.translationProviderFactory;
 			this.translationProviderConfigurations.putAll(
 					translatorConfiguration.translationProviderConfigurations);
@@ -96,26 +87,22 @@ public final class TranslationConfiguration {
 		}
 
 		public Builder translationCache(TranslationCache translationCache) {
-			assert translationCache != null : "translationCache is null";
+			Objects.requireNonNull(translationCache, "translationCache is null");
 			this.translationCache = translationCache;
 			return this;
 		}
 
-		public Builder translationListener(TranslationListener translationListener) {
-			assert translationListener != null : "translationListener is null";
-			this.translationListener = translationListener;
-			return this;
-		}
-
 		public Builder translationProviderFactory(TranslationProviderFactory translatorProviderFactory) {
-			assert translatorProviderFactory != null : "translatorProviderFactory is null";
+			Objects.requireNonNull(translatorProviderFactory, "translatorProviderFactory is null");
 			this.translationProviderFactory = translatorProviderFactory;
 			return this;
 		}
 
 		public Builder translationProviderConfiguration(
 				TranslationProviderConfiguration translationProviderConfiguration) {
-			assert translationProviderConfiguration != null : "translationProviderConfiguration is null";
+			Objects.requireNonNull(
+					translationProviderConfiguration,
+					"translationProviderConfiguration is null");
 			this.translationProviderConfigurations.put(
 					translationProviderConfiguration.getClass(),
 					translationProviderConfiguration);

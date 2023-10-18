@@ -48,10 +48,10 @@ For this purpose a `TranslationLanguage` object is created.
 
 ```java
 TranslationLanguage language = TranslationLanguage.builder()
-                .providerType(SupportedProvider.LIBRE_TRANSLATE)
-                .source("de")
-                .target("en")
-                .build();
+		.providerType(SupportedProvider.LIBRE_TRANSLATE)
+		.source("de")
+		.target("en")
+		.build();
 ```
 
 A configuration must be stored for the specified provider, which can be set via the `TranslatorConfiguration.Builder`.
@@ -59,95 +59,120 @@ A configuration must be stored for the specified provider, which can be set via 
 ```java
 
 LibreTranslateTranslationProviderConfiguration providerConfig =
-        LibreTranslateTranslationProviderConfiguration.builder()
-                .url(...)
-                .apiKey(...)
-                .build();
+		LibreTranslateTranslationProviderConfiguration.builder()
+				.url(...)
+				.apiKey(...)
+				.build();
 
 TranslatorConfiguration translatorConfiguration =
-        TranslatorConfiguration.builder()
-                .translationProviderConfiguration(providerConfig)
-                ...
-                .build();
+		TranslatorConfiguration.builder()
+				.translationProviderConfiguration(providerConfig)
+				...
+				.build();
 ```
 
 ### Translate a singe String/Html
 
 ```java
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-        .providerConfig(...)
-        ...
-        .build();
+		.providerConfig(...)
+		...
+		.build();
 
 StringTranslator translator = StringTranslator.builder()
-        .translatorConfiguration(translatorConfiguration)
-        .build();
+		.translatorConfiguration(translatorConfiguration)
+		.build();
 
 TranslationLanguage language = TranslationLanguage.builder()
-                .providerType(SupportedProvider.LIBRE_TRANSLATE)
-                .source("de")
-                .target("en")
-                .build();
+		.source("de")
+		.target("en")
+		.build();
 
 // translate string
-String result = translator.translate(language, "Hallo");
+TranslationParameter parameterForText = TranslationParameter.builder()
+		.format(Format.TEXT)
+		.language(language)
+		.providerType(SupportedProvider.DEEPL)
+		.build();
+String result = translator.translate(parameterForText, "Hallo");
+
 // translate html
-String htmlResult = translator.translate(language, "<strong>Hallo</strong>");
+TranslationParameter parameterForHtml = TranslationParameter.builder()
+		.format(Format.HTML)
+		.language(language)
+		.providerType(SupportedProvider.DEEPL)
+		.build();
+String htmlResult = translator.translate(parameterForHtml, "<strong>Hallo</strong>");
 ```
 
 ### Translate a String-Array
 
 ```java
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-        .providerConfig(...)
-        ...
-        .build();
+		.providerConfig(...)
+		...
+		.build();
 
 StringArrayTranslator translator = StringArrayTranslator.builder()
-        .translatorConfiguration(translatorConfiguration)
-        .build();
+		.translatorConfiguration(translatorConfiguration)
+		.build();
 
 TranslationLanguage language = TranslationLanguage.builder()
-                .providerType(SupportedProvider.LIBRE_TRANSLATE)
-                .source("de")
-                .target("en")
-                .build();
+		.source("de")
+		.target("en")
+		.build();
 
-String[] result = translator.translate(
-        language,
-        new String[] {"Hallo", "Welt"});
+TranslationParameter parameter = TranslationParameter.builder()
+		.format(Format.TEXT)
+		.language(language)
+		.providerType(SupportedProvider.DEEPL)
+		.build();
+
+String[] result = translator.translate(	parameter, new String[] {"Hallo", "Welt"});
+
+// or
+String[] result = translator.translate(	parameter, "Hallo", "Welt");
 ```
 
 ### Translate a Json-String
 
 ```java
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-        .providerConfig(...)
-        ...
-        .build();
+		.providerConfig(...)
+		...
+		.build();
+
+JsonStringTranslator translator = JsonStringTranslator.builder()
+		.translatorConfiguration(translatorConfiguration)
+		.build();
 
 TranslationLanguage language = TranslationLanguage.builder()
-                .providerType(SupportedProvider.LIBRE_TRANSLATE)
-                .source("de")
-                .target("en")
-                .build();
+		.source("de")
+		.target("en")
+		.build();
+
+TranslationParameter parameter = TranslationParameter.builder()
+		.format(Format.TEXT)
+		.language(language)
+		.providerType(SupportedProvider.DEEPL)
+		.build();
 
 String sourceJson = ...
-String targetJson = translator.translate(language, sourceJson);
+String targetJson = translator.translate(parameter, sourceJson);
 ```
 
 `sourceJson`:
 ```json
 {
-  "headline": "Überschrift",
-  "text": "Ein schöner Text",
-  "items": [
-    {
-      "text": "Blumen",
-      "number": 10,
-      "boolean": true
-    }
-  ]
+	"headline": "Überschrift",
+	"text": "Ein schöner Text",
+	"items": [
+		{
+			"text": "Blumen",
+			"number": 10,
+			"boolean": true
+		}
+	]
 }
 ```
 
@@ -155,15 +180,15 @@ String targetJson = translator.translate(language, sourceJson);
 
 ```json
 {
-  "headline": "Heading",
-  "text": "A beautiful text",
-  "items": [
-    {
-      "text": "Flowers",
-      "number": 10,
-      "boolean": true
-    }
-  ]
+	"headline": "Heading",
+	"text": "A beautiful text",
+	"items": [
+		{
+			"text": "Flowers",
+			"number": 10,
+			"boolean": true
+		}
+	]
 }
 ```
 
@@ -172,41 +197,40 @@ String targetJson = translator.translate(language, sourceJson);
 Is the following directory structure given
 
 ```
-basedir/
-├─ de/
-   ├─ a.json
-   ├─ b/
-      ├─ c.json
+└─ basedir/
+   └─ de/
+      ├─ a.json
+      └─ b/
+         └─ c.json
 ```
 
 The following code translates all json files and puts them in a parallel directory.
 
 ```java
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-        .providerConfig(...)
-        ...
-        .build();
+		.providerConfig(...)
+		...
+		.build();
 
 JsonFileListTranslator jsonFileListTranslator = JsonFileListTranslator.builder()
-        .dir(Paths.get("basedir"))
-        .output(Paths.get("output/de.translated"))
-        .sourceLang("de")
-        .targetLangList("en")
-        .translatorConfiguration(translatorConfiguration)
-        .build();
-        
+		.dir(Paths.get("basedir"))
+		.output(Paths.get("output/de.translated"))
+		.sourceLang("de")
+		.targetLangList("en")
+		.translatorConfiguration(translatorConfiguration)
+		.build();
+
 jsonFileListTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
 ```
 
 The translations are stored in this structure
 ```
 output/
-├─ de.translated/
-   ├─ en/
-      ├─ a.json
-      ├─ b/
-         ├─ c.json
-
+└── de.translated/
+    └── en/
+        ├── a.json
+        └── b/
+            └── c.json
 ```
 
 ### Caching
@@ -217,8 +241,8 @@ For this purpose the `TranslationCache` interface is implemented.
 
 ```java
 public interface TranslationCache {
-        public Optional<String> translate(String sourceText);
-        public void update(List<? extends TranslatableText> translated);
+	public Optional<String> translate(String sourceText);
+	public void update(List<? extends TranslatableText> translated);
 }
 ```
 
@@ -227,51 +251,23 @@ An example here is the `TranslationFileCache` implementation. An example here is
 ```java
 Path output = Paths.get("output/de.translated");
 TranslationFileCache translationCache = new TranslationFileCache(
-        output.resolve(".translation-cache"));
+		output.resolve(".translation-cache"));
 
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-        .providerConfig(...)
-        ...
-        .build();
+		.providerConfig(...)
+		...
+		.build();
 
 JsonFileListTranslator jsonFileListTranslator = JsonFileListTranslator.builder()
-        .dir(Paths.get("basedir"))
-        .output(output)
-        .translationCache(translationCache)
-        .sourceLang("de")
-        .targetLangList("en")
-        .translatorConfiguration(translatorConfiguration)
-        .build();
+		.dir(Paths.get("basedir"))
+		.output(output)
+		.translationCache(translationCache)
+		.sourceLang("de")
+		.targetLangList("en")
+		.translatorConfiguration(translatorConfiguration)
+		.build();
 jsonFileListTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
 ```
-
-### Translation listener
-
-To retrieve information about the translation process, the `TranslationListener` interface can be implemented.
-
-```java
-public interface TranslationListener {
-        void translated(TranslationEvent event);
-}
-```
-
-The listener is set in the `TranslatorConfiguration`.
-
-```java
-TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-        //...
-        .translationListener(...)
-        //...
-        .build();
-```
-
-The information can be queried via the `TranslationEvent` object.
-
-`event.getTranslationLanguage()` - Source and target language of the translation.
-`event.getTranslationTime()` - Time in milliseconds that the translation took.
-`event.getChunks()` - Number of texts passed to libretranslate in an array.
-`event.getSourceBytes()` - Number of bytes that were translated.
-`event.getTargetBytes()` - Number of bytes of the translated text.
 
 ### Protect placeholder `${...}` and `{...}`
 
@@ -281,8 +277,8 @@ With placeholders of the form `${...}` and `{...}` it can be prevented that thes
 
 ```java
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-        //...
-        .encodePlaceholder(true)
-        //...
-        .build();
+		//...
+		.encodePlaceholder(true)
+		//...
+		.build();
 ```

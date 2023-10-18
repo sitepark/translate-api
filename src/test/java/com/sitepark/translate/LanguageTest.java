@@ -81,14 +81,14 @@ class LanguageTest {
 
 	@Test
 	void testSetCodeToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Language.builder().code(null);
 		}, "code null should not allowed");
 	}
 
 	@Test
 	void testMissingCode() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			Language.builder()
 					.name("deutsch")
 					.targets("it")
@@ -98,14 +98,14 @@ class LanguageTest {
 
 	@Test
 	void testSetNameToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Language.builder().name(null);
 		}, "name null should not allowed");
 	}
 
 	@Test
 	void testMissingName() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			Language.builder()
 					.code("de")
 					.targets("it")
@@ -115,28 +115,28 @@ class LanguageTest {
 
 	@Test
 	void testSetTargetsToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Language.builder().targets((String)null);
 		}, "targets null should not allowed");
 	}
 
 	@Test
 	void testSetTargetsArrayToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Language.builder().targets((String[])null);
 		}, "targets null should not allowed");
 	}
 
 	@Test
 	void testSetTargetsListToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Language.builder().targets((List<String>)null);
 		}, "targets null should not allowed");
 	}
 
 	@Test
 	void testMissingTargets() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			Language.builder()
 					.code("de")
 					.name("deutsch")

@@ -79,49 +79,49 @@ class LibreTranslateTranslationProviderConfigurationTest {
 
 	@Test
 	void testSetUrlToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			LibreTranslateTranslationProviderConfiguration.builder().url(null);
 		});
 	}
 
 	@Test
 	void testSetAuthKeyToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			LibreTranslateTranslationProviderConfiguration.builder().apiKey(null);
 		});
 	}
 
 	@Test
 	void testSetProxyHostToNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			LibreTranslateTranslationProviderConfiguration.builder().proxy(null, 8080);
 		});
 	}
 
 	@Test
 	void testSetProxyPortToZero() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			LibreTranslateTranslationProviderConfiguration.builder().proxy("test.de", 0);
 		});
 	}
 
 	@Test
 	void testSetProxySelectorToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			LibreTranslateTranslationProviderConfiguration.builder().proxy((ProxySelector)null);
 		});
 	}
 
 	@Test
 	void testSetProxyInetSocketAddressToNull() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			LibreTranslateTranslationProviderConfiguration.builder().proxy((InetSocketAddress)null);
 		});
 	}
 
 	@Test
 	void testMissingUri() throws URISyntaxException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			LibreTranslateTranslationProviderConfiguration.builder()
 					.apiKey("abc")
 					.proxy("sitepark.com", 8080)

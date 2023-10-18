@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 @SuppressWarnings({
 	"PMD.JUnitTestContainsTooManyAsserts",
 	"PMD.AvoidDuplicateLiterals"
@@ -12,46 +14,32 @@ import org.junit.jupiter.api.Test;
 class TranslationLanguageTest {
 
 	@Test
+	@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+	public void testEqualsContract() {
+		EqualsVerifier.forClass(TranslationLanguage.class).verify();
+	}
+
+	@Test
 	void testBuilder() {
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
 				.source("de_DE")
 				.target("en_US")
 				.build();
-		assertEquals(SupportedProvider.DEEPL, language.getProviderType(), "unexpected provider");
 		assertEquals("de_DE", language.getSource(), "unexpected source");
 		assertEquals("en_US", language.getTarget(), "unexpected target");
 	}
 
 	@Test
-	void testSetNullProvider() {
-		assertThrows(AssertionError.class, () -> {
-			TranslationLanguage.builder().providerType(null);
-		}, "providerType null should not allowed");
-	}
-
-	@Test
-	void testMissingProvider() {
-		assertThrows(AssertionError.class, () -> {
-			TranslationLanguage.builder()
-					.source("de_DE")
-					.target("en_US")
-					.build();
-		}, "providerType null should not allowed");
-	}
-
-	@Test
 	void testSetNullSource() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslationLanguage.builder().source(null);
 		}, "source null should not allowed");
 	}
 
 	@Test
 	void testMissingSource() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			TranslationLanguage.builder()
-					.providerType(SupportedProvider.DEEPL)
 					.target("en_US")
 					.build();
 		}, "source null should not allowed");
@@ -59,16 +47,15 @@ class TranslationLanguageTest {
 
 	@Test
 	void testSetNullTarget() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			TranslationLanguage.builder().target(null);
 		}, "target null should not allowed");
 	}
 
 	@Test
 	void testMissingTarget() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			TranslationLanguage.builder()
-					.providerType(SupportedProvider.DEEPL)
 					.source("de_DE")
 					.build();
 		}, "target null should not allowed");
@@ -77,7 +64,6 @@ class TranslationLanguageTest {
 	@Test
 	void testToBuilder() {
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.DEEPL)
 				.source("de_DE")
 				.target("en_US")
 				.build();
@@ -86,7 +72,6 @@ class TranslationLanguageTest {
 				.source("fr_FR")
 				.build();
 
-		assertEquals(SupportedProvider.DEEPL, language.getProviderType(), "unexpected provider");
 		assertEquals("fr_FR", language.getSource(), "unexpected source");
 		assertEquals("en_US", language.getTarget(), "unexpected target");
 	}

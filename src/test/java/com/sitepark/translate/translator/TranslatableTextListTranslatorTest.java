@@ -11,13 +11,16 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import com.sitepark.translate.Format;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationCache;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationLanguage;
+import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
 
 class TranslatableTextListTranslatorTest {
 
@@ -25,15 +28,18 @@ class TranslatableTextListTranslatorTest {
 	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 	void test() throws Exception {
 
+		TranslationResult translationResult = TranslationResult.builder()
+				.request(mock(TranslationRequest.class))
+				.text(new String[] {
+						"Flowers",
+						"Blue"
+				})
+				.statistic(TranslationResultStatistic.EMPTY)
+				.build();
+
+
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(
-				any(Format.class),
-				any(TranslationLanguage.class),
-				any(String[].class)))
-		.thenReturn(new String[] {
-				"Flowers",
-				"Blue"
-		});
+		when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
 
 		TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
 		when(transporterFactory.create(any())).thenReturn(transporter);
@@ -51,12 +57,16 @@ class TranslatableTextListTranslatorTest {
 				.build();
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.LIBRE_TRANSLATE)
 				.source("de")
 				.target("en")
 				.build();
 
-		translator.translate(language, translatableTextList);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.language(language)
+				.providerType(SupportedProvider.LIBRE_TRANSLATE)
+				.build();
+
+		translator.translate(parameter, translatableTextList);
 
 		assertEquals("Flowers", translatableTextList.get(0).getTargetText(), "unexpected translation");
 		assertEquals("Blue", translatableTextList.get(1).getTargetText(), "unexpected translation");
@@ -65,14 +75,17 @@ class TranslatableTextListTranslatorTest {
 	@Test
 	void testWithCache() throws Exception {
 
+		TranslationResult translationResult = TranslationResult.builder()
+				.request(mock(TranslationRequest.class))
+				.text(new String[] {
+						"Blue"
+				})
+				.statistic(TranslationResultStatistic.EMPTY)
+				.build();
+
+
 		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(
-				any(Format.class),
-				any(TranslationLanguage.class),
-				any(String[].class)))
-		.thenReturn(new String[] {
-				"Blue"
-		});
+		when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
 
 		TranslationCache translationCache = mock(TranslationCache.class);
 		// last match wins
@@ -97,12 +110,16 @@ class TranslatableTextListTranslatorTest {
 				.build();
 
 		TranslationLanguage language = TranslationLanguage.builder()
-				.providerType(SupportedProvider.LIBRE_TRANSLATE)
 				.source("de")
 				.target("en")
 				.build();
 
-		translator.translate(language, translatableTextList);
+		TranslationParameter parameter = TranslationParameter.builder()
+				.language(language)
+				.providerType(SupportedProvider.LIBRE_TRANSLATE)
+				.build();
+
+		translator.translate(parameter, translatableTextList);
 
 		assertEquals("Flowers", translatableTextList.get(0).getTargetText(), "unexpected translation");
 		assertEquals("Blue", translatableTextList.get(1).getTargetText(), "unexpected translation");

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,13 +70,13 @@ public final class SupportedLanguages {
 		}
 
 		public Builder language(Language language) {
-			assert language != null : "language is null";
+			Objects.requireNonNull(language, "language is null");
 			this.languages.put(language.getCode(), language);
 			return this;
 		}
 
 		public Builder language(Language.Builder languageBuilder) {
-			assert languageBuilder != null : "languageBuilder is null";
+			Objects.requireNonNull(languageBuilder, "languageBuilder is null");
 			Language language = languageBuilder.build();
 			this.languages.put(language.getCode(), language);
 			return this;
