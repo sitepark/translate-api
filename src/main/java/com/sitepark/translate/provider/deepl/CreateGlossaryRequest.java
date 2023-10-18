@@ -47,7 +47,7 @@ public final class CreateGlossaryRequest {
 		}
 
 		return new CreateGlossaryRequest(
-				glossary.getLanguage().toString(),
+				glossary.getName(),
 				glossary.getLanguage().getSource(),
 				glossary.getLanguage().getTarget(),
 				entries.toString(),

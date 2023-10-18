@@ -104,11 +104,7 @@ class DeeplTranslationProviderTest {
 
 	@Test
 	void testGetGlossaryId() {
-		TranslationLanguage language = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
-		String id = this.provider.getGlossaryId(language).get();
+		String id = this.provider.getGlossaryId("test:de/en").get();
 		assertEquals("ee0c28af-e9cd-4b59-9199-f114ebc0d602", id, "unexpected glossary id");
 	}
 
@@ -118,6 +114,7 @@ class DeeplTranslationProviderTest {
 		Glossary glossary = this.provider.getGlossary("ee0c28af-e9cd-4b59-9199-f114ebc0d602").get();
 
 		Glossary expected = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -150,6 +147,7 @@ class DeeplTranslationProviderTest {
 	@Test
 	void testRecreateGlossary() throws Exception {
 		Glossary glossary = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -175,7 +173,7 @@ class DeeplTranslationProviderTest {
 			lastRequest = this.mockWebServer.takeRequest();
 		}
 
-		String expected = "{\"name\":\"de - en\"," +
+		String expected = "{\"name\":\"test:de/en\"," +
 				"\"entries\":\"Foo\\tBar\\nHallo\\tHey\\n\"," +
 				"\"source_lang\":\"de\"," +
 				"\"target_lang\":\"en\"," +

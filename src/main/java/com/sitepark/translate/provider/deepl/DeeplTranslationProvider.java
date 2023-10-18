@@ -242,6 +242,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 		}
 
 		return Optional.of(Glossary.builder()
+				.name(response.get().name)
 				.language(TranslationLanguage.builder()
 						.source(response.get().sourceLang)
 						.target(response.get().targetLang)
@@ -252,20 +253,17 @@ public class DeeplTranslationProvider implements TranslationProvider {
 	}
 
 	@Override
-	public Optional<String> getGlossaryId(TranslationLanguage language) {
-		List<GlossaryResponse> glossaries = this.getGlossaries(language);
+	public Optional<String> getGlossaryId(String name) {
+		List<GlossaryResponse> glossaries = this.getGlossaries(name);
 		return glossaries.stream().map(res -> res.glossaryId).findFirst();
 	}
 
-	private List<GlossaryResponse> getGlossaries(TranslationLanguage language) {
+	private List<GlossaryResponse> getGlossaries(String name) {
 
 		List<GlossaryResponse> glossaries = new ArrayList<>();
 
 		for (GlossaryResponse glossary : this.getGlossaries()) {
-			if (!glossary.sourceLang.equals(language.getSource())) {
-				continue;
-			}
-			if (!glossary.targetLang.equals(language.getTarget())) {
+			if (!glossary.name.equals(name)) {
 				continue;
 			}
 			glossaries.add(glossary);
@@ -408,7 +406,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
 	@Override
 	public String recreate(Glossary glossary) {
 
-		List<GlossaryResponse> glossaries = this.getGlossaries(glossary.getLanguage());
+		List<GlossaryResponse> glossaries = this.getGlossaries(glossary.getName());
 
 		for (GlossaryResponse res : glossaries) {
 			this.removeGlossary(res.glossaryId);

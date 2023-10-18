@@ -17,8 +17,8 @@ public class GlossaryManager {
 		return translationProvider.getGlossary(id);
 	}
 
-	public Optional<String> getGlossaryId(TranslationLanguage language) {
-		return translationProvider.getGlossaryId(language);
+	public Optional<String> getGlossaryId(String name) {
+		return translationProvider.getGlossaryId(name);
 	}
 
 	public String recreate(Glossary glossary) {

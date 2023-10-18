@@ -20,9 +20,52 @@ class GlossaryTest {
 	}
 
 	@Test
+	public void testSetName() {
+
+		Glossary glossar = Glossary.builder()
+				.name("test:de/en")
+				.language(TranslationLanguage.builder()
+						.source("de")
+						.target("en")
+						.build()
+				)
+				.build();
+
+		assertEquals("test:de/en", glossar.getName(), "unexpected name");
+	}
+
+	@Test
+	public void testNullName() {
+		assertThrows(NullPointerException.class, () -> {
+			Glossary.builder().name(null);
+		}, "Setting null as name should not be allowed");
+	}
+
+	@Test
+	public void testBlankName() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Glossary.builder().name(" ");
+		}, "Setting blank name should not be allowed");
+	}
+
+	@Test
+	public void testUnsetName() {
+		assertThrows(IllegalStateException.class, () -> {
+			Glossary.builder()
+					.language(TranslationLanguage.builder()
+							.source("de")
+							.target("en")
+							.build()
+					)
+					.build();
+		}, "Missing name must lead to an error");
+	}
+
+	@Test
 	public void testSetLanguage() {
 
 		Glossary glossar = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -45,6 +88,14 @@ class GlossaryTest {
 		}, "Setting null as language should not be allowed");
 	}
 
+	@Test
+	public void testUnsetLanguage() {
+		assertThrows(IllegalStateException.class, () -> {
+			Glossary.builder()
+					.name("test:de/en")
+					.build();
+		}, "Missing language must lead to an error");
+	}
 
 	@Test
 	public void testSetEntry() {
@@ -55,6 +106,7 @@ class GlossaryTest {
 				.build();
 
 		Glossary glossar = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -77,6 +129,7 @@ class GlossaryTest {
 		};
 
 		Glossary glossar = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -98,6 +151,7 @@ class GlossaryTest {
 					.build());
 
 		Glossary glossar = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -141,6 +195,7 @@ class GlossaryTest {
 	public void testToBuilder() {
 
 		Glossary glossary = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -155,6 +210,7 @@ class GlossaryTest {
 		Glossary copy = glossary.toBuilder().build();
 
 		Glossary expected = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")

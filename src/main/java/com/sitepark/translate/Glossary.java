@@ -13,13 +13,20 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @JsonDeserialize(builder = Glossary.Builder.class)
 public final class Glossary {
 
+	private final String name;
+
 	private final TranslationLanguage language;
 
 	private final List<GlossaryEntry> entryList;
 
 	private Glossary(Builder builder) {
+		this.name = builder.name;
 		this.language = builder.language;
 		this.entryList = Collections.unmodifiableList(builder.entryList);
+	}
+
+	public String getName() {
+		return this.name;
 	}
 
 	public TranslationLanguage getLanguage() {
@@ -42,6 +49,9 @@ public final class Glossary {
 	@Override
 	public int hashCode() {
 		int hashCode = 0;
+		if (this.name != null) {
+			hashCode += this.name.hashCode();
+		}
 		if (this.language != null) {
 			hashCode += this.language.hashCode();
 		}
@@ -59,6 +69,7 @@ public final class Glossary {
 		}
 		Glossary glossar = (Glossary)o;
 		return
+				Objects.equals(glossar.getName(), this.name) &&
 				Objects.equals(glossar.getLanguage(), this.language) &&
 				Objects.equals(glossar.getEntryList(), this.entryList);
 	}
@@ -67,6 +78,9 @@ public final class Glossary {
 	public String toString() {
 
 		StringBuilder b = new StringBuilder(50)
+				.append("name:")
+				.append(this.name)
+				.append(", ")
 				.append("language:")
 				.append(this.language)
 				.append('\n');
@@ -80,6 +94,8 @@ public final class Glossary {
 	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
 	public final static class Builder {
 
+		private String name;
+
 		private TranslationLanguage language;
 
 		private final List<GlossaryEntry> entryList = new ArrayList<>();
@@ -88,8 +104,18 @@ public final class Glossary {
 		}
 
 		private Builder(Glossary glossar) {
+			this.name = glossar.name;
 			this.language = glossar.language;
 			this.entryList.addAll(glossar.entryList);
+		}
+
+		public Builder name(String name) {
+			Objects.requireNonNull(name, "name is null");
+			if (name.isBlank()) {
+				throw new IllegalArgumentException("name is blank");
+			}
+			this.name = name;
+			return this;
 		}
 
 		public Builder language(TranslationLanguage language) {
@@ -121,6 +147,9 @@ public final class Glossary {
 		}
 
 		public Glossary build() {
+			if (this.name == null) {
+				throw new IllegalStateException("name not set");
+			}
 			if (this.language == null) {
 				throw new IllegalStateException("language not set");
 			}

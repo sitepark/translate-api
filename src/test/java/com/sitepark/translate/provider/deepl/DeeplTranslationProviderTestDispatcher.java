@@ -33,7 +33,7 @@ public class DeeplTranslationProviderTestDispatcher extends Dispatcher {
 			case "/glossaries":
 				return new MockResponse().setResponseCode(HttpURLConnection.HTTP_OK).setBody("{\"glossaries\": [{\n"
 						+ "  \"glossary_id\": \"ee0c28af-e9cd-4b59-9199-f114ebc0d602\",\n"
-						+ "  \"name\": \"de - en\",\n"
+						+ "  \"name\": \"test:de/en\",\n"
 						+ "  \"ready\": true,\n"
 						+ "  \"source_lang\": \"de\",\n"
 						+ "  \"target_lang\": \"en\",\n"
@@ -43,7 +43,7 @@ public class DeeplTranslationProviderTestDispatcher extends Dispatcher {
 			case "/glossaries/ee0c28af-e9cd-4b59-9199-f114ebc0d602":
 				return new MockResponse().setResponseCode(HttpURLConnection.HTTP_OK).setBody("{\n"
 						+ "  \"glossary_id\": \"ee0c28af-e9cd-4b59-9199-f114ebc0d602\",\n"
-						+ "  \"name\": \"de - en\",\n"
+						+ "  \"name\": \"test:de/en\",\n"
 						+ "  \"ready\": true,\n"
 						+ "  \"source_lang\": \"de\",\n"
 						+ "  \"target_lang\": \"en\",\n"

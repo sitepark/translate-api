@@ -200,12 +200,7 @@ class DeeplTranslationProviderIntegrationTest {
 
 		GlossaryManager glossarManager = new GlossaryManager(provider);
 
-		TranslationLanguage language = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
-
-		Optional<String> id = glossarManager.getGlossaryId(language);
+		Optional<String> id = glossarManager.getGlossaryId("test:de/en");
 		System.out.println("exists glossary: " + id.orElse("not found"));
 
 		Glossary glossary = Glossary.builder()

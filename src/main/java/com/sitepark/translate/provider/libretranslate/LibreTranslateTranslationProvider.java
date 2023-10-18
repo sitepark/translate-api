@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.translate.Glossary;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.TranslationConfiguration;
-import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 import com.sitepark.translate.TranslationRequest;
@@ -179,7 +178,7 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 	}
 
 	@Override
-	public Optional<String> getGlossaryId(TranslationLanguage language) {
+	public Optional<String> getGlossaryId(String name) {
 		return Optional.empty();
 	}
 

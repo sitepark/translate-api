@@ -10,6 +10,7 @@ class GlossaryDifferTest {
 	void test() {
 
 		Glossary a = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
@@ -28,6 +29,7 @@ class GlossaryDifferTest {
 				.build();
 
 		Glossary b = Glossary.builder()
+				.name("test:de/en")
 				.language(TranslationLanguage.builder()
 						.source("de")
 						.target("en")
