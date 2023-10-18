@@ -229,7 +229,7 @@ output/
 └── de.translated/
     └── en/
         ├── a.json
-        ├── b/
+        └── b/
             └── c.json
 ```
 
