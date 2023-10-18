@@ -201,24 +201,24 @@ basedir/
 ├─ de/
 	├─ a.json
 	├─ b/
-			├─ c.json
+		├─ c.json
 ```
 
 The following code translates all json files and puts them in a parallel directory.
 
 ```java
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-				.providerConfig(...)
-				...
-				.build();
+		.providerConfig(...)
+		...
+		.build();
 
 JsonFileListTranslator jsonFileListTranslator = JsonFileListTranslator.builder()
-				.dir(Paths.get("basedir"))
-				.output(Paths.get("output/de.translated"))
-				.sourceLang("de")
-				.targetLangList("en")
-				.translatorConfiguration(translatorConfiguration)
-				.build();
+		.dir(Paths.get("basedir"))
+		.output(Paths.get("output/de.translated"))
+		.sourceLang("de")
+		.targetLangList("en")
+		.translatorConfiguration(translatorConfiguration)
+		.build();
 
 jsonFileListTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
 ```
@@ -242,8 +242,8 @@ For this purpose the `TranslationCache` interface is implemented.
 
 ```java
 public interface TranslationCache {
-				public Optional<String> translate(String sourceText);
-				public void update(List<? extends TranslatableText> translated);
+	public Optional<String> translate(String sourceText);
+	public void update(List<? extends TranslatableText> translated);
 }
 ```
 
@@ -278,8 +278,8 @@ With placeholders of the form `${...}` and `{...}` it can be prevented that thes
 
 ```java
 TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builder()
-				//...
-				.encodePlaceholder(true)
-				//...
-				.build();
+		//...
+		.encodePlaceholder(true)
+		//...
+		.build();
 ```
