@@ -230,7 +230,7 @@ output/
     └── en/
         ├── a.json
         ├── b/
-        └── c.json
+            └── c.json
 ```
 
 ### Caching
