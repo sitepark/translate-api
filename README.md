@@ -197,11 +197,11 @@ String targetJson = translator.translate(parameter, sourceJson);
 Is the following directory structure given
 
 ```
-basedir/
-├─ de/
-	├─ a.json
-	├─ b/
-		├─ c.json
+└─ basedir/
+   └─ de/
+      ├─ a.json
+      └─ b/
+         └─ c.json
 ```
 
 The following code translates all json files and puts them in a parallel directory.
@@ -226,11 +226,11 @@ jsonFileListTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
 The translations are stored in this structure
 ```
 output/
-├─ de.translated/
-	├─ en/
-		├─ a.json
-		├─ b/
-			|- c.json
+└── de.translated/
+    └── en/
+        ├── a.json
+        ├── b/
+        └── c.json
 ```
 
 ### Caching
