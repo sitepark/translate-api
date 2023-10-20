@@ -8,5 +8,5 @@ on:
 
 jobs:
   verify:
-    uses: sitepark-com/github-project-workflow/.github/workflows/maven-verify.yml@main
+    uses: sitepark-com/github-project-workflow/.github/workflows/maven-verify.yml@release/1.x
 
