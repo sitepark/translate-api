@@ -5,12 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationCache;
 import com.sitepark.translate.TranslationConfiguration;
@@ -21,107 +15,103 @@ import com.sitepark.translate.TranslationProviderFactory;
 import com.sitepark.translate.TranslationRequest;
 import com.sitepark.translate.TranslationResult;
 import com.sitepark.translate.TranslationResultStatistic;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
 
 class TranslatableTextListTranslatorTest {
 
-	@Test
-	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
-	void test() throws Exception {
+  @Test
+  @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+  void test() throws Exception {
 
-		TranslationResult translationResult = TranslationResult.builder()
-				.request(mock(TranslationRequest.class))
-				.text(new String[] {
-						"Flowers",
-						"Blue"
-				})
-				.statistic(TranslationResultStatistic.EMPTY)
-				.build();
+    TranslationResult translationResult =
+        TranslationResult.builder()
+            .request(mock(TranslationRequest.class))
+            .text(new String[] {"Flowers", "Blue"})
+            .statistic(TranslationResultStatistic.EMPTY)
+            .build();
 
+    TranslationProvider transporter = mock(TranslationProvider.class);
+    when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
 
-		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
+    TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
+    when(transporterFactory.create(any())).thenReturn(transporter);
 
-		TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
-		when(transporterFactory.create(any())).thenReturn(transporter);
+    TranslationConfiguration translatorConfiguration =
+        TranslationConfiguration.builder().translationProviderFactory(transporterFactory).build();
 
-		TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder()
-				.translationProviderFactory(transporterFactory)
-				.build();
+    List<TranslatableText> translatableTextList = new ArrayList<>();
+    translatableTextList.add(new TranslatableText("Blume"));
+    translatableTextList.add(new TranslatableText("Blau"));
 
-		List<TranslatableText> translatableTextList = new ArrayList<>();
-		translatableTextList.add(new TranslatableText("Blume"));
-		translatableTextList.add(new TranslatableText("Blau"));
+    TranslatableTextListTranslator translator =
+        TranslatableTextListTranslator.builder()
+            .translatorConfiguration(translatorConfiguration)
+            .build();
 
-		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
-				.translatorConfiguration(translatorConfiguration)
-				.build();
+    TranslationLanguage language = TranslationLanguage.builder().source("de").target("en").build();
 
-		TranslationLanguage language = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .language(language)
+            .providerType(SupportedProvider.LIBRE_TRANSLATE)
+            .build();
 
-		TranslationParameter parameter = TranslationParameter.builder()
-				.language(language)
-				.providerType(SupportedProvider.LIBRE_TRANSLATE)
-				.build();
+    translator.translate(parameter, translatableTextList);
 
-		translator.translate(parameter, translatableTextList);
+    assertEquals("Flowers", translatableTextList.get(0).getTargetText(), "unexpected translation");
+    assertEquals("Blue", translatableTextList.get(1).getTargetText(), "unexpected translation");
+  }
 
-		assertEquals("Flowers", translatableTextList.get(0).getTargetText(), "unexpected translation");
-		assertEquals("Blue", translatableTextList.get(1).getTargetText(), "unexpected translation");
-	}
+  @Test
+  void testWithCache() throws Exception {
 
-	@Test
-	void testWithCache() throws Exception {
+    TranslationResult translationResult =
+        TranslationResult.builder()
+            .request(mock(TranslationRequest.class))
+            .text(new String[] {"Blue"})
+            .statistic(TranslationResultStatistic.EMPTY)
+            .build();
 
-		TranslationResult translationResult = TranslationResult.builder()
-				.request(mock(TranslationRequest.class))
-				.text(new String[] {
-						"Blue"
-				})
-				.statistic(TranslationResultStatistic.EMPTY)
-				.build();
+    TranslationProvider transporter = mock(TranslationProvider.class);
+    when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
 
+    TranslationCache translationCache = mock(TranslationCache.class);
+    // last match wins
+    when(translationCache.translate(any())).thenReturn(Optional.empty());
+    when(translationCache.translate("Blume")).thenReturn(Optional.of("Flowers"));
 
-		TranslationProvider transporter = mock(TranslationProvider.class);
-		when(transporter.translate(any(TranslationRequest.class))).thenReturn(translationResult);
+    TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
+    when(transporterFactory.create(any())).thenReturn(transporter);
 
-		TranslationCache translationCache = mock(TranslationCache.class);
-		// last match wins
-		when(translationCache.translate(any())).thenReturn(Optional.empty());
-		when(translationCache.translate("Blume")).thenReturn(Optional.of("Flowers"));
+    TranslationConfiguration translatorConfiguration =
+        TranslationConfiguration.builder()
+            .translationProviderFactory(transporterFactory)
+            .translationCache(translationCache)
+            .build();
 
-		TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
-		when(transporterFactory.create(any())).thenReturn(transporter);
+    List<TranslatableText> translatableTextList = new ArrayList<>();
+    translatableTextList.add(new TranslatableText("Blume"));
+    translatableTextList.add(new TranslatableText("Blau"));
 
-		TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder()
-				.translationProviderFactory(transporterFactory)
-				.translationCache(translationCache)
-				.build();
+    TranslatableTextListTranslator translator =
+        TranslatableTextListTranslator.builder()
+            .translatorConfiguration(translatorConfiguration)
+            .build();
 
+    TranslationLanguage language = TranslationLanguage.builder().source("de").target("en").build();
 
-		List<TranslatableText> translatableTextList = new ArrayList<>();
-		translatableTextList.add(new TranslatableText("Blume"));
-		translatableTextList.add(new TranslatableText("Blau"));
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .language(language)
+            .providerType(SupportedProvider.LIBRE_TRANSLATE)
+            .build();
 
-		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
-				.translatorConfiguration(translatorConfiguration)
-				.build();
+    translator.translate(parameter, translatableTextList);
 
-		TranslationLanguage language = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
-
-		TranslationParameter parameter = TranslationParameter.builder()
-				.language(language)
-				.providerType(SupportedProvider.LIBRE_TRANSLATE)
-				.build();
-
-		translator.translate(parameter, translatableTextList);
-
-		assertEquals("Flowers", translatableTextList.get(0).getTargetText(), "unexpected translation");
-		assertEquals("Blue", translatableTextList.get(1).getTargetText(), "unexpected translation");
-	}
+    assertEquals("Flowers", translatableTextList.get(0).getTargetText(), "unexpected translation");
+    assertEquals("Blue", translatableTextList.get(1).getTargetText(), "unexpected translation");
+  }
 }

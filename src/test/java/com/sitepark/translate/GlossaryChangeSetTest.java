@@ -3,45 +3,36 @@ package com.sitepark.translate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
-
-import org.junit.jupiter.api.Test;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
 
 class GlossaryChangeSetTest {
 
-	@Test
-	@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-	public void testEqualsContract() {
-		EqualsVerifier.forClass(GlossaryChangeSet.class).verify();
-	}
+  @Test
+  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+  public void testEqualsContract() {
+    EqualsVerifier.forClass(GlossaryChangeSet.class).verify();
+  }
 
-	@Test
-	public void testAdded() {
+  @Test
+  public void testAdded() {
 
-		GlossaryChangeSet changeSet = new GlossaryChangeSet();
-		GlossaryEntry entry = GlossaryEntry.builder()
-				.source("Hallo")
-				.target("Hello")
-				.build();
+    GlossaryChangeSet changeSet = new GlossaryChangeSet();
+    GlossaryEntry entry = GlossaryEntry.builder().source("Hallo").target("Hello").build();
 
-		changeSet.added(entry);
+    changeSet.added(entry);
 
-		assertEquals(Arrays.asList(entry), changeSet.getAdded(), "unexpected added list");
-	}
+    assertEquals(Arrays.asList(entry), changeSet.getAdded(), "unexpected added list");
+  }
 
-	@Test
-	public void testDeleted() {
+  @Test
+  public void testDeleted() {
 
-		GlossaryChangeSet changeSet = new GlossaryChangeSet();
-		GlossaryEntry entry = GlossaryEntry.builder()
-				.source("Hallo")
-				.target("Hello")
-				.build();
+    GlossaryChangeSet changeSet = new GlossaryChangeSet();
+    GlossaryEntry entry = GlossaryEntry.builder().source("Hallo").target("Hello").build();
 
-		changeSet.deleted(entry);
+    changeSet.deleted(entry);
 
-		assertEquals(Arrays.asList(entry), changeSet.getDeleted(), "unexpected deleted list");
-	}
-
+    assertEquals(Arrays.asList(entry), changeSet.getDeleted(), "unexpected deleted list");
+  }
 }

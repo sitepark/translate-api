@@ -5,19 +5,19 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 class TranslatableTextNodeInObject extends TranslatableTextNode {
 
-	private final ObjectNode object;
+  private final ObjectNode object;
 
-	private final String key;
+  private final String key;
 
-	public TranslatableTextNodeInObject(ObjectNode object, String key, TextNode node) {
-		super(node);
-		this.object = object;
-		this.key = key;
-	}
+  public TranslatableTextNodeInObject(ObjectNode object, String key, TextNode node) {
+    super(node);
+    this.object = object;
+    this.key = key;
+  }
 
-	@Override
-	public void setTargetText(String text) {
-		this.object.put(this.key, text);
-		super.setTargetText(text);
-	}
+  @Override
+  public void setTargetText(String text) {
+    this.object.put(this.key, text);
+    super.setTargetText(text);
+  }
 }

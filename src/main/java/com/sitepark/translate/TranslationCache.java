@@ -1,9 +1,8 @@
 package com.sitepark.translate;
 
+import com.sitepark.translate.translator.TranslatableText;
 import java.util.List;
 import java.util.Optional;
-
-import com.sitepark.translate.translator.TranslatableText;
 
 /**
  * With the caching implementation you can prevent that already translated
@@ -14,14 +13,14 @@ import com.sitepark.translate.translator.TranslatableText;
  */
 public interface TranslationCache {
 
-	/**
-	 * Returns an non empty optional, if the translation is cached.
-	 */
-	public Optional<String> translate(String sourceText);
+  /**
+   * Returns an non empty optional, if the translation is cached.
+   */
+  public Optional<String> translate(String sourceText);
 
-	/**
-	 * Passes all translated texts of a translation process. Also those that
-	 * were determined via caching.
-	 */
-	public void update(List<? extends TranslatableText> translated);
+  /**
+   * Passes all translated texts of a translation process. Also those that
+   * were determined via caching.
+   */
+  public void update(List<? extends TranslatableText> translated);
 }
