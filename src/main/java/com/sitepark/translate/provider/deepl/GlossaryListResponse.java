@@ -1,10 +1,8 @@
 package com.sitepark.translate.provider.deepl;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class GlossaryListResponse {
-	@JsonProperty
-	public List<GlossaryResponse> glossaries;
+  @JsonProperty public List<GlossaryResponse> glossaries;
 }
