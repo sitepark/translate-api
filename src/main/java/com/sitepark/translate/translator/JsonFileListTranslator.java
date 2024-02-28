@@ -10,8 +10,10 @@ import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -99,8 +101,53 @@ public final class JsonFileListTranslator extends Translator {
               + " seconds.");
       this.write(targetLanguage);
     }
+
+    this.copyToGeneralEn();
+
     long totalDuration = (System.currentTimeMillis() - tt) / 1000;
     this.logger.info("translated in " + totalDuration + " seconds.");
+  }
+
+  private void copyToGeneralEn() {
+    Path enUS = this.getOutputDir("en-us");
+    if (!Files.isDirectory(enUS)) {
+      System.out.println("not found " + enUS);
+      return;
+    }
+
+    Path en = this.getOutputDir("en");
+    System.out.println("copy " + enUS + " -> " + en);
+    this.copy(enUS, "en");
+  }
+
+  private void copy(Path src, String lang) {
+    try {
+      Path dest = this.getOutputDir(lang);
+      Files.walk(src)
+          .forEach(
+              source -> {
+                if (source.equals(src)) {
+                  try {
+                    Files.createDirectories(dest);
+                  } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                  }
+                  return;
+                }
+                int prefixLength = src.toString().length() + 1;
+                Path destination = dest.resolve(source.toString().substring(prefixLength));
+                if (Files.isDirectory(destination)) {
+                  return;
+                }
+                try {
+                  Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                  throw new UncheckedIOException(e);
+                }
+              });
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   private void write(String lang) throws IOException {
