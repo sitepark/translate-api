@@ -78,8 +78,7 @@ public final class Glossary {
         new StringBuilder(50)
             .append("name:")
             .append(this.name)
-            .append(", ")
-            .append("language:")
+            .append(", language:")
             .append(this.language)
             .append('\n');
     for (GlossaryEntry entity : this.entryList) {
