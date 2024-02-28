@@ -3,20 +3,11 @@ package com.sitepark.translate.provider.deepl;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
 import com.sitepark.translate.Format;
 import com.sitepark.translate.Glossary;
 import com.sitepark.translate.GlossaryEntry;
 import com.sitepark.translate.GlossaryManager;
+import com.sitepark.translate.Language;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
@@ -28,206 +19,199 @@ import com.sitepark.translate.TranslationRequest;
 import com.sitepark.translate.TranslationResult;
 import com.sitepark.translate.translator.TranslatableText;
 import com.sitepark.translate.translator.TranslatableTextListTranslator;
-
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("PMD")
 @Tag("IntegrationTest")
 @Disabled
 class DeeplTranslationProviderIntegrationTest {
 
-	private TranslationProvider createProvider() throws IOException, URISyntaxException {
-		return new DeeplTranslationProvider(this.createConfiguration());
-	}
+  private TranslationProvider createProvider() throws IOException, URISyntaxException {
+    return new DeeplTranslationProvider(this.createConfiguration());
+  }
 
-	private TranslationConfiguration createConfiguration() throws IOException, URISyntaxException {
+  private TranslationConfiguration createConfiguration() throws IOException, URISyntaxException {
 
-		DeeplTestConnection con = DeeplTestConnection.get();
+    DeeplTestConnection con = DeeplTestConnection.get();
 
-		DeeplTranslationProviderConfiguration.Builder builder =
-				DeeplTranslationProviderConfiguration.builder()
-				.url(con.getUrl())
-				.authKey(con.getAuthKey());
+    DeeplTranslationProviderConfiguration.Builder builder =
+        DeeplTranslationProviderConfiguration.builder().url(con.getUrl()).authKey(con.getAuthKey());
 
-		return TranslationConfiguration.builder()
-				.translationProviderConfiguration(builder.build())
-				.encodePlaceholder(true)
-				.build();
-	}
+    return TranslationConfiguration.builder()
+        .translationProviderConfiguration(builder.build())
+        .encodePlaceholder(true)
+        .build();
+  }
 
-	@Test
-	void testSupportedLanguages() throws URISyntaxException, IOException, InterruptedException {
+  @Test
+  void testSupportedLanguages() throws URISyntaxException, IOException, InterruptedException {
+    TranslationProvider translator = this.createProvider();
+    SupportedLanguages supportedLanguages = translator.getSupportedLanguages();
+    assertTrue(supportedLanguages.getAll().size() > 0, "supportedLanguages should not be empty");
+    for (Language lang : supportedLanguages.getAll()) {
+      System.out.println(lang.getCode() + " - " + lang.getName());
+    }
+    Locale.availableLocales()
+        .filter(l -> l.getLanguage().equals("ar"))
+        .forEach(System.out::println);
+  }
 
-		TranslationProvider translator = this.createProvider();
+  @Test
+  void testTranslate() throws URISyntaxException, IOException, InterruptedException {
 
-		SupportedLanguages supportedLanguages = translator.getSupportedLanguages();
+    TranslationProvider translator = this.createProvider();
 
-		assertTrue(supportedLanguages.getAll().size() > 0, "supportedLanguages should not be empty");
-	}
+    TranslationLanguage translationLanguage =
+        TranslationLanguage.builder().source("de").target("en").build();
 
-	@Test
-	void testTranslate() throws URISyntaxException, IOException, InterruptedException {
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .format(Format.TEXT)
+            .language(translationLanguage)
+            .providerType(SupportedProvider.DEEPL)
+            .build();
 
-		TranslationProvider translator = this.createProvider();
+    TranslationRequest req =
+        TranslationRequest.builder().parameter(parameter).sourceText("Hallo", "Welt").build();
 
-		TranslationLanguage translationLanguage = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
+    TranslationResult result = translator.translate(req);
 
-		TranslationParameter parameter = TranslationParameter.builder()
-				.format(Format.TEXT)
-				.language(translationLanguage)
-				.providerType(SupportedProvider.DEEPL)
-				.build();
+    assertArrayEquals(new String[] {"Hello", "World"}, result.getText(), "Unexpected translation");
+  }
 
-		TranslationRequest req = TranslationRequest.builder()
-				.parameter(parameter)
-				.sourceText("Hallo", "Welt")
-				.build();
+  @Test
+  void testTranslateHtml() throws URISyntaxException, IOException, InterruptedException {
 
-		TranslationResult result = translator.translate(req);
+    TranslationConfiguration translatorConfiguration = this.createConfiguration();
 
-		assertArrayEquals(new String[] {"Hello", "World"}, result.getText(), "Unexpected translation");
-	}
+    List<TranslatableText> translatableTextList = new ArrayList<>();
+    translatableTextList.add(new TranslatableText("Hallo Welt & <test>  \"Universum\""));
+    translatableTextList.add(
+        new TranslatableText("Hallo Welt &amp; &lt;test&gt; \"Universum\"", Format.HTML));
 
-	@Test
-	void testTranslateHtml() throws URISyntaxException, IOException, InterruptedException {
+    TranslationLanguage language = TranslationLanguage.builder().source("de").target("en").build();
 
-		TranslationConfiguration translatorConfiguration = this.createConfiguration();
+    TranslatableTextListTranslator translator =
+        TranslatableTextListTranslator.builder()
+            .translatorConfiguration(translatorConfiguration)
+            .build();
 
-		List<TranslatableText> translatableTextList = new ArrayList<>();
-		translatableTextList.add(new TranslatableText("Hallo Welt & <test>  \"Universum\""));
-		translatableTextList.add(new TranslatableText("Hallo Welt &amp; &lt;test&gt; \"Universum\"", Format.HTML));
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .language(language)
+            .providerType(SupportedProvider.DEEPL)
+            .build();
 
-		TranslationLanguage language = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
+    translator.translate(parameter, translatableTextList);
 
-		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
-				.translatorConfiguration(translatorConfiguration)
-				.build();
+    System.out.println(translatableTextList.get(0).getTargetText());
+    System.out.println(translatableTextList.get(1).getTargetText());
 
-		TranslationParameter parameter = TranslationParameter.builder()
-				.language(language)
-				.providerType(SupportedProvider.DEEPL)
-				.build();
+    // assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
+  }
 
-		translator.translate(parameter, translatableTextList);
+  @Test
+  void testTranslateHtmlBroken() throws URISyntaxException, IOException, InterruptedException {
 
-		System.out.println(translatableTextList.get(0).getTargetText());
-		System.out.println(translatableTextList.get(1).getTargetText());
+    TranslationConfiguration translatorConfiguration = this.createConfiguration();
 
-		//assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
-	}
+    List<TranslatableText> translatableTextList = new ArrayList<>();
+    translatableTextList.add(
+        new TranslatableText(
+            "<div class=\"SP-LinkList SP-LinkList--compact SP-Util__sectionMarginSmall\">\n"
+                + "<ul class=\"SP-LinkList__list\">\n"
+                + "   <li class=\"SP-LinkList__item\">\n"
+                + "      <a data-variant=\"in-linklist\" href=\"https://www.kunstcaching.de/\" rel=\"noopener\" target=\"_blank\" data-entity-ref=\"1\">www.kunstcaching.de</a>\n"
+                + "   </li>\n"
+                + "   <li class=\"SP-LinkList__item\">\n"
+                + "      <a data-variant=\"in-linklist\" href=\"https://www.pablo-zibes.de\" rel=\"noopener\" target=\"_blank\" data-entity-ref=\"2\">Website von Pablo Zibes</a>\n"
+                + "   </li>\n"
+                + "</ul>\n"
+                + "</div>"));
 
-	@Test
-	void testTranslateHtmlBroken() throws URISyntaxException, IOException, InterruptedException {
+    TranslationLanguage language = TranslationLanguage.builder().source("de").target("en").build();
 
-		TranslationConfiguration translatorConfiguration = this.createConfiguration();
+    TranslatableTextListTranslator translator =
+        TranslatableTextListTranslator.builder()
+            .translatorConfiguration(translatorConfiguration)
+            .build();
 
-		List<TranslatableText> translatableTextList = new ArrayList<>();
-		translatableTextList.add(new TranslatableText(
-				"<div class=\"SP-LinkList SP-LinkList--compact SP-Util__sectionMarginSmall\">\n"
-				+ "<ul class=\"SP-LinkList__list\">\n"
-				+ "   <li class=\"SP-LinkList__item\">\n"
-				+ "      <a data-variant=\"in-linklist\" href=\"https://www.kunstcaching.de/\" rel=\"noopener\" target=\"_blank\" data-entity-ref=\"1\">www.kunstcaching.de</a>\n"
-				+ "   </li>\n"
-				+ "   <li class=\"SP-LinkList__item\">\n"
-				+ "      <a data-variant=\"in-linklist\" href=\"https://www.pablo-zibes.de\" rel=\"noopener\" target=\"_blank\" data-entity-ref=\"2\">Website von Pablo Zibes</a>\n"
-				+ "   </li>\n"
-				+ "</ul>\n"
-				+ "</div>"));
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .language(language)
+            .providerType(SupportedProvider.DEEPL)
+            .build();
 
-		TranslationLanguage language = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
+    translator.translate(parameter, translatableTextList);
 
-		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
-				.translatorConfiguration(translatorConfiguration)
-				.build();
+    System.out.println(translatableTextList.get(0).getTargetText());
 
-		TranslationParameter parameter = TranslationParameter.builder()
-				.language(language)
-				.providerType(SupportedProvider.DEEPL)
-				.build();
+    // assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
+  }
 
-		translator.translate(parameter, translatableTextList);
+  @Test
+  void testTranslateHtmlBrokenAmp() throws URISyntaxException, IOException, InterruptedException {
 
-		System.out.println(translatableTextList.get(0).getTargetText());
+    TranslationConfiguration translatorConfiguration = this.createConfiguration();
 
-		//assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
-	}
+    List<TranslatableText> translatableTextList = new ArrayList<>();
+    translatableTextList.add(new TranslatableText("Einrichtungen & Beteiligungen"));
 
-	@Test
-	void testTranslateHtmlBrokenAmp() throws URISyntaxException, IOException, InterruptedException {
+    TranslationLanguage language = TranslationLanguage.builder().source("de").target("en").build();
 
-		TranslationConfiguration translatorConfiguration = this.createConfiguration();
+    TranslatableTextListTranslator translator =
+        TranslatableTextListTranslator.builder()
+            .translatorConfiguration(translatorConfiguration)
+            .build();
 
-		List<TranslatableText> translatableTextList = new ArrayList<>();
-		translatableTextList.add(new TranslatableText("Einrichtungen & Beteiligungen"));
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .language(language)
+            .providerType(SupportedProvider.DEEPL)
+            .build();
 
-		TranslationLanguage language = TranslationLanguage.builder()
-				.source("de")
-				.target("en")
-				.build();
+    translator.translate(parameter, translatableTextList);
 
-		TranslatableTextListTranslator translator = TranslatableTextListTranslator.builder()
-				.translatorConfiguration(translatorConfiguration)
-				.build();
+    System.out.println(translatableTextList.get(0).getTargetText());
 
-		TranslationParameter parameter = TranslationParameter.builder()
-				.language(language)
-				.providerType(SupportedProvider.DEEPL)
-				.build();
+    // assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
+  }
 
-		translator.translate(parameter, translatableTextList);
+  @Test
+  void testGlossarManagement() throws URISyntaxException, IOException, InterruptedException {
 
-		System.out.println(translatableTextList.get(0).getTargetText());
+    TranslationConfiguration translatorConfiguration = this.createConfiguration();
+    TranslationProviderFactory factory = new TranslationProviderFactory(translatorConfiguration);
 
-		//assertArrayEquals(new String[] {"Hello", "World"}, res, "Unexpected translation");
-	}
+    TranslationProvider provider = factory.create(SupportedProvider.DEEPL);
 
+    GlossaryManager glossarManager = new GlossaryManager(provider);
 
-	@Test
-	void testGlossarManagement() throws URISyntaxException, IOException, InterruptedException {
+    Optional<String> id = glossarManager.getGlossaryId("test:de/en");
+    System.out.println("exists glossary: " + id.orElse("not found"));
 
-		TranslationConfiguration translatorConfiguration = this.createConfiguration();
-		TranslationProviderFactory factory = new TranslationProviderFactory(translatorConfiguration);
+    Glossary glossary =
+        Glossary.builder()
+            .language(TranslationLanguage.builder().source("de").target("en").build())
+            .entry(GlossaryEntry.builder().source("Hallo").target("Hey").build())
+            .entry(GlossaryEntry.builder().source("Foo").target("Bar").build())
+            .build();
 
-		TranslationProvider provider = factory.create(SupportedProvider.DEEPL);
+    String newId = glossarManager.recreate(glossary);
 
-		GlossaryManager glossarManager = new GlossaryManager(provider);
+    System.out.println("new glossary: " + newId);
 
-		Optional<String> id = glossarManager.getGlossaryId("test:de/en");
-		System.out.println("exists glossary: " + id.orElse("not found"));
-
-		Glossary glossary = Glossary.builder()
-				.language(TranslationLanguage.builder()
-						.source("de")
-						.target("en")
-						.build()
-				)
-				.entry(GlossaryEntry.builder()
-						.source("Hallo")
-						.target("Hey")
-						.build()
-				)
-				.entry(GlossaryEntry.builder()
-						.source("Foo")
-						.target("Bar")
-						.build()
-				)
-				.build();
-
-		String newId = glossarManager.recreate(glossary);
-
-		System.out.println("new glossary: " + newId);
-
-		Glossary loaded = glossarManager.getGlossary(newId).get();
-		for (GlossaryEntry entry : loaded.getEntryList()) {
-			System.out.println(entry.getSource() + ", " + entry.getTarget());
-		}
-	}
+    Glossary loaded = glossarManager.getGlossary(newId).get();
+    for (GlossaryEntry entry : loaded.getEntryList()) {
+      System.out.println(entry.getSource() + ", " + entry.getTarget());
+    }
+  }
 }

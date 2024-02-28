@@ -12,6 +12,14 @@ public class TransportLanguage {
 
   private boolean supportsFormality;
 
+  public TransportLanguage() {}
+
+  public TransportLanguage(String language, String name, boolean supportsFormality) {
+    this.language = language;
+    this.name = name;
+    this.supportsFormality = supportsFormality;
+  }
+
   public String getLanguage() {
     return this.language;
   }

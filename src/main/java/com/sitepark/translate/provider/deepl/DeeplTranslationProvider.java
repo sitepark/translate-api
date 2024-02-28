@@ -40,6 +40,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
     this.translatorConfiguration = translatorConfiguration;
   }
 
+  @Override
   public TranslationResult translate(TranslationRequest req) {
 
     String[] sourceTextToTranslate = req.getSourceText();
@@ -171,6 +172,7 @@ public class DeeplTranslationProvider implements TranslationProvider {
     return count;
   }
 
+  @Override
   public SupportedLanguages getSupportedLanguages() {
 
     SupportedLanguages.Builder builder = SupportedLanguages.builder();
@@ -216,7 +218,10 @@ public class DeeplTranslationProvider implements TranslationProvider {
     HttpClient client = this.createHttpClient();
 
     try {
-      return client.send(request, new JsonBodyLanguagesHandler()).body().get();
+      List<TransportLanguage> list =
+          new ArrayList<>(client.send(request, new JsonBodyLanguagesHandler()).body().get());
+      list.add(new TransportLanguage("ar", "Abrabic", false));
+      return list;
     } catch (InterruptedException | IOException e) {
       throw new TranslationProviderException(e.getMessage(), e);
     }
