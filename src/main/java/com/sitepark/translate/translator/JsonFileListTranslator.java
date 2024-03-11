@@ -40,9 +40,9 @@ public final class JsonFileListTranslator extends Translator {
 
   private List<JsonFile> jsonFiles;
 
-  private List<JsonNode> jsonNodes;
-
   private List<TranslatableTextNode> translatableTextNodeList;
+
+  private TranslatableTextNodeCollectorExcludes excludes;
 
   private JsonFileListTranslator(Builder builder) {
     super(builder);
@@ -67,7 +67,7 @@ public final class JsonFileListTranslator extends Translator {
 
     Language sourceLanguage = this.getSourceLanguage(provider);
     this.loadJsonFiles();
-    this.collectJsonNodes();
+    this.loadExcludeFile();
     this.collectTranslatableText();
 
     long tt = System.currentTimeMillis();
@@ -164,13 +164,23 @@ public final class JsonFileListTranslator extends Translator {
     }
   }
 
-  private void collectJsonNodes() {
-    this.jsonNodes = this.jsonFiles.stream().map(json -> json.node).collect(Collectors.toList());
+  private void collectTranslatableText() {
+    this.translatableTextNodeList =
+        this.jsonFiles.stream()
+            .flatMap(
+                json -> {
+                  TranslatableTextNodeCollector collector =
+                      new TranslatableTextNodeCollector(json.key);
+                  return collector.excludes(this.excludes).collect(json.node).stream();
+                })
+            .collect(Collectors.toList());
   }
 
-  private void collectTranslatableText() {
-    TranslatableTextNodeCollector collector = new TranslatableTextNodeCollector();
-    this.translatableTextNodeList = collector.collect(this.jsonNodes);
+  private void loadExcludeFile() throws IOException {
+    Path excludeFile = this.dir.resolve(this.sourceLang + ".excludes");
+    if (Files.exists(excludeFile)) {
+      this.excludes = TranslatableTextNodeCollectorExcludes.of(excludeFile);
+    }
   }
 
   @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")
@@ -262,13 +272,18 @@ public final class JsonFileListTranslator extends Translator {
     void error(String msg, Throwable t);
   }
 
-  private static final class JsonFile {
-    private final Path sourceFile;
-    private final JsonNode node;
+  public static final class JsonFile {
+    public final Path sourceFile;
+    public final JsonNode node;
+    public final String key;
 
     private JsonFile(Path sourceFile, JsonNode node) {
       this.sourceFile = sourceFile;
       this.node = node;
+
+      String path = sourceFile.toString();
+      String fileWithoutSuffix = path.substring(0, path.lastIndexOf('.'));
+      this.key = fileWithoutSuffix.replace('/', '.');
     }
   }
 

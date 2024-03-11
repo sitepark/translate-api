@@ -11,6 +11,23 @@ import java.util.function.Consumer;
 
 public class TranslatableTextNodeCollector {
 
+  private final String key;
+
+  private TranslatableTextNodeCollectorExcludes excludes;
+
+  public TranslatableTextNodeCollector() {
+    this(null);
+  }
+
+  public TranslatableTextNodeCollector excludes(TranslatableTextNodeCollectorExcludes excludes) {
+    this.excludes = excludes;
+    return this;
+  }
+
+  public TranslatableTextNodeCollector(String key) {
+    this.key = key;
+  }
+
   public List<TranslatableTextNode> collect(List<JsonNode> jsonList) {
     List<TranslatableTextNode> translatableTextNodeList = new ArrayList<>();
     for (JsonNode json : jsonList) {
@@ -25,8 +42,20 @@ public class TranslatableTextNodeCollector {
     return translatableTextNodeList;
   }
 
+  public List<TranslatableTextNode> collect(JsonNode json) {
+    List<TranslatableTextNode> translatableTextNodeList = new ArrayList<>();
+    this.filterTextNodes(
+        null,
+        null,
+        json,
+        (node) -> {
+          translatableTextNodeList.add(node);
+        });
+    return translatableTextNodeList;
+  }
+
   private void filterTextNodes(
-      JsonNode parent, Object key, JsonNode node, Consumer<TranslatableTextNode> consumer) {
+      JsonNode parent, Object nodeKey, JsonNode node, Consumer<TranslatableTextNode> consumer) {
     if (node instanceof ObjectNode) {
       node.fields()
           .forEachRemaining(e -> filterTextNodes(node, e.getKey(), e.getValue(), consumer));
@@ -37,9 +66,23 @@ public class TranslatableTextNodeCollector {
         this.filterTextNodes(node, i, it.next(), consumer);
       }
     } else if (node instanceof TextNode) {
+      String absoluteKeys = this.getAbsoluteKey(nodeKey);
+      if (this.excludes != null && this.excludes.contains(absoluteKeys)) {
+        return;
+      }
       TranslatableTextNode updatableTextNode =
-          TranslatableTextNode.create(parent, key, (TextNode) node);
+          TranslatableTextNode.create(parent, nodeKey, (TextNode) node);
       consumer.accept(updatableTextNode);
     }
+  }
+
+  private String getAbsoluteKey(Object nodeKey) {
+    if (nodeKey == null) {
+      return this.key;
+    }
+    if (this.key == null) {
+      return nodeKey.toString();
+    }
+    return this.key + "." + nodeKey;
   }
 }
