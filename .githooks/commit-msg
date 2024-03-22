@@ -3,9 +3,17 @@
 # Create a regex for a conventional commit.
 convetional_commit_regex="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z \-]+\))?!?: .+$"
 
+# Accept Merge commits
+merge_msg_regex="^Merge branch '.+'.+$"
+
 # Get the commit message (the parameter we're given is just the path to the
 # temporary file which holds the message).
 commit_message=$(cat "$1")
+
+if [[ "$commit_message" =~ $merge_msg_regex ]]; then
+   echo -e "\e[32mAccept Merge commits...\e[0m"
+   exit 0
+fi
 
 # Check the message, if we match, all good baby.
 if [[ "$commit_message" =~ $convetional_commit_regex ]]; then
