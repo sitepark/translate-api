@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   start-hotfix:
-    uses: sitepark-com/github-project-workflow/.github/workflows/maven-start-hotfix.yml@release/1.x
+    uses: sitepark/github-project-workflow/.github/workflows/maven-start-hotfix.yml@release/1.x
     with:
       ref: ${{ github.ref }}
 

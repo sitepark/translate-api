@@ -8,4 +8,4 @@ on:
 
 jobs:
   create-github-release:
-    uses: sitepark-com/github-project-workflow/.github/workflows/create-github-release-draft.yml@release/1.x
+    uses: sitepark/github-project-workflow/.github/workflows/create-github-release-draft.yml@release/1.x

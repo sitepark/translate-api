@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    uses: sitepark-com/github-project-workflow/.github/workflows/maven-deploy-snapshot.yml@release/1.x
+    uses: sitepark/github-project-workflow/.github/workflows/maven-deploy-snapshot.yml@release/1.x
     secrets:
       MVN_REPO_SERVER_USERNAME: ${{ secrets.MVN_REPO_SERVER_USERNAME }}
       MVN_REPO_SERVER_PASSWORD: ${{ secrets.MVN_REPO_SERVER_PASSWORD }}

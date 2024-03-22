@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   release:
-    uses: sitepark-com/github-project-workflow/.github/workflows/maven-release.yml@release/1.x
+    uses: sitepark/github-project-workflow/.github/workflows/maven-release.yml@release/1.x
     with:
       botName: "sitepark-bot"
       botEmail: "opensource@sitepark.com"
