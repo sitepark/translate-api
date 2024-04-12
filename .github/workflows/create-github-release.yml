@@ -1,0 +1,11 @@
+name: (📡) Create GitHub Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+jobs:
+  create-github-release:
+    uses: sitepark/github-project-workflow/.github/workflows/create-github-release.yml@release/1.x
