@@ -5,5 +5,5 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    rebase-strategy: eager
+    rebase-strategy: auto
 
