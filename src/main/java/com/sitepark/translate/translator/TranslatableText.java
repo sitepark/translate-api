@@ -4,14 +4,12 @@ import com.sitepark.translate.Format;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+@SuppressWarnings("AvoidCatchingGenericException")
 public class TranslatableText {
 
   private final String sourceText;
-
-  private String sourceTextHash;
-
   private final Format format;
-
+  private String sourceTextHash;
   private String targetText;
 
   public TranslatableText(String sourceText) {
@@ -24,35 +22,7 @@ public class TranslatableText {
     this.format = format;
   }
 
-  public void setTargetText(String targetText) {
-    this.targetText = targetText;
-  }
-
-  public Format getFormat() {
-    return this.format;
-  }
-
-  public String getSourceText() {
-    return this.sourceText;
-  }
-
-  public String getTargetText() {
-    return this.targetText;
-  }
-
-  public String toHash() {
-
-    if (this.sourceTextHash != null) {
-      return this.sourceTextHash;
-    }
-    if (this.sourceText == null) {
-      return null;
-    }
-
-    this.sourceTextHash = TranslatableText.toHash(this.sourceText);
-    return this.sourceTextHash;
-  }
-
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static String toHash(String sourceText) {
 
     try {
@@ -72,5 +42,34 @@ public class TranslatableText {
     } catch (Exception e) {
       throw new TranslatorException(e.getMessage(), e);
     }
+  }
+
+  public Format getFormat() {
+    return this.format;
+  }
+
+  public String getSourceText() {
+    return this.sourceText;
+  }
+
+  public String getTargetText() {
+    return this.targetText;
+  }
+
+  public void setTargetText(String targetText) {
+    this.targetText = targetText;
+  }
+
+  public String toHash() {
+
+    if (this.sourceTextHash != null) {
+      return this.sourceTextHash;
+    }
+    if (this.sourceText == null) {
+      return null;
+    }
+
+    this.sourceTextHash = TranslatableText.toHash(this.sourceText);
+    return this.sourceTextHash;
   }
 }

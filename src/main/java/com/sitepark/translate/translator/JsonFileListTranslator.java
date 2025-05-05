@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings({"PMD.GuardLogStatement", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.GuardLogStatement", "PMD.TooManyMethods", "PMD.SystemPrintln"})
 public final class JsonFileListTranslator extends Translator {
 
   private final Path dir;
@@ -204,6 +204,7 @@ public final class JsonFileListTranslator extends Translator {
             new IllegalArgumentException("Unsupported source language '" + this.sourceLang + "'"));
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private void translate(SupportedProvider provider, String targetLang) {
 
     TranslationFileCache cache = this.createTranslationCache(targetLang);
@@ -240,6 +241,7 @@ public final class JsonFileListTranslator extends Translator {
     return new JsonFile(path, node);
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private JsonNode parseJson(Path file) {
     try {
       ObjectMapper mapper = new ObjectMapper();
@@ -249,6 +251,7 @@ public final class JsonFileListTranslator extends Translator {
     }
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private TranslationFileCache createTranslationCache(String targetLang) {
 
     Path cacheFile = this.getOutputDir(targetLang).resolve(".translation-cache-file");
@@ -289,14 +292,10 @@ public final class JsonFileListTranslator extends Translator {
 
   public static final class Builder extends Translator.Builder<Builder> {
 
-    private Path dir;
-
-    private Path output;
-
-    private String sourceLang;
-
     private final Set<String> targetLangList = new HashSet<>();
-
+    private Path dir;
+    private Path output;
+    private String sourceLang;
     private Logger logger;
 
     private Builder() {}

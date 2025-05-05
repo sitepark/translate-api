@@ -22,7 +22,7 @@ class GlossaryChangeSetTest {
 
     changeSet.added(entry);
 
-    assertEquals(Arrays.asList(entry), changeSet.getAdded(), "unexpected added list");
+    assertEquals(Arrays.asList(entry), changeSet.getAddedEntries(), "unexpected added list");
   }
 
   @Test
@@ -33,6 +33,6 @@ class GlossaryChangeSetTest {
 
     changeSet.deleted(entry);
 
-    assertEquals(Arrays.asList(entry), changeSet.getDeleted(), "unexpected deleted list");
+    assertEquals(Arrays.asList(entry), changeSet.getDeletedEntries(), "unexpected deleted list");
   }
 }

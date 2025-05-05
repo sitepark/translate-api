@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@SuppressWarnings("AvoidCatchingGenericException")
 public class JsonBodyHandler<T, U> implements BodyHandler<Supplier<JsonResult<T, U>>> {
 
   private final Class<T> successType;
@@ -58,6 +59,7 @@ public class JsonBodyHandler<T, U> implements BodyHandler<Supplier<JsonResult<T,
     };
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private Function<InputStream, Supplier<JsonResult<T, U>>> successNoContent(int statusCode) {
     return (input) -> {
       return () -> {

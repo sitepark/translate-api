@@ -8,7 +8,13 @@
 	<!-- https://spotbugs.readthedocs.io/en/stable/filter.html -->
 	<Match>
 		<Bug
-			pattern="REC_CATCH_EXCEPTION,RV_CHECK_FOR_POSITIVE_INDEXOF,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,THROWS_METHOD_THROWS_CLAUSE_THROWABLE,PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES,PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_FIELD_NAMES" />
+			pattern="REC_CATCH_EXCEPTION,RV_CHECK_FOR_POSITIVE_INDEXOF,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,THROWS_METHOD_THROWS_CLAUSE_THROWABLE,PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES" />
+	</Match>
+
+	<Match>
+		<Class name="~com.sitepark.ies.contentrepository.core.usecase.*" />
+		<Method name="&lt;init&gt;"/>
+		<Bug pattern="EI_EXPOSE_REP2" />
 	</Match>
 
 	<!-- False positive: https://github.com/spotbugs/spotbugs/issues/2628 -->

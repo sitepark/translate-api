@@ -8,7 +8,7 @@ import com.sitepark.translate.TranslationRequest;
 import com.sitepark.translate.TranslationResult;
 import java.util.Objects;
 
-public abstract class Translator {
+public class Translator {
 
   private final TranslationConfiguration translatorConfiguration;
 

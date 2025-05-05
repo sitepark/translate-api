@@ -21,7 +21,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings({"PMD.GuardLogStatement", "PMD.TooManyMethods"})
+@SuppressWarnings({
+  "PMD.GuardLogStatement",
+  "PMD.TooManyMethods",
+  "PMD.AvoidCatchingGenericException"
+})
 public final class JsonFileTranslator extends Translator {
 
   private final Path dir;
@@ -115,9 +119,17 @@ public final class JsonFileTranslator extends Translator {
       if (parent == null) {
         parent = this.dir;
       }
-      String filename = jsonFile.sourceFile.getFileName().toString();
+      if (parent == null) {
+        throw new IllegalStateException("parent is null");
+      }
+
+      Path filenamePath = jsonFile.sourceFile.getFileName();
+      if (filenamePath == null) {
+        throw new IllegalStateException(jsonFile.sourceFile + " as no filename");
+      }
+      String filename = filenamePath.toString();
       String basename = filename.substring(0, filename.length() - this.sourceSuffix.length());
-      if (parent != null && !Files.exists(parent)) {
+      if (!Files.exists(parent)) {
         Files.createDirectories(parent);
       }
       Path translatedFile = parent.resolve(basename + "." + lang + ".json");
@@ -213,7 +225,11 @@ public final class JsonFileTranslator extends Translator {
   private TranslationFileCache createTranslationCache(String targetLang) throws IOException {
 
     Path cacheFile = this.output.resolve(".translation-cache").resolve(targetLang);
-    Files.createDirectories(cacheFile.getParent());
+    Path parent = cacheFile.getParent();
+    if (parent == null) {
+      throw new IllegalStateException(cacheFile + " has no parent directory");
+    }
+    Files.createDirectories(parent);
 
     TranslationFileCache cache = new TranslationFileCache(cacheFile);
     try {
@@ -247,14 +263,10 @@ public final class JsonFileTranslator extends Translator {
 
   public static final class Builder extends Translator.Builder<Builder> {
 
-    private Path dir;
-
-    private Path output;
-
-    private String sourceLang;
-
     private final Set<String> targetLangList = new HashSet<>();
-
+    private Path dir;
+    private Path output;
+    private String sourceLang;
     private Logger logger;
 
     private Builder() {}
