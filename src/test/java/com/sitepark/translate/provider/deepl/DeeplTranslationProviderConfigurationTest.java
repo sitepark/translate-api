@@ -11,7 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.UnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
 class DeeplTranslationProviderConfigurationTest {
 
   @Test

@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({
-  "PMD.JUnitTestContainsTooManyAsserts",
-  "PMD.JUnitAssertionsShouldIncludeMessage",
+  "PMD.UnitTestContainsTooManyAsserts",
+  "PMD.UnitTestAssertionsShouldIncludeMessage",
 })
 class ScannerTest {
 

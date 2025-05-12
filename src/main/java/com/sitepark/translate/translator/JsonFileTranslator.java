@@ -10,10 +10,8 @@ import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -23,34 +21,32 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings({"PMD.GuardLogStatement", "PMD.TooManyMethods", "PMD.SystemPrintln"})
-public final class JsonFileListTranslator extends Translator {
+@SuppressWarnings({
+  "PMD.GuardLogStatement",
+  "PMD.TooManyMethods",
+  "PMD.AvoidCatchingGenericException"
+})
+public final class JsonFileTranslator extends Translator {
 
+  private static final String EN_US = "en-us";
   private final Path dir;
-
   private final Path output;
-
   private final String sourceLang;
-
+  private final String sourceSuffix;
   private final Set<String> targetLangList;
-
   private final Logger logger;
-
-  private Path sourceDir;
-
   private List<JsonFile> jsonFiles;
-
   private List<TranslatableTextNode> translatableTextNodeList;
-
   private TranslatableTextNodeCollectorExcludes excludes;
 
-  private JsonFileListTranslator(Builder builder) {
+  private JsonFileTranslator(Builder builder) {
     super(builder);
     this.dir = builder.dir;
     this.output = builder.output;
     this.sourceLang = builder.sourceLang;
     this.targetLangList = builder.targetLangList;
     this.logger = builder.logger;
+    this.sourceSuffix = "." + this.sourceLang + ".json";
   }
 
   public static Builder builder() {
@@ -62,8 +58,6 @@ public final class JsonFileListTranslator extends Translator {
   }
 
   public void translate(SupportedProvider provider, List<String> targets) throws IOException {
-
-    this.sourceDir = this.dir.resolve(this.sourceLang);
 
     Language sourceLanguage = this.getSourceLanguage(provider);
     this.loadJsonFiles();
@@ -100,54 +94,13 @@ public final class JsonFileListTranslator extends Translator {
               + duration
               + " seconds.");
       this.write(targetLanguage);
+      if (EN_US.equals(targetLanguage)) {
+        this.write("en");
+      }
     }
-
-    this.copyToGeneralEn();
 
     long totalDuration = (System.currentTimeMillis() - tt) / 1000;
     this.logger.info("translated in " + totalDuration + " seconds.");
-  }
-
-  private void copyToGeneralEn() {
-    Path enUS = this.getOutputDir("en-us");
-    if (!Files.isDirectory(enUS)) {
-      System.out.println("not found " + enUS);
-      return;
-    }
-
-    Path en = this.getOutputDir("en");
-    System.out.println("copy " + enUS + " -> " + en);
-    this.copy(enUS, "en");
-  }
-
-  private void copy(Path src, String lang) {
-    try {
-      Path dest = this.getOutputDir(lang);
-      Files.walk(src)
-          .forEach(
-              source -> {
-                if (source.equals(src)) {
-                  try {
-                    Files.createDirectories(dest);
-                  } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                  }
-                  return;
-                }
-                int prefixLength = src.toString().length() + 1;
-                Path destination = dest.resolve(source.toString().substring(prefixLength));
-                if (Files.isDirectory(destination)) {
-                  return;
-                }
-                try {
-                  Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                  throw new UncheckedIOException(e);
-                }
-              });
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
   }
 
   private void write(String lang) throws IOException {
@@ -155,11 +108,24 @@ public final class JsonFileListTranslator extends Translator {
     ObjectMapper mapper = new ObjectMapper();
 
     for (JsonFile jsonFile : this.jsonFiles) {
-      Path translatedFile = this.getOutputDir(lang).resolve(jsonFile.sourceFile);
-      Path parent = translatedFile.getParent();
-      if (parent != null && !Files.exists(parent)) {
+      Path parent = jsonFile.sourceFile.getParent();
+      if (parent == null) {
+        parent = this.dir;
+      }
+      if (parent == null) {
+        throw new IllegalStateException("parent is null");
+      }
+
+      Path filenamePath = jsonFile.sourceFile.getFileName();
+      if (filenamePath == null) {
+        throw new IllegalStateException(jsonFile.sourceFile + " as no filename");
+      }
+      String filename = filenamePath.toString();
+      String basename = filename.substring(0, filename.length() - this.sourceSuffix.length());
+      if (!Files.exists(parent)) {
         Files.createDirectories(parent);
       }
+      Path translatedFile = parent.resolve(basename + "." + lang + ".json");
       mapper.writerWithDefaultPrettyPrinter().writeValue(translatedFile.toFile(), jsonFile.node);
     }
   }
@@ -185,11 +151,11 @@ public final class JsonFileListTranslator extends Translator {
 
   @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")
   private void loadJsonFiles() throws IOException {
-    try (Stream<Path> stream = Files.walk(this.sourceDir)) {
+    try (Stream<Path> stream = Files.walk(this.dir)) {
       this.jsonFiles =
           stream
               .filter(Files::isRegularFile)
-              .filter(p -> p.toString().endsWith(".json"))
+              .filter(p -> p.toString().endsWith(this.sourceSuffix))
               .map(this::createJsonFile)
               .collect(Collectors.toList());
     }
@@ -204,8 +170,7 @@ public final class JsonFileListTranslator extends Translator {
             new IllegalArgumentException("Unsupported source language '" + this.sourceLang + "'"));
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  private void translate(SupportedProvider provider, String targetLang) {
+  private void translate(SupportedProvider provider, String targetLang) throws IOException {
 
     TranslationFileCache cache = this.createTranslationCache(targetLang);
 
@@ -232,16 +197,15 @@ public final class JsonFileListTranslator extends Translator {
 
   private JsonFile createJsonFile(Path file) {
 
-    if (this.sourceDir == null) {
-      throw new IllegalStateException("sourceDir is not set");
+    if (this.dir == null) {
+      throw new IllegalStateException("dir is not set");
     }
 
-    Path path = file.subpath(this.sourceDir.getNameCount(), file.getNameCount());
+    Path path = file.subpath(this.dir.getNameCount(), file.getNameCount());
     JsonNode node = this.parseJson(file);
     return new JsonFile(path, node);
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private JsonNode parseJson(Path file) {
     try {
       ObjectMapper mapper = new ObjectMapper();
@@ -251,10 +215,14 @@ public final class JsonFileListTranslator extends Translator {
     }
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  private TranslationFileCache createTranslationCache(String targetLang) {
+  private TranslationFileCache createTranslationCache(String targetLang) throws IOException {
 
-    Path cacheFile = this.getOutputDir(targetLang).resolve(".translation-cache-file");
+    Path cacheFile = this.output.resolve(".translation-cache").resolve(targetLang);
+    Path parent = cacheFile.getParent();
+    if (parent == null) {
+      throw new IllegalStateException(cacheFile + " has no parent directory");
+    }
+    Files.createDirectories(parent);
 
     TranslationFileCache cache = new TranslationFileCache(cacheFile);
     try {
@@ -263,10 +231,6 @@ public final class JsonFileListTranslator extends Translator {
       this.logger.error("Unalbe to load cache " + cacheFile + ": " + e.getMessage(), e);
     }
     return cache;
-  }
-
-  private Path getOutputDir(String lang) {
-    return this.output.resolve(lang);
   }
 
   public static interface Logger {
@@ -342,14 +306,16 @@ public final class JsonFileListTranslator extends Translator {
     }
 
     @Override
-    public JsonFileListTranslator build() {
+    public JsonFileTranslator build() {
       assert dir != null : "dir is null";
-      assert output != null : "output is null";
+      if (output == null) {
+        output = dir;
+      }
       assert sourceLang != null : "sourceLang is null";
       if (this.logger == null) {
         this.logger = new NullLogger();
       }
-      return new JsonFileListTranslator(this);
+      return new JsonFileTranslator(this);
     }
   }
 

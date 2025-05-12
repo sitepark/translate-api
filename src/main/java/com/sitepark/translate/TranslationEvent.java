@@ -2,6 +2,7 @@ package com.sitepark.translate;
 
 import java.util.Objects;
 
+@SuppressWarnings("PMD.DataClass")
 public final class TranslationEvent {
 
   private final TranslationLanguage translationLanguage;
@@ -22,43 +23,33 @@ public final class TranslationEvent {
     this.targetBytes = builder.targetBytes;
   }
 
-  /**
-   * Source and target language of the translation.
-   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /** Source and target language of the translation. */
   public TranslationLanguage getTranslationLanguage() {
     return this.translationLanguage;
   }
 
-  /**
-   * Time in milliseconds that the translation took.
-   */
+  /** Time in milliseconds that the translation took. */
   public long getTranslationTime() {
     return this.translationTime;
   }
 
-  /**
-   * Number of texts passed to libretranslate in an array.
-   */
+  /** Number of texts passed to libretranslate in an array. */
   public int getChunks() {
     return this.chunks;
   }
 
-  /**
-   * Number of bytes that were translated
-   */
+  /** Number of bytes that were translated */
   public int getSourceBytes() {
     return this.sourceBytes;
   }
 
-  /**
-   * Number of bytes of the translated text.
-   */
+  /** Number of bytes of the translated text. */
   public int getTargetBytes() {
     return this.targetBytes;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public static final class Builder {

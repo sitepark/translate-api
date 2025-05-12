@@ -17,6 +17,7 @@ import com.sitepark.translate.TranslationResultStatistic;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,10 +26,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-class JsonFileListTranslatorTest {
+class JsonFileTranslatorTest {
 
   @Test
-  @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.UnitTestContainsTooManyAsserts"})
+  @SuppressWarnings({"PMD.UseConcurrentHashMap"})
   void test() throws Exception {
 
     SupportedLanguages supportedLanguages =
@@ -65,14 +66,15 @@ class JsonFileListTranslatorTest {
     TranslationConfiguration translatorConfiguration =
         TranslationConfiguration.builder().translationProviderFactory(transporterFactory).build();
 
-    Path dir = Paths.get("src/test/resources/JsonFileListTranslator");
-    Path output = Paths.get("target/test/JsonFileListTranslator/translations");
-    this.cleanCache(output);
+    Path resources = Paths.get("src/test/resources/JsonFileTranslator");
+    Path testdir = Paths.get("target/test/JsonFileTranslator");
 
-    JsonFileListTranslator jsonFileListTranslator =
-        JsonFileListTranslator.builder()
-            .dir(dir)
-            .output(output)
+    this.clean(testdir);
+    this.copyFiles(resources, testdir);
+
+    JsonFileTranslator jsonFileListTranslator =
+        JsonFileTranslator.builder()
+            .dir(testdir)
             .sourceLang("de")
             .targetLangList("en")
             .translatorConfiguration(translatorConfiguration)
@@ -80,23 +82,26 @@ class JsonFileListTranslatorTest {
 
     jsonFileListTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
 
-    Path resultA = output.resolve("en/a.json");
+    Path resultA = testdir.resolve("a.en.json");
     assertEquals(
         "{\n" + "  \"text\" : \"Hello\"\n" + "}",
         Files.readString(resultA, StandardCharsets.UTF_8),
         "wrong content in en/a.json");
-
-    Path resultC = output.resolve("en/b/c.json");
-    assertEquals(
-        "{\n" + "  \"d\" : \"World\"\n" + "}",
-        Files.readString(resultC, StandardCharsets.UTF_8),
-        "wrong content in en/b/c.json");
   }
 
-  private void cleanCache(Path dir) throws IOException {
+  private void clean(Path dir) throws IOException {
     if (!Files.exists(dir)) {
       return;
     }
     Files.walk(dir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+  }
+
+  private void copyFiles(Path source, Path destination) throws IOException {
+    Files.createDirectories(destination);
+    try (DirectoryStream<Path> stream = Files.newDirectoryStream(source); ) {
+      for (Path file : stream) {
+        Files.copy(file, destination.resolve(file.getFileName()));
+      }
+    }
   }
 }

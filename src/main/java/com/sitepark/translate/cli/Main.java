@@ -18,6 +18,8 @@ public final class Main {
 
     if (TranslateJson.COMMAND_NAME.equals(command)) {
       TranslateJson.execute(arguments);
+    } else if (TranslateJsonFile.COMMAND_NAME.equals(command)) {
+      TranslateJsonFile.execute(arguments);
     } else {
       System.err.println("unknown command: " + command);
     }

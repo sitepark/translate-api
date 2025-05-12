@@ -24,12 +24,13 @@ import org.junit.jupiter.api.Test;
 class JsonNodeTranslatorTest {
 
   @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void test() throws Exception {
 
     TranslationResult result =
         TranslationResult.builder()
             .request(mock(TranslationRequest.class))
-            .text(new String[] {"Flowers", "Blue"})
+            .text("Flowers", "Blue")
             .statistic(TranslationResultStatistic.EMPTY)
             .build();
 
