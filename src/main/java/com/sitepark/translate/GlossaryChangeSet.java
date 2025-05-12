@@ -29,19 +29,16 @@ public final class GlossaryChangeSet {
 
   @Override
   public int hashCode() {
-    int hashCode = 0;
-    hashCode += this.addedEntries.hashCode();
-    hashCode += this.deletedEntries.hashCode();
-    return hashCode;
+    return Objects.hash(this.addedEntries, this.deletedEntries);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof GlossaryChangeSet changeSet)) {
+    if (!(o instanceof GlossaryChangeSet that)) {
       return false;
     }
 
-    return Objects.equals(changeSet.addedEntries, this.addedEntries)
-        && Objects.equals(changeSet.deletedEntries, this.deletedEntries);
+    return Objects.equals(that.addedEntries, this.addedEntries)
+        && Objects.equals(that.deletedEntries, this.deletedEntries);
   }
 }

@@ -14,7 +14,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestContainsTooManyAsserts"})
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.UnitTestContainsTooManyAsserts"})
 class LibreTranslateTranslationProviderTest {
 
   @Test

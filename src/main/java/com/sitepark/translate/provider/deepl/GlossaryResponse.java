@@ -3,6 +3,7 @@ package com.sitepark.translate.provider.deepl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
 
+@SuppressWarnings("PMD.DataClass")
 public class GlossaryResponse {
   @JsonProperty("glossary_id")
   public String glossaryId;

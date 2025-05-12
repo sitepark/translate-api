@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 class JsonFileListTranslatorTest {
 
   @Test
-  @SuppressWarnings({"PMD.UseConcurrentHashMap"})
+  @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.UnitTestContainsTooManyAsserts"})
   void test() throws Exception {
 
     SupportedLanguages supportedLanguages =
