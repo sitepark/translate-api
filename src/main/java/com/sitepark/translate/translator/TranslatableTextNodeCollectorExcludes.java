@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TranslatableTextNodeCollectorExcludes {
+public final class TranslatableTextNodeCollectorExcludes {
   private final Set<String> excludes;
 
   private TranslatableTextNodeCollectorExcludes(Set<String> excludes) {

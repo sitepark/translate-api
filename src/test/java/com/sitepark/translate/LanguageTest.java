@@ -9,24 +9,24 @@ import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.UnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
 class LanguageTest {
 
   @Test
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-  public void testEqualsContract() {
+  void testEqualsContract() {
     EqualsVerifier.forClass(Language.class).verify();
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testDeserialize() throws Exception {
     String json = "{\"code\":\"de\", \"name\":\"deutsch\",\"targets\":[\"en\",\"it\"]}";
     ObjectMapper mapper = new ObjectMapper();
     Language language = mapper.readValue(json, Language.class);
     assertEquals("de", language.getCode(), "wrong code");
     assertEquals("deutsch", language.getName(), "wrong name");
-    assertEquals(Arrays.asList(new String[] {"en", "it"}), language.getTargets(), "wrong name");
+    assertEquals(Arrays.asList("en", "it"), language.getTargets(), "wrong name");
   }
 
   @Test
@@ -35,15 +35,12 @@ class LanguageTest {
         Language.builder()
             .code("de")
             .name("deutsch")
-            .targets(Arrays.asList(new String[] {"en", "fr"}))
+            .targets(Arrays.asList("en", "fr"))
             .targets("it")
             .build();
     assertEquals("de", language.getCode(), "unexpected code");
     assertEquals("deutsch", language.getName(), "unexpected name");
-    assertEquals(
-        Arrays.asList(new String[] {"en", "fr", "it"}),
-        language.getTargets(),
-        "unexpected targets");
+    assertEquals(Arrays.asList("en", "fr", "it"), language.getTargets(), "unexpected targets");
   }
 
   @Test
@@ -52,16 +49,13 @@ class LanguageTest {
         Language.builder()
             .code("de")
             .name("deutsch")
-            .targets(Arrays.asList(new String[] {"en", "fr"}))
+            .targets(Arrays.asList("en", "fr"))
             .targets("it")
             .build();
     language = language.toBuilder().code("es").name("espanol").build();
     assertEquals("es", language.getCode(), "unexpected code");
     assertEquals("espanol", language.getName(), "unexpected name");
-    assertEquals(
-        Arrays.asList(new String[] {"en", "fr", "it"}),
-        language.getTargets(),
-        "unexpected targets");
+    assertEquals(Arrays.asList("en", "fr", "it"), language.getTargets(), "unexpected targets");
   }
 
   @Test

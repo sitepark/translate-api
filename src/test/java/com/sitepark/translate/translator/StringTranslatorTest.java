@@ -25,7 +25,7 @@ class StringTranslatorTest {
     TranslationResult translationResult =
         TranslationResult.builder()
             .request(mock(TranslationRequest.class))
-            .text(new String[] {"Hello"})
+            .text("Hello")
             .statistic(TranslationResultStatistic.EMPTY)
             .build();
 
