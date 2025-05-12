@@ -10,18 +10,18 @@ class GlossaryEntryTest {
 
   @Test
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-  public void testEqualsContract() {
+  void testEqualsContract() {
     EqualsVerifier.forClass(GlossaryEntry.class).verify();
   }
 
   @Test
-  public void testSetSource() {
+  void testSetSource() {
     GlossaryEntry entry = GlossaryEntry.builder().source("de").target("en").build();
     assertEquals("de", entry.getSource(), "unexpected source");
   }
 
   @Test
-  public void testNullSource() {
+  void testNullSource() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -31,7 +31,7 @@ class GlossaryEntryTest {
   }
 
   @Test
-  public void testBlankSource() {
+  void testBlankSource() {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
@@ -41,7 +41,7 @@ class GlossaryEntryTest {
   }
 
   @Test
-  public void testUnsetSource() {
+  void testUnsetSource() {
     assertThrows(
         IllegalStateException.class,
         () -> {
@@ -51,13 +51,13 @@ class GlossaryEntryTest {
   }
 
   @Test
-  public void testSetTarget() {
+  void testSetTarget() {
     GlossaryEntry entry = GlossaryEntry.builder().source("de").target("en").build();
     assertEquals("en", entry.getTarget(), "unexpected source");
   }
 
   @Test
-  public void testNullTarget() {
+  void testNullTarget() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -67,7 +67,7 @@ class GlossaryEntryTest {
   }
 
   @Test
-  public void testBlankTarget() {
+  void testBlankTarget() {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
@@ -77,7 +77,7 @@ class GlossaryEntryTest {
   }
 
   @Test
-  public void testUnsetTarget() {
+  void testUnsetTarget() {
     assertThrows(
         IllegalStateException.class,
         () -> {
@@ -87,7 +87,8 @@ class GlossaryEntryTest {
   }
 
   @Test
-  public void testToBuilder() {
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testToBuilder() {
 
     GlossaryEntry entry = GlossaryEntry.builder().source("de").target("en").build();
 

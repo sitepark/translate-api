@@ -10,12 +10,12 @@ class GlossaryChangeSetTest {
 
   @Test
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-  public void testEqualsContract() {
+  void testEqualsContract() {
     EqualsVerifier.forClass(GlossaryChangeSet.class).verify();
   }
 
   @Test
-  public void testAdded() {
+  void testAdded() {
 
     GlossaryChangeSet changeSet = new GlossaryChangeSet();
     GlossaryEntry entry = GlossaryEntry.builder().source("Hallo").target("Hello").build();
@@ -26,7 +26,7 @@ class GlossaryChangeSetTest {
   }
 
   @Test
-  public void testDeleted() {
+  void testDeleted() {
 
     GlossaryChangeSet changeSet = new GlossaryChangeSet();
     GlossaryEntry entry = GlossaryEntry.builder().source("Hallo").target("Hello").build();

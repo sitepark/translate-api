@@ -25,7 +25,7 @@ class StringArrayTranslatorTest {
     TranslationResult translationResult =
         TranslationResult.builder()
             .request(mock(TranslationRequest.class))
-            .text(new String[] {"Hello", "World"})
+            .text("Hello", "World")
             .statistic(TranslationResultStatistic.EMPTY)
             .build();
 

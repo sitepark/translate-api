@@ -28,22 +28,15 @@ import java.util.stream.Stream;
 })
 public final class JsonFileTranslator extends Translator {
 
+  private static final String EN_US = "en-us";
   private final Path dir;
-
   private final Path output;
-
   private final String sourceLang;
-
   private final String sourceSuffix;
-
   private final Set<String> targetLangList;
-
   private final Logger logger;
-
   private List<JsonFile> jsonFiles;
-
   private List<TranslatableTextNode> translatableTextNodeList;
-
   private TranslatableTextNodeCollectorExcludes excludes;
 
   private JsonFileTranslator(Builder builder) {
@@ -101,7 +94,7 @@ public final class JsonFileTranslator extends Translator {
               + duration
               + " seconds.");
       this.write(targetLanguage);
-      if (targetLanguage.equals("en-us")) {
+      if (EN_US.equals(targetLanguage)) {
         this.write("en");
       }
     }

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.sitepark.translate.Format;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.UnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
 class TransportRequestTest {
 
   @Test
@@ -64,7 +64,7 @@ class TransportRequestTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
-          TransportRequest.builder().q(new String[] {});
+          TransportRequest.builder().q();
         });
   }
 

@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-@SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts"})
+@SuppressWarnings({"PMD.UnitTestContainsTooManyAsserts"})
 class TranslationProviderConfigurationTest {
 
   @Test

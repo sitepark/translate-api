@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+@SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
 class JsonBodyLanguagesHandlerTest {
 
   @Test
