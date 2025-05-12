@@ -1,0 +1,9 @@
+name: (📡) Auto-Merge Dependabot Minor Updates
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  automerge:
+    uses: sitepark/github-project-workflow/.github/workflows/dependabot-automerge-minor.yml@release/1.x
