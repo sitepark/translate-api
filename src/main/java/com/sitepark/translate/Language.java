@@ -3,7 +3,6 @@ package com.sitepark.translate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +23,10 @@ public final class Language {
     this.targets = Collections.unmodifiableList(builder.targets);
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public String getCode() {
     return this.code;
   }
@@ -32,13 +35,8 @@ public final class Language {
     return this.name;
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<String> getTargets() {
     return this.targets;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {
@@ -82,11 +80,9 @@ public final class Language {
   @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
   public static final class Builder {
 
-    private String code;
-
-    private String name;
-
     private final List<String> targets = new ArrayList<>();
+    private String code;
+    private String name;
 
     private Builder() {}
 
