@@ -23,13 +23,13 @@ import org.junit.jupiter.api.Test;
 class TranslatableTextListTranslatorTest {
 
   @Test
-  @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+  @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.UnitTestContainsTooManyAsserts"})
   void test() throws Exception {
 
     TranslationResult translationResult =
         TranslationResult.builder()
             .request(mock(TranslationRequest.class))
-            .text(new String[] {"Flowers", "Blue"})
+            .text("Flowers", "Blue")
             .statistic(TranslationResultStatistic.EMPTY)
             .build();
 
@@ -66,12 +66,13 @@ class TranslatableTextListTranslatorTest {
   }
 
   @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testWithCache() throws Exception {
 
     TranslationResult translationResult =
         TranslationResult.builder()
             .request(mock(TranslationRequest.class))
-            .text(new String[] {"Blue"})
+            .text("Blue")
             .statistic(TranslationResultStatistic.EMPTY)
             .build();
 

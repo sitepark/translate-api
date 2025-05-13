@@ -22,13 +22,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.JUnitTestContainsTooManyAsserts"})
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.UnitTestContainsTooManyAsserts"})
 class DeeplTranslationProviderTest {
 
+  private static final Dispatcher DISPATCHER = new DeeplTranslationProviderTestDispatcher();
   private MockWebServer mockWebServer;
   private DeeplTranslationProvider provider;
-
-  private static final Dispatcher DISPATCHER = new DeeplTranslationProviderTestDispatcher();
 
   @BeforeEach
   void setUp() throws URISyntaxException {

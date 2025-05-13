@@ -13,12 +13,12 @@ class GlossaryTest {
 
   @Test
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-  public void testEqualsContract() {
+  void testEqualsContract() {
     EqualsVerifier.forClass(Glossary.class).verify();
   }
 
   @Test
-  public void testSetName() {
+  void testSetName() {
 
     Glossary glossar =
         Glossary.builder()
@@ -30,7 +30,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testNullName() {
+  void testNullName() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -40,7 +40,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testBlankName() {
+  void testBlankName() {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
@@ -50,7 +50,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testUnsetName() {
+  void testUnsetName() {
     assertThrows(
         IllegalStateException.class,
         () -> {
@@ -62,7 +62,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testSetLanguage() {
+  void testSetLanguage() {
 
     Glossary glossar =
         Glossary.builder()
@@ -76,7 +76,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testNullSourceLanguage() {
+  void testNullSourceLanguage() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -86,7 +86,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testUnsetLanguage() {
+  void testUnsetLanguage() {
     assertThrows(
         IllegalStateException.class,
         () -> {
@@ -96,7 +96,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testSetEntry() {
+  void testSetEntry() {
 
     GlossaryEntry entry = GlossaryEntry.builder().source("Hallo").target("Hey").build();
 
@@ -111,7 +111,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testSetEntryArray() {
+  void testSetEntryArray() {
 
     GlossaryEntry[] entryArray =
         new GlossaryEntry[] {GlossaryEntry.builder().source("Hallo").target("Hey").build()};
@@ -127,7 +127,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testSetEntryList() {
+  void testSetEntryList() {
 
     List<GlossaryEntry> entryList =
         Arrays.asList(GlossaryEntry.builder().source("Hallo").target("Hey").build());
@@ -143,7 +143,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testNullEntryList() {
+  void testNullEntryList() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -152,7 +152,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testNullEntryInList() {
+  void testNullEntryInList() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -161,7 +161,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testNullEntryArray() {
+  void testNullEntryArray() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -170,7 +170,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testNullEntry() {
+  void testNullEntry() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -179,7 +179,7 @@ class GlossaryTest {
   }
 
   @Test
-  public void testToBuilder() {
+  void testToBuilder() {
 
     Glossary glossary =
         Glossary.builder()

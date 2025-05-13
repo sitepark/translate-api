@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter
-	xmlns="https://github.com/spotbugs/filter/3.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
-
+		xmlns="https://github.com/spotbugs/filter/3.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
 
 	<!-- https://spotbugs.readthedocs.io/en/stable/filter.html -->
 	<Match>
 		<Bug
-			pattern="REC_CATCH_EXCEPTION,RV_CHECK_FOR_POSITIVE_INDEXOF,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,THROWS_METHOD_THROWS_CLAUSE_THROWABLE,PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES,PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_FIELD_NAMES" />
+				pattern="REC_CATCH_EXCEPTION,RV_CHECK_FOR_POSITIVE_INDEXOF,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,THROWS_METHOD_THROWS_CLAUSE_THROWABLE,PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES"/>
 	</Match>
 
 	<!-- False positive: https://github.com/spotbugs/spotbugs/issues/2628 -->
 	<Match>
-		<Class name="~.*\.*Test" />
-		<Bug pattern="RV_EXCEPTION_NOT_THROWN" />
+		<Class name="~.*\.*Test"/>
+		<Bug pattern="RV_EXCEPTION_NOT_THROWN"/>
 	</Match>
-
 </FindBugsFilter>

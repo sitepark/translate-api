@@ -24,7 +24,7 @@ class JsonStringTranslatorTest {
     TranslationResult translationResult =
         TranslationResult.builder()
             .request(mock(TranslationRequest.class))
-            .text(new String[] {"Heading", "A beautiful text", "Flowers"})
+            .text("Heading", "A beautiful text", "Flowers")
             .statistic(TranslationResultStatistic.EMPTY)
             .build();
 

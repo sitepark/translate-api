@@ -10,29 +10,29 @@ class GlossaryChangeSetTest {
 
   @Test
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-  public void testEqualsContract() {
+  void testEqualsContract() {
     EqualsVerifier.forClass(GlossaryChangeSet.class).verify();
   }
 
   @Test
-  public void testAdded() {
+  void testAdded() {
 
     GlossaryChangeSet changeSet = new GlossaryChangeSet();
     GlossaryEntry entry = GlossaryEntry.builder().source("Hallo").target("Hello").build();
 
     changeSet.added(entry);
 
-    assertEquals(Arrays.asList(entry), changeSet.getAdded(), "unexpected added list");
+    assertEquals(Arrays.asList(entry), changeSet.getAddedEntries(), "unexpected added list");
   }
 
   @Test
-  public void testDeleted() {
+  void testDeleted() {
 
     GlossaryChangeSet changeSet = new GlossaryChangeSet();
     GlossaryEntry entry = GlossaryEntry.builder().source("Hallo").target("Hello").build();
 
     changeSet.deleted(entry);
 
-    assertEquals(Arrays.asList(entry), changeSet.getDeleted(), "unexpected deleted list");
+    assertEquals(Arrays.asList(entry), changeSet.getDeletedEntries(), "unexpected deleted list");
   }
 }

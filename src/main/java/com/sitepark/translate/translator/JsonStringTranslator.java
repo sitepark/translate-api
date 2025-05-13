@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.translate.TranslationParameter;
 
+@SuppressWarnings("PMD.AvoidCatchingGenericException")
 public final class JsonStringTranslator extends Translator {
 
   private JsonStringTranslator(Builder builder) {
     super(builder);
+  }
+
+  public static Builder builder() {
+    return new Builder();
   }
 
   public String translate(TranslationParameter parameter, String json) {
@@ -23,10 +28,6 @@ public final class JsonStringTranslator extends Translator {
     jsonNode = jsonNodeTranslator.translate(parameter, jsonNode);
 
     return this.jsonToString(jsonNode);
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   private String jsonToString(JsonNode jsonNode) {

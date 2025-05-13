@@ -5,6 +5,7 @@ import com.sitepark.translate.Format;
 import java.util.Arrays;
 import java.util.Objects;
 
+@SuppressWarnings("PMD.DataClass")
 public final class TransportRequest {
 
   private final String[] q;
@@ -23,6 +24,10 @@ public final class TransportRequest {
     this.target = builder.target;
     this.format = builder.format;
     this.apiKey = builder.apiKey;
+  }
+
+  public static Builder builder() {
+    return new Builder();
   }
 
   public String[] getQ() {
@@ -44,10 +49,6 @@ public final class TransportRequest {
   @JsonProperty("api_key")
   public String getApiKey() {
     return this.apiKey;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {
