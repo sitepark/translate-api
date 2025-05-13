@@ -1,9 +1,7 @@
 package com.sitepark.translate.provider.deepl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-@SuppressFBWarnings("UWF_UNWRITTEN_FIELD")
 public class TransportLanguage {
 
   private String language;

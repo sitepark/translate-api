@@ -8,7 +8,6 @@ import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationLanguage;
 import com.sitepark.translate.TranslationParameter;
 import com.sitepark.translate.TranslationProvider;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -149,7 +148,6 @@ public final class JsonFileTranslator extends Translator {
     }
   }
 
-  @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")
   private void loadJsonFiles() throws IOException {
     try (Stream<Path> stream = Files.walk(this.dir)) {
       this.jsonFiles =
