@@ -113,7 +113,7 @@
 		<dependency>
 			<groupId>nl.jqno.equalsverifier</groupId>
 			<artifactId>equalsverifier</artifactId>
-			<version>4.0.7</version>
+			<version>4.0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
@@ -247,7 +247,7 @@
 						</goals>
 						<configuration>
 							<rules>
-								<banDuplicatePomDependencyVersions></banDuplicatePomDependencyVersions>
+								<banDuplicatePomDependencyVersions/>
 								<requireMavenVersion>
 									<version>3.8</version>
 								</requireMavenVersion>
@@ -269,7 +269,7 @@
 									<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
 									<message>No Snapshots Allowed!</message>
 								</requireReleaseDeps>
-								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins"></requireReleaseDepsInPlugins>
+								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins"/>
 							</rules>
 							<fail>true</fail>
 						</configuration>
@@ -333,7 +333,7 @@
 							<reflowLongStrings>true</reflowLongStrings>
 							<formatJavadoc>false</formatJavadoc>
 						</googleJavaFormat>
-						<formatAnnotations></formatAnnotations>
+						<formatAnnotations/>
 					</java>
 					<pom>
 						<!-- These are the defaults, you can override if you want -->
