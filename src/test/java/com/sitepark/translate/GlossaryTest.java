@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 class GlossaryTest {
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEqualsContract() {
     EqualsVerifier.forClass(Glossary.class).verify();
   }
