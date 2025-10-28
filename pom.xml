@@ -333,7 +333,6 @@
 							<reflowLongStrings>true</reflowLongStrings>
 							<formatJavadoc>false</formatJavadoc>
 						</googleJavaFormat>
-						<formatAnnotations></formatAnnotations>
 					</java>
 					<pom>
 						<!-- These are the defaults, you can override if you want -->
