@@ -20,7 +20,7 @@ class Scanner {
   List<Token> scanTokens() {
     while (!isAtEnd()) {
       // We are at the beginning of the next lexeme.
-      start = current; // NOPMD by veltrup on 24.05.23, 15:38
+      start = current;
       scanToken();
     }
 
@@ -71,7 +71,8 @@ class Scanner {
   }
 
   private char advance() {
-    return source.charAt(current++);
+    current++;
+    return source.charAt(current - 1);
   }
 
   private void addToken(TokenType type) {

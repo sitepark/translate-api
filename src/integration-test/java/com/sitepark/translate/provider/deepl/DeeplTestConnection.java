@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@SuppressWarnings({"PMD.ReplaceHashtableWithMap"})
 public final class DeeplTestConnection {
 
 	private final String url;
@@ -14,14 +13,6 @@ public final class DeeplTestConnection {
 	private DeeplTestConnection(String url, String authKey) {
 		this.url = url;
 		this.authKey = authKey;
-	}
-
-	public String getUrl() {
-		return this.url;
-	}
-
-	public String getAuthKey() {
-		return this.authKey;
 	}
 
 	public static DeeplTestConnection get() throws IOException {
@@ -40,5 +31,13 @@ public final class DeeplTestConnection {
 			throw new IOException("authKey missing in deepl.local.properties");
 		}
 		return new DeeplTestConnection(props.getProperty("url"), props.getProperty("authKey"));
+	}
+
+	public String getUrl() {
+		return this.url;
+	}
+
+	public String getAuthKey() {
+		return this.authKey;
 	}
 }

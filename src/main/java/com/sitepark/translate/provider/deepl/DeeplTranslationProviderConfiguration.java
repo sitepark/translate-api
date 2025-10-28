@@ -24,6 +24,10 @@ public final class DeeplTranslationProviderConfiguration
     this.authKey = builder.authKey;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   @Override
   public SupportedProvider getType() {
     return SupportedProvider.DEEPL;
@@ -41,15 +45,10 @@ public final class DeeplTranslationProviderConfiguration
     return Optional.ofNullable(this.proxy);
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
-  @SuppressWarnings("PMD.TooManyMethods")
   public static final class Builder {
 
     private URI uri;

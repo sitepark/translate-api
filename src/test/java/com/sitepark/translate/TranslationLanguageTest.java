@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 class TranslationLanguageTest {
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEqualsContract() {
     EqualsVerifier.forClass(TranslationLanguage.class).verify();
   }

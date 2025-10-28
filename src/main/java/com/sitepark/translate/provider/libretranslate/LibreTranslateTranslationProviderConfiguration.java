@@ -24,6 +24,10 @@ public final class LibreTranslateTranslationProviderConfiguration
     this.apiKey = builder.apiKey;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   @Override
   public SupportedProvider getType() {
     return SupportedProvider.LIBRE_TRANSLATE;
@@ -41,15 +45,10 @@ public final class LibreTranslateTranslationProviderConfiguration
     return Optional.ofNullable(this.proxy);
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
-  @SuppressWarnings("PMD.TooManyMethods")
   public static final class Builder {
 
     private URI uri;
