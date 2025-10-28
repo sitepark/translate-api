@@ -30,6 +30,10 @@ public final class TranslationConfiguration {
     }
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public Optional<TranslationCache> getTranslationCache() {
     return Optional.ofNullable(this.translationCache);
   }
@@ -58,25 +62,17 @@ public final class TranslationConfiguration {
     return this.encodePlaceholder;
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
-  @SuppressWarnings("PMD.TooManyMethods")
   public static final class Builder {
-
-    private TranslationCache translationCache;
-
-    private TranslationProviderFactory translationProviderFactory;
 
     private final Map<
             Class<? extends TranslationProviderConfiguration>, TranslationProviderConfiguration>
         translationProviderConfigurations = new ConcurrentHashMap<>();
-
+    private TranslationCache translationCache;
+    private TranslationProviderFactory translationProviderFactory;
     private boolean encodePlaceholder;
 
     private Builder() {}
