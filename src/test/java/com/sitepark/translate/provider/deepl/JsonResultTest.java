@@ -27,7 +27,6 @@ class JsonResultTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.GuardLogStatement")
   void testNullErrorValue() {
     assertThrows(
         NullPointerException.class,

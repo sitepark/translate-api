@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@SuppressWarnings({"PMD.ReplaceHashtableWithMap"})
 public final class LibreTranslateTestConnection {
 
 	private final String url;
@@ -14,14 +13,6 @@ public final class LibreTranslateTestConnection {
 	private LibreTranslateTestConnection(String url, String apiKey) {
 		this.url = url;
 		this.apiKey = apiKey;
-	}
-
-	public String getUrl() {
-		return this.url;
-	}
-
-	public String getApiKey() {
-		return this.apiKey;
 	}
 
 	public static LibreTranslateTestConnection get() throws IOException {
@@ -37,5 +28,13 @@ public final class LibreTranslateTestConnection {
 			throw new IOException("url missing in deepl.local.properties");
 		}
 		return new LibreTranslateTestConnection(props.getProperty("url"), props.getProperty("apiKey"));
+	}
+
+	public String getUrl() {
+		return this.url;
+	}
+
+	public String getApiKey() {
+		return this.apiKey;
 	}
 }

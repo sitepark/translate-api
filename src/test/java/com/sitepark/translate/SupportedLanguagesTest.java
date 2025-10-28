@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.UnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.UnitTestContainsTooManyAsserts"})
 class SupportedLanguagesTest {
 
   @Test
