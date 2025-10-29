@@ -247,7 +247,7 @@
 						</goals>
 						<configuration>
 							<rules>
-								<banDuplicatePomDependencyVersions></banDuplicatePomDependencyVersions>
+								<banDuplicatePomDependencyVersions/>
 								<requireMavenVersion>
 									<version>3.8</version>
 								</requireMavenVersion>
@@ -269,7 +269,7 @@
 									<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
 									<message>No Snapshots Allowed!</message>
 								</requireReleaseDeps>
-								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins"></requireReleaseDepsInPlugins>
+								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins"/>
 							</rules>
 							<fail>true</fail>
 						</configuration>
