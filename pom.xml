@@ -247,7 +247,7 @@
 						</goals>
 						<configuration>
 							<rules>
-								<banDuplicatePomDependencyVersions/>
+								<banDuplicatePomDependencyVersions></banDuplicatePomDependencyVersions>
 								<requireMavenVersion>
 									<version>3.8</version>
 								</requireMavenVersion>
@@ -269,7 +269,7 @@
 									<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
 									<message>No Snapshots Allowed!</message>
 								</requireReleaseDeps>
-								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins"/>
+								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins"></requireReleaseDepsInPlugins>
 							</rules>
 							<fail>true</fail>
 						</configuration>
@@ -333,7 +333,6 @@
 							<reflowLongStrings>true</reflowLongStrings>
 							<formatJavadoc>false</formatJavadoc>
 						</googleJavaFormat>
-						<formatAnnotations/>
 					</java>
 					<pom>
 						<!-- These are the defaults, you can override if you want -->
