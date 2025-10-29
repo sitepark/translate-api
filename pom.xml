@@ -46,7 +46,7 @@
 	</scm>
 
 	<properties>
-		<junit.version>5.13.4</junit.version>
+		<junit.version>6.0.0</junit.version>
 		<spotbugs.version>4.9.3</spotbugs.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>21</maven.compiler.release>
@@ -59,6 +59,13 @@
 				<groupId>org.junit</groupId>
 				<artifactId>junit-bom</artifactId>
 				<version>${junit.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-bom</artifactId>
+				<version>3.27.6</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -99,9 +106,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<version>3.0</version>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
