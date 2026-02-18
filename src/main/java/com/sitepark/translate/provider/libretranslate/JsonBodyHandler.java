@@ -1,5 +1,6 @@
 package com.sitepark.translate.provider.libretranslate;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.translate.TranslationProviderException;
 import java.io.IOException;
@@ -18,14 +19,6 @@ public class JsonBodyHandler<W> implements HttpResponse.BodyHandler<Supplier<W>>
     this.wClass = wClass;
   }
 
-  @Override
-  public HttpResponse.BodySubscriber<Supplier<W>> apply(HttpResponse.ResponseInfo responseInfo) {
-    if (responseInfo.statusCode() != HttpURLConnection.HTTP_OK) {
-      throw new TranslationProviderException("HTTP-Status: " + responseInfo.statusCode());
-    }
-    return asJSON(this.wClass);
-  }
-
   public static <W> HttpResponse.BodySubscriber<Supplier<W>> asJSON(Class<W> targetType) {
     HttpResponse.BodySubscriber<InputStream> upstream =
         HttpResponse.BodySubscribers.ofInputStream();
@@ -40,10 +33,19 @@ public class JsonBodyHandler<W> implements HttpResponse.BodyHandler<Supplier<W>>
       try (InputStream stream = inputStream) {
         text = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper.readValue(text, targetType);
       } catch (IOException e) {
         throw new UncheckedIOException(text, e);
       }
     };
+  }
+
+  @Override
+  public HttpResponse.BodySubscriber<Supplier<W>> apply(HttpResponse.ResponseInfo responseInfo) {
+    if (responseInfo.statusCode() != HttpURLConnection.HTTP_OK) {
+      throw new TranslationProviderException("HTTP-Status: " + responseInfo.statusCode());
+    }
+    return asJSON(this.wClass);
   }
 }

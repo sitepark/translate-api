@@ -65,7 +65,7 @@ class DeeplTranslationProviderIntegrationTest {
   }
 
   @Test
-  void testTranslate() throws URISyntaxException, IOException, InterruptedException {
+  void testTranslateWithFormatText() throws URISyntaxException, IOException, InterruptedException {
 
     TranslationProvider translator = this.createProvider();
 
@@ -85,6 +85,33 @@ class DeeplTranslationProviderIntegrationTest {
     TranslationResult result = translator.translate(req);
 
     assertArrayEquals(new String[] {"Hello", "World"}, result.getText(), "Unexpected translation");
+  }
+
+  @Test
+  void testTranslateWithFormatHtml() throws URISyntaxException, IOException, InterruptedException {
+
+    TranslationProvider translator = this.createProvider();
+
+    TranslationLanguage translationLanguage =
+        TranslationLanguage.builder().source("de").target("en").build();
+
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .format(Format.HTML)
+            .language(translationLanguage)
+            .providerType(SupportedProvider.DEEPL)
+            .build();
+
+    TranslationRequest req =
+        TranslationRequest.builder()
+            .parameter(parameter)
+            .sourceText("Hallo", "<b>Welt</b>")
+            .build();
+
+    TranslationResult result = translator.translate(req);
+
+    assertArrayEquals(
+        new String[] {"Hello", "<b>world</b>"}, result.getText(), "Unexpected translation");
   }
 
   @Test

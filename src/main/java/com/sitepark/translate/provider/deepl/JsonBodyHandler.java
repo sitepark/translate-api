@@ -1,5 +1,6 @@
 package com.sitepark.translate.provider.deepl;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sitepark.translate.TranslationProviderException;
@@ -75,6 +76,7 @@ public class JsonBodyHandler<T, U> implements BodyHandler<Supplier<JsonResult<T,
   private <R> R parseResult(InputStream input, Class<R> type) {
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new JavaTimeModule());
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     if (type == String.class) {
       try {
