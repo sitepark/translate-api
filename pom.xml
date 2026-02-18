@@ -5,7 +5,7 @@
 
 	<groupId>com.sitepark</groupId>
 	<artifactId>translate-api</artifactId>
-	<version>2.2.0</version>
+	<version>2.3.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Translate Java API</name>
 	<description>Java API for translating texts across different providers</description>
@@ -41,7 +41,7 @@
 	<scm>
 		<connection>scm:git:git@github.com:sitepark/translate-api.git</connection>
 		<developerConnection>scm:git:git@github.com:sitepark/translate-api.git</developerConnection>
-		<tag>2.2.0</tag>
+		<tag>HEAD</tag>
 		<url>https://github.com/sitepark/translate-api</url>
 	</scm>
 
@@ -253,7 +253,7 @@
 						</goals>
 						<configuration>
 							<rules>
-								<banDuplicatePomDependencyVersions />
+								<banDuplicatePomDependencyVersions/>
 								<requireMavenVersion>
 									<version>3.8</version>
 								</requireMavenVersion>
@@ -275,7 +275,7 @@
 									<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
 									<message>No Snapshots Allowed!</message>
 								</requireReleaseDeps>
-								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins" />
+								<requireReleaseDepsInPlugins implementation="org.apache.maven.enforcer.rule.requireReleaseDepsInPlugins"/>
 							</rules>
 							<fail>true</fail>
 						</configuration>
