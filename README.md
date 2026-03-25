@@ -28,6 +28,28 @@ A Java API to translate texts with various translation services. The following s
 mvn install package
 ```
 
+## Docker
+
+Pre-built images are published to the GitHub Container Registry on every release.
+
+**Pull the image**
+
+```sh
+docker pull ghcr.io/sitepark/translate-api:latest
+```
+
+**Run the container**
+
+```sh
+docker run --rm ghcr.io/sitepark/translate-api:latest translate-json "deepl:XXXXXXXXXX" src/lang de src/lang/de.translated
+```
+
+**Use a specific version**
+
+```sh
+docker pull ghcr.io/sitepark/translate-api:2.3.0
+```
+
 ## How to use
 
 Maven-Dependency
