@@ -1,5 +1,7 @@
 package com.sitepark.translate.translator;
 
+import static java.awt.SystemColor.text;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
@@ -16,8 +18,8 @@ class TranslatableTextNodeInObject extends TranslatableTextNode {
   }
 
   @Override
-  public void setTargetText(String text) {
+  public void setTarget(String lang, String text) {
     this.object.put(this.key, text);
-    super.setTargetText(text);
+    super.setTarget(lang, text);
   }
 }

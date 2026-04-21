@@ -17,11 +17,16 @@ public final class TranslatableTextListTranslator extends Translator {
     super(builder);
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public TranslationResultStatistic translate(
       TranslationParameter parameter, List<? extends TranslatableText> translatableTextList) {
 
     List<? extends TranslatableText> untranslated =
-        this.translateWithCacheIfPossible(translatableTextList);
+        this.translateWithCacheIfPossible(
+            parameter.getLanguage().getTarget(), translatableTextList);
 
     if (untranslated.isEmpty()) {
       return TranslationResultStatistic.EMPTY;
@@ -70,7 +75,7 @@ public final class TranslatableTextListTranslator extends Translator {
     for (int i = 0; i < result.getText().length; i++) {
       TranslatableText node = formatFiltered.get(i);
       String text = result.getText()[i];
-      node.setTargetText(text);
+      node.setTarget(parameter.getLanguage().getTarget(), text);
     }
 
     return result.getStatistic();
@@ -84,7 +89,7 @@ public final class TranslatableTextListTranslator extends Translator {
    * @return all untranslated texts
    */
   private List<? extends TranslatableText> translateWithCacheIfPossible(
-      List<? extends TranslatableText> translatableTextList) {
+      String targetLang, List<? extends TranslatableText> translatableTextList) {
 
     if (this.getTranslationCache() == null) {
       return translatableTextList;
@@ -95,17 +100,13 @@ public final class TranslatableTextListTranslator extends Translator {
     for (TranslatableText text : translatableTextList) {
       Optional<String> translatedText = this.getTranslationCache().translate(text.getSourceText());
       if (translatedText.isPresent()) {
-        text.setTargetText(translatedText.get());
+        text.setTarget(targetLang, translatedText.get());
       } else {
         untranslated.add(text);
       }
     }
 
     return untranslated;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public static class Builder extends Translator.Builder<Builder> {

@@ -10,6 +10,7 @@ public class TranslatableText {
   private final String sourceText;
   private final Format format;
   private String sourceTextHash;
+  private String targetLang;
   private String targetText;
 
   public TranslatableText(String sourceText) {
@@ -56,8 +57,13 @@ public class TranslatableText {
     return this.targetText;
   }
 
-  public void setTargetText(String targetText) {
+  public void setTarget(String targetLang, String targetText) {
+    this.targetLang = targetLang;
     this.targetText = targetText;
+  }
+
+  public String getTargetLang() {
+    return this.targetLang;
   }
 
   public String toHash() {

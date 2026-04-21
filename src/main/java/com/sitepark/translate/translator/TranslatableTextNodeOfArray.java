@@ -16,8 +16,8 @@ class TranslatableTextNodeOfArray extends TranslatableTextNode {
   }
 
   @Override
-  public void setTargetText(String targetText) {
+  public void setTarget(String targetLang, String targetText) {
     this.array.set(this.index, targetText);
-    super.setTargetText(targetText);
+    super.setTarget(targetLang, targetText);
   }
 }

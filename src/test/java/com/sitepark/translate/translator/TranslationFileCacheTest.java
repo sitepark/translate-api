@@ -22,7 +22,7 @@ class TranslationFileCacheTest {
 
     List<TranslatableText> list = new ArrayList<>();
     TranslatableText text = new TranslatableText("Hallo Welt");
-    text.setTargetText("Hello World");
+    text.setTarget("en", "Hello World");
     list.add(text);
 
     cache.update(list);
