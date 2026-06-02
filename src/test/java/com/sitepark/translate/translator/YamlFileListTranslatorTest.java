@@ -1,0 +1,100 @@
+package com.sitepark.translate.translator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.sitepark.translate.Language;
+import com.sitepark.translate.SupportedLanguages;
+import com.sitepark.translate.SupportedProvider;
+import com.sitepark.translate.TranslationConfiguration;
+import com.sitepark.translate.TranslationProvider;
+import com.sitepark.translate.TranslationProviderFactory;
+import com.sitepark.translate.TranslationRequest;
+import com.sitepark.translate.TranslationResult;
+import com.sitepark.translate.TranslationResultStatistic;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class YamlFileListTranslatorTest {
+
+  @Test
+  @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.UnitTestContainsTooManyAsserts"})
+  void test() throws Exception {
+
+    SupportedLanguages supportedLanguages =
+        SupportedLanguages.builder()
+            .language(Language.builder().code("de").name("deutsch").targets("en"))
+            .build();
+
+    Map<String, String> dictionary = new HashMap<>();
+    dictionary.put("Hallo", "Hello");
+    dictionary.put("Welt", "World");
+
+    TranslationProvider transporter = mock(TranslationProvider.class);
+    when(transporter.translate(any(TranslationRequest.class)))
+        .thenAnswer(
+            invocationOnMock -> {
+              TranslationRequest req = (TranslationRequest) invocationOnMock.getArguments()[0];
+              String[] sourceText = req.getSourceText();
+              String[] translations = new String[sourceText.length];
+              for (int i = 0; i < translations.length; i++) {
+                translations[i] = dictionary.get(sourceText[i]);
+              }
+
+              return TranslationResult.builder()
+                  .request(req)
+                  .text(translations)
+                  .statistic(TranslationResultStatistic.EMPTY)
+                  .build();
+            });
+    when(transporter.getSupportedLanguages()).thenReturn(supportedLanguages);
+
+    TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
+    when(transporterFactory.create(any())).thenReturn(transporter);
+
+    TranslationConfiguration translatorConfiguration =
+        TranslationConfiguration.builder().translationProviderFactory(transporterFactory).build();
+
+    Path dir = Paths.get("src/test/resources/YamlFileListTranslator");
+    Path output = Paths.get("target/test/YamlFileListTranslator/translations");
+    this.cleanCache(output);
+
+    YamlFileListTranslator yamlFileListTranslator =
+        YamlFileListTranslator.builder()
+            .dir(dir)
+            .output(output)
+            .sourceLang("de")
+            .targetLangList("en")
+            .translatorConfiguration(translatorConfiguration)
+            .build();
+
+    yamlFileListTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
+
+    YAMLMapper mapper = new YAMLMapper();
+
+    Path resultA = output.resolve("en/a.yaml");
+    String translatedA = mapper.readTree(resultA.toFile()).get("text").asText();
+    assertEquals("Hello", translatedA, "wrong translation in en/a.yaml");
+
+    Path resultC = output.resolve("en/b/c.yaml");
+    String translatedC = mapper.readTree(resultC.toFile()).get("d").asText();
+    assertEquals("World", translatedC, "wrong translation in en/b/c.yaml");
+  }
+
+  private void cleanCache(Path dir) throws IOException {
+    if (!Files.exists(dir)) {
+      return;
+    }
+    Files.walk(dir).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+  }
+}
