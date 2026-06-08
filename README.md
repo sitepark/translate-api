@@ -41,7 +41,7 @@ docker pull ghcr.io/sitepark/translate-api:latest
 **Run the container**
 
 ```sh
-docker run --rm ghcr.io/sitepark/translate-api:latest translate-json "deepl:XXXXXXXXXX" src/lang de src/lang/de.translated
+docker run -v $(pwd):/app --rm ghcr.io/sitepark/translate-api:latest translate-json translate-json "deepl:XXXXXXXXXX" src/lang de src/lang/de.translated
 ```
 
 **Use a specific version**
