@@ -304,3 +304,10 @@ TranslatorConfiguration translatorConfiguration = TranslatorConfiguration.builde
 		//...
 		.build();
 ```
+
+Plain-text strings containing placeholders are detected automatically — no explicit `Format` needs to be set. The protection mechanism differs by provider:
+
+- **DeepL**: uses XML tag handling (`tag_handling=xml` + `ignore_tags`). Only strings that actually contain placeholders are sent in XML mode; plain strings without placeholders are unaffected.
+- **LibreTranslate**: uses HTML mode with `translate="no"` span tags, since LibreTranslate does not support XML tag handling.
+
+HTML strings that also contain placeholders continue to use HTML mode on both providers.
