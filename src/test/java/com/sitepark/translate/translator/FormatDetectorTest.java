@@ -1,8 +1,10 @@
 package com.sitepark.translate.translator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.sitepark.translate.Format;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
@@ -53,8 +55,35 @@ class FormatDetectorTest {
   }
 
   @Test
-  void testContainsPlaceholder() {
+  void testContainsPlaceholderDollarBrace() {
     assertTrue(
         FormatDetector.containsPlaceholder("Good morning ${name}"), "should find placeholder");
+  }
+
+  @Test
+  void testContainsPlaceholderBrace() {
+    assertTrue(
+        FormatDetector.containsPlaceholder("Good morning {name}"), "should find placeholder");
+  }
+
+  @Test
+  void testDetectPlainTextWithDollarBracePlaceholder() {
+    assertEquals(Format.XML, FormatDetector.detect("Good morning ${name}"), "expected XML");
+  }
+
+  @Test
+  void testDetectPlainTextWithBracePlaceholder() {
+    assertEquals(Format.XML, FormatDetector.detect("Hello {name}!"), "expected XML");
+  }
+
+  @Test
+  void testDetectHtmlWithPlaceholder() {
+    assertEquals(
+        Format.HTML, FormatDetector.detect("<b>Hello</b> {name}"), "HTML takes priority over XML");
+  }
+
+  @Test
+  void testDetectPlainText() {
+    assertEquals(Format.TEXT, FormatDetector.detect("Hello World"), "expected TEXT");
   }
 }

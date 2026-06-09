@@ -2,6 +2,7 @@ package com.sitepark.translate.provider.deepl;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sitepark.translate.Format;
 import com.sitepark.translate.Glossary;
@@ -71,6 +72,44 @@ class DeeplTranslationProviderTest {
 
     assertArrayEquals(
         new String[] {"Hello", "World"}, translated.getText(), "unexpected translation");
+  }
+
+  @Test
+  void testXmlFormatSendsTagHandlingAndIgnoreTags() throws Exception {
+
+    DeeplTranslationProviderConfiguration providerConfig =
+        DeeplTranslationProviderConfiguration.builder()
+            .url(this.mockWebServer.url("").toString().replaceAll("/$", ""))
+            .authKey("test")
+            .build();
+
+    TranslationConfiguration config =
+        TranslationConfiguration.builder()
+            .encodePlaceholder(true)
+            .translationProviderConfiguration(providerConfig)
+            .build();
+
+    DeeplTranslationProvider xmlProvider = new DeeplTranslationProvider(config);
+
+    TranslationLanguage language = TranslationLanguage.builder().source("de").target("en").build();
+
+    TranslationRequest req =
+        TranslationRequest.builder()
+            .parameter(
+                TranslationParameter.builder()
+                    .format(Format.XML)
+                    .language(language)
+                    .providerType(SupportedProvider.DEEPL)
+                    .build())
+            .sourceText("Hallo {name}", "Welt {value}")
+            .build();
+
+    xmlProvider.translate(req);
+
+    RecordedRequest recorded = this.mockWebServer.takeRequest();
+    String body = recorded.getBody().readUtf8();
+    assertTrue(body.contains("tag_handling=xml"), "expected tag_handling=xml in body: " + body);
+    assertTrue(body.contains("ignore_tags=x"), "expected ignore_tags=x in body: " + body);
   }
 
   @Test

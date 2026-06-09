@@ -22,7 +22,7 @@ class TranslatableTextTest {
   @Test
   void testAutoDetectPlaceholderConstructor() {
     TranslatableText text = new TranslatableText("text with placeholder ${name}");
-    assertEquals(Format.HTML, text.getFormat(), "format should be html");
+    assertEquals(Format.XML, text.getFormat(), "format should be xml");
   }
 
   @Test

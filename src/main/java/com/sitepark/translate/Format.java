@@ -6,6 +6,7 @@ import java.util.Locale;
 public enum Format {
   TEXT,
   HTML,
+  XML,
   AUTO;
 
   @Override

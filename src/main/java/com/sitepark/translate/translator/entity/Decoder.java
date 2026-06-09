@@ -6,6 +6,11 @@ import java.util.regex.Pattern;
 
 public final class Decoder {
 
+  private static final Pattern HTML_ENTITY_PATTERN =
+      Pattern.compile("(<span data-encoded-entity=\"true\" translate=\"no\">)(.*?)(</span>)");
+
+  private static final Pattern XML_ENTITY_PATTERN = Pattern.compile("<x>(.*?)</x>");
+
   private Decoder() {}
 
   public static String[] decode(String... text) {
@@ -13,9 +18,7 @@ public final class Decoder {
   }
 
   public static String decode(String text) {
-    Pattern pattern =
-        Pattern.compile("(<span data-encoded-entity=\"true\" translate=\"no\">)(.*?)(</span>)");
-    Matcher matcher = pattern.matcher(text);
+    Matcher matcher = HTML_ENTITY_PATTERN.matcher(text);
     int start = 0;
     StringBuilder decoded = new StringBuilder();
     while (matcher.find()) {
@@ -24,5 +27,19 @@ public final class Decoder {
     }
     decoded.append(text.substring(start, text.length()));
     return decoded.toString();
+  }
+
+  public static String[] decodeXml(String... text) {
+    return Arrays.stream(text).map(Decoder::decodeXml).toArray(String[]::new);
+  }
+
+  public static String decodeXml(String text) {
+    Matcher m = XML_ENTITY_PATTERN.matcher(text);
+    StringBuffer sb = new StringBuffer();
+    while (m.find()) {
+      m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1)));
+    }
+    m.appendTail(sb);
+    return sb.toString().replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">");
   }
 }
