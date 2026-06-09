@@ -34,13 +34,15 @@ public final class TranslatableTextListTranslator extends Translator {
 
     TranslationResultStatistic htmlStatistic = this.translate(Format.HTML, parameter, untranslated);
 
+    TranslationResultStatistic xmlStatistic = this.translate(Format.XML, parameter, untranslated);
+
     TranslationResultStatistic textStatistic = this.translate(Format.TEXT, parameter, untranslated);
 
     if (this.getTranslationCache() != null) {
       this.getTranslationCache().update(translatableTextList);
     }
 
-    return htmlStatistic.add(textStatistic);
+    return htmlStatistic.add(xmlStatistic).add(textStatistic);
   }
 
   private TranslationResultStatistic translate(

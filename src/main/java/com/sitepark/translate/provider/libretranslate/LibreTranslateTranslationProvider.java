@@ -1,6 +1,7 @@
 package com.sitepark.translate.provider.libretranslate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sitepark.translate.Format;
 import com.sitepark.translate.Glossary;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.TranslationConfiguration;
@@ -36,16 +37,24 @@ public class LibreTranslateTranslationProvider implements TranslationProvider {
 
   public TranslationResult translate(TranslationRequest req) {
 
+    Format format = req.getParameter().getFormat().orElse(null);
+    Format effectiveFormat = format == Format.XML ? Format.HTML : format;
+
     String[] encodedSourceText = this.encodePlacerholder(req.getSourceText());
 
     UnifiedSourceText unifiedSourceText = new UnifiedSourceText(encodedSourceText);
+
+    TranslationParameter effectiveParameter =
+        effectiveFormat != format
+            ? req.getParameter().toBuilder().format(effectiveFormat).build()
+            : req.getParameter();
 
     try {
 
       long start = System.currentTimeMillis();
 
       String[] translated =
-          this.translationRequest(req.getParameter(), unifiedSourceText.getSourceText());
+          this.translationRequest(effectiveParameter, unifiedSourceText.getSourceText());
 
       String[] decodedTranslation = this.decodePlacerholder(translated);
 

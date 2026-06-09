@@ -14,4 +14,29 @@ class EncoderTest {
         s,
         "Unexpected encoding");
   }
+
+  @Test
+  void testEncodeXmlWithPlaceholder() {
+    assertEquals(
+        "Hello <x>{name}</x>!", Encoder.encodeXml("Hello {name}!"), "Unexpected XML encoding");
+  }
+
+  @Test
+  void testEncodeXmlWithDollarBracePlaceholder() {
+    assertEquals(
+        "Hello <x>${name}</x>!", Encoder.encodeXml("Hello ${name}!"), "Unexpected XML encoding");
+  }
+
+  @Test
+  void testEncodeXmlWithoutPlaceholderIsUnchanged() {
+    assertEquals("Hello World", Encoder.encodeXml("Hello World"), "Plain text should be unchanged");
+  }
+
+  @Test
+  void testEncodeXmlEscapesSpecialChars() {
+    assertEquals(
+        "A &amp; B &lt;x&gt; <x>{val}</x>",
+        Encoder.encodeXml("A & B <x> {val}"),
+        "Unexpected XML escaping");
+  }
 }

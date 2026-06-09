@@ -44,9 +44,11 @@ public class DeeplTranslationProvider implements TranslationProvider {
   public TranslationResult translate(TranslationRequest req) {
 
     String[] sourceTextToTranslate = req.getSourceText();
-    if (req.getParameter().getFormat().isPresent()
-        && req.getParameter().getFormat().get() == Format.HTML) {
+    Format format = req.getParameter().getFormat().orElse(null);
+    if (format == Format.HTML) {
       sourceTextToTranslate = this.encodePlacerholder(req.getSourceText());
+    } else if (format == Format.XML) {
+      sourceTextToTranslate = this.encodePlacerholderXml(req.getSourceText());
     }
 
     UnifiedSourceText unifiedSourceText = new UnifiedSourceText(sourceTextToTranslate);
@@ -59,7 +61,10 @@ public class DeeplTranslationProvider implements TranslationProvider {
 
       String[] translated = translationRequest(modifiedReq);
 
-      String[] decodedTranslation = this.decodePlacerholder(translated);
+      String[] decodedTranslation =
+          format == Format.XML
+              ? this.decodePlacerholderXml(translated)
+              : this.decodePlacerholder(translated);
 
       return TranslationResult.builder()
           .request(req)
@@ -88,9 +93,14 @@ public class DeeplTranslationProvider implements TranslationProvider {
     List<String[]> params = new ArrayList<>();
     params.add(new String[] {"source_lang", language.getSource()});
     params.add(new String[] {"target_lang", language.getTarget()});
-    if (req.getParameter().getFormat().isPresent()
-        && req.getParameter().getFormat().get() == Format.HTML) {
-      params.add(new String[] {"tag_handling", Format.HTML.toString().toLowerCase()});
+    if (req.getParameter().getFormat().isPresent()) {
+      Format fmt = req.getParameter().getFormat().get();
+      if (fmt == Format.HTML) {
+        params.add(new String[] {"tag_handling", "html"});
+      } else if (fmt == Format.XML) {
+        params.add(new String[] {"tag_handling", "xml"});
+        params.add(new String[] {"ignore_tags", "x"});
+      }
     }
     for (String text : req.getSourceText()) {
       params.add(new String[] {"text", text});
@@ -162,6 +172,22 @@ public class DeeplTranslationProvider implements TranslationProvider {
     }
 
     return Decoder.decode(q);
+  }
+
+  private String[] encodePlacerholderXml(String... q) {
+    if (!this.translatorConfiguration.isEncodePlaceholder()) {
+      return q;
+    }
+
+    return Encoder.encodeXml(q);
+  }
+
+  private String[] decodePlacerholderXml(String... q) {
+    if (!this.translatorConfiguration.isEncodePlaceholder()) {
+      return q;
+    }
+
+    return Decoder.decodeXml(q);
   }
 
   private int byteCount(String... array) {
