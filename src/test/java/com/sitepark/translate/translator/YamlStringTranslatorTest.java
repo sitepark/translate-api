@@ -1,6 +1,7 @@
 package com.sitepark.translate.translator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -62,5 +63,25 @@ class YamlStringTranslatorTest {
     assertThat(result).contains("Heading");
     assertThat(result).contains("A beautiful text");
     assertThat(result).contains("Flowers");
+  }
+
+  @Test
+  void testWithMalformedYamlThrows() {
+
+    TranslationConfiguration translatorConfiguration = TranslationConfiguration.builder().build();
+
+    YamlStringTranslator translator =
+        YamlStringTranslator.builder().translatorConfiguration(translatorConfiguration).build();
+
+    TranslationLanguage language = TranslationLanguage.builder().source("de").target("en").build();
+
+    TranslationParameter parameter =
+        TranslationParameter.builder()
+            .providerType(SupportedProvider.LIBRE_TRANSLATE)
+            .language(language)
+            .build();
+
+    assertThrows(
+        TranslatorException.class, () -> translator.translate(parameter, "text: [unclosed\n"));
   }
 }
