@@ -1,6 +1,7 @@
 package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -87,6 +88,73 @@ class JsonFileTranslatorTest {
         "{\n" + "  \"text\" : \"Hello\"\n" + "}",
         Files.readString(resultA, StandardCharsets.UTF_8),
         "wrong content in en/a.json");
+  }
+
+  @Test
+  @SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.UnitTestContainsTooManyAsserts"})
+  void testWithSeparateOutputDirectory() throws Exception {
+
+    SupportedLanguages supportedLanguages =
+        SupportedLanguages.builder()
+            .language(Language.builder().code("de").name("deutsch").targets("en"))
+            .build();
+
+    Map<String, String> dictionary = new HashMap<>();
+    dictionary.put("Hallo", "Hello");
+    dictionary.put("Welt", "World");
+
+    TranslationProvider transporter = mock(TranslationProvider.class);
+    when(transporter.translate(any(TranslationRequest.class)))
+        .thenAnswer(
+            invocationOnMock -> {
+              TranslationRequest req = (TranslationRequest) invocationOnMock.getArguments()[0];
+              String[] sourceText = req.getSourceText();
+              String[] translations = new String[sourceText.length];
+              for (int i = 0; i < translations.length; i++) {
+                translations[i] = dictionary.get(sourceText[i]);
+              }
+
+              return TranslationResult.builder()
+                  .request(req)
+                  .text(translations)
+                  .statistic(TranslationResultStatistic.EMPTY)
+                  .build();
+            });
+    when(transporter.getSupportedLanguages()).thenReturn(supportedLanguages);
+
+    TranslationProviderFactory transporterFactory = mock(TranslationProviderFactory.class);
+    when(transporterFactory.create(any())).thenReturn(transporter);
+
+    TranslationConfiguration translatorConfiguration =
+        TranslationConfiguration.builder().translationProviderFactory(transporterFactory).build();
+
+    Path resources = Paths.get("src/test/resources/JsonFileTranslator");
+    Path testdir = Paths.get("target/test/JsonFileTranslatorSeparateOutput/src");
+    Path outputdir = Paths.get("target/test/JsonFileTranslatorSeparateOutput/generated");
+
+    this.clean(testdir.getParent());
+    this.copyFiles(resources, testdir);
+
+    JsonFileTranslator jsonFileTranslator =
+        JsonFileTranslator.builder()
+            .dir(testdir)
+            .output(outputdir)
+            .sourceLang("de")
+            .targetLangList("en")
+            .translatorConfiguration(translatorConfiguration)
+            .build();
+
+    jsonFileTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
+
+    Path resultA = outputdir.resolve("a.en.json");
+    assertEquals(
+        "{\n" + "  \"text\" : \"Hello\"\n" + "}",
+        Files.readString(resultA, StandardCharsets.UTF_8),
+        "wrong content in generated/a.en.json");
+
+    assertFalse(
+        Files.exists(testdir.resolve("a.en.json")),
+        "translated file must not be written into the source directory");
   }
 
   private void clean(Path dir) throws IOException {

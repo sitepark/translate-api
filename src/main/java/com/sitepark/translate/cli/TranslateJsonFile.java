@@ -58,6 +58,7 @@ public class TranslateJsonFile {
     String url = arguments[0];
     Path dir = Paths.get(arguments[1]).toAbsolutePath();
     String sourceLang = arguments[2];
+    Path output = arguments.length > 3 ? Paths.get(arguments[3]).toAbsolutePath() : dir;
     if (!Files.exists(dir)) {
       throw new IllegalArgumentException("dir " + dir + " not exitst");
     }
@@ -78,7 +79,7 @@ public class TranslateJsonFile {
     this.jsonFileTranslator =
         JsonFileTranslator.builder()
             .dir(dir)
-            .output(dir)
+            .output(output)
             .sourceLang(sourceLang)
             .translatorConfiguration(translatorConfiguration)
             .logger(new ConsoleLogger(true))
@@ -143,13 +144,16 @@ public class TranslateJsonFile {
 
   private void usage() {
     System.out.println(
-        "translate translate-json <libre-translate-url> <dir> <source-lang> <output-dir>");
+        "translate translate-json-file <url> <dir> <source-lang> [output-dir] "
+            + "[target-language]...");
     System.out.println("");
     System.out.println(
         "<url>                   URL to translation server: "
             + "<provider-scheme>:http[s]://host/[?params]");
     System.out.println("<dir>                   directory in which the json files are located");
     System.out.println("<source-lang>           Language to be translated.");
+    System.out.println(
+        "[output-dir]            directory to write translated files to (default: <dir>)");
     System.out.println("");
     System.out.println("Supported provider-scheme:");
     for (String provider : SupportedProvider.scheme()) {

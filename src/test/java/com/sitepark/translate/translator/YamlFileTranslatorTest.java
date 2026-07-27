@@ -1,6 +1,7 @@
 package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -265,6 +266,49 @@ class YamlFileTranslatorTest {
     YAMLMapper mapper = new YAMLMapper();
     String result = mapper.readTree(testdir.resolve("a.en.yaml").toFile()).get("text").asText();
     assertEquals("Hello", result, "translation should still succeed despite cache error");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testWithSeparateOutputDirectory() throws Exception {
+
+    SupportedLanguages supportedLanguages =
+        SupportedLanguages.builder()
+            .language(Language.builder().code("de").name("deutsch").targets("en"))
+            .build();
+
+    Map<String, String> dictionary = new HashMap<>();
+    dictionary.put("Hallo", "Hello");
+
+    TranslationConfiguration translatorConfiguration =
+        this.createTranslatorConfiguration(supportedLanguages, dictionary);
+
+    Path resources = Paths.get("src/test/resources/YamlFileTranslator");
+    Path testdir = Paths.get("target/test/YamlFileTranslatorSeparateOutput/src");
+    Path outputdir = Paths.get("target/test/YamlFileTranslatorSeparateOutput/generated");
+
+    this.clean(testdir.getParent());
+    this.copyFiles(resources, testdir);
+
+    YamlFileTranslator yamlFileTranslator =
+        YamlFileTranslator.builder()
+            .dir(testdir)
+            .output(outputdir)
+            .sourceLang("de")
+            .targetLangList("en")
+            .translatorConfiguration(translatorConfiguration)
+            .build();
+
+    yamlFileTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
+
+    Path resultA = outputdir.resolve("a.en.yaml");
+    YAMLMapper mapper = new YAMLMapper();
+    String translated = mapper.readTree(resultA.toFile()).get("text").asText();
+    assertEquals("Hello", translated, "wrong translation in a.en.yaml");
+
+    assertFalse(
+        Files.exists(testdir.resolve("a.en.yaml")),
+        "translated file must not be written into the source directory");
   }
 
   private TranslationConfiguration createTranslatorConfiguration(

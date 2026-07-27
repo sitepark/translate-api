@@ -117,13 +117,8 @@ public final class YamlFileTranslator extends Translator {
     YAMLMapper mapper = new YAMLMapper();
 
     for (YamlFile yamlFile : this.yamlFiles) {
-      Path parent = yamlFile.sourceFile.getParent();
-      if (parent == null) {
-        parent = this.dir;
-      }
-      if (parent == null) {
-        throw new IllegalStateException("parent is null");
-      }
+      Path relativeParent = yamlFile.sourceFile.getParent();
+      Path parent = relativeParent == null ? this.output : this.output.resolve(relativeParent);
 
       Path filenamePath = yamlFile.sourceFile.getFileName();
       if (filenamePath == null) {
