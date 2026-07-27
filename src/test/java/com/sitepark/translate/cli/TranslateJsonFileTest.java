@@ -21,4 +21,15 @@ class TranslateJsonFileTest {
         "libretranslate:https://dummy?apiKey=abc", "src/test/resources/translate-json", "de");
     assertNotNull(translateJsonFile.getTranslator(), "translator expected");
   }
+
+  @Test
+  void testParseArgumentsWithOutputDir() {
+    TranslateJsonFile translateJsonFile = new TranslateJsonFile();
+    translateJsonFile.parseArguments(
+        "deepl:https://dummy?authKey=abc",
+        "src/test/resources/translate-json",
+        "de",
+        "target/test/translate-json-generated");
+    assertNotNull(translateJsonFile.getTranslator(), "translator expected");
+  }
 }

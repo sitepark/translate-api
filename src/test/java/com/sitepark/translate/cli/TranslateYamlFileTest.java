@@ -32,13 +32,24 @@ class TranslateYamlFileTest {
   }
 
   @Test
+  void testParseArgumentsWithOutputDir() {
+    TranslateYamlFile translateYamlFile = new TranslateYamlFile();
+    translateYamlFile.parseArguments(
+        "deepl:https://dummy?authKey=abc",
+        "src/test/resources/translate-yaml",
+        "de",
+        "target/test/translate-yaml-generated");
+    assertNotNull(translateYamlFile.getTranslator(), "translator expected");
+  }
+
+  @Test
   void testParseArgumentsWithTargetLanguages() {
     TranslateYamlFile translateYamlFile = new TranslateYamlFile();
     translateYamlFile.parseArguments(
         "deepl:https://dummy?authKey=abc",
         "src/test/resources/translate-yaml",
         "de",
-        "unused",
+        "target/test/translate-yaml-target-langs",
         "en",
         "fr");
     assertNotNull(translateYamlFile.getTranslator(), "translator expected");
