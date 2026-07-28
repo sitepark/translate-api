@@ -28,4 +28,16 @@ class DecoderTest {
   void testDecodeXmlNoWrappersIsUnchanged() {
     assertEquals("Hello World", Decoder.decodeXml("Hello World"), "Should be unchanged");
   }
+
+  @Test
+  void testDecodeXmlStripsWrapperSpanningNewlines() {
+    assertEquals(
+        "{count, plural,\n    one   {Category}\n    other {Categories}\n    }",
+        Decoder.decodeXml(
+            "<x>{count, plural,\n"
+                + "    one   {</x>Category<x>}\n"
+                + "    other {</x>Categories<x>}\n"
+                + "    }</x>"),
+        "multi-line <x> blocks must be stripped");
+  }
 }

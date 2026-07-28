@@ -86,4 +86,25 @@ class FormatDetectorTest {
   void testDetectPlainText() {
     assertEquals(Format.TEXT, FormatDetector.detect("Hello World"), "expected TEXT");
   }
+
+  @Test
+  void testDetectIcuTypedArgument() {
+    assertEquals(
+        Format.XML,
+        FormatDetector.detect("{value, number, ::.#} kB"),
+        "ICU typed argument should be detected as XML");
+  }
+
+  @Test
+  void testDetectIcuPlural() {
+    assertEquals(
+        Format.XML,
+        FormatDetector.detect("{count, plural, one {Kategorie} other {Kategorien}}"),
+        "ICU plural should be detected as XML");
+  }
+
+  @Test
+  void testDetectDatePatternIsPlainText() {
+    assertEquals(Format.TEXT, FormatDetector.detect("dd.MM.yyyy"), "expected TEXT");
+  }
 }
