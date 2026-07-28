@@ -39,4 +39,20 @@ class EncoderTest {
         Encoder.encodeXml("A & B <x> {val}"),
         "Unexpected XML escaping");
   }
+
+  @Test
+  void testEncodeXmlDelegatesToIcuForPlural() {
+    assertEquals(
+        "<x>{count, plural, one {</x>Kategorie<x>} other {</x>Kategorien<x>}}</x>",
+        Encoder.encodeXml("{count, plural, one {Kategorie} other {Kategorien}}"),
+        "ICU plural should be encoded via IcuMessageEncoder");
+  }
+
+  @Test
+  void testEncodeXmlDelegatesToIcuForTypedArgument() {
+    assertEquals(
+        "<x>{value, number, ::.#}</x> kB",
+        Encoder.encodeXml("{value, number, ::.#} kB"),
+        "ICU typed argument should be encoded via IcuMessageEncoder");
+  }
 }
