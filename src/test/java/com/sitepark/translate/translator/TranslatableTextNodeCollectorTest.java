@@ -90,4 +90,32 @@ class TranslatableTextNodeCollectorTest {
     assertFalse(sources.contains("drop"), "array element excluded by indexed full path");
     assertTrue(sources.contains("keep"), "other array element remains");
   }
+
+  @Test
+  void testNullBaseKeyUsesPathDirectly() throws IOException {
+    // collector built without a base key -> keys are the bare nested path (no file prefix)
+    JsonNode node = new YAMLMapper().readTree("format:\n  date: dd.MM.yyyy\n");
+    Set<String> sources =
+        new TranslatableTextNodeCollector()
+                .excludes(TranslatableTextNodeCollectorExcludes.of(Set.of("format.date")))
+                .collect(node)
+                .stream()
+                .map(TranslatableTextNode::getSourceText)
+                .collect(Collectors.toSet());
+    assertFalse(sources.contains("dd.MM.yyyy"), "excluded via null-base full path");
+  }
+
+  @Test
+  void testRootScalarExcludedByBaseKey() throws IOException {
+    // a document that is a bare scalar: the node has no key, so it is addressed by the base key
+    JsonNode node = new YAMLMapper().readTree("\"just a string\"\n");
+    Set<String> sources =
+        new TranslatableTextNodeCollector("root")
+                .excludes(TranslatableTextNodeCollectorExcludes.of(Set.of("root")))
+                .collect(node)
+                .stream()
+                .map(TranslatableTextNode::getSourceText)
+                .collect(Collectors.toSet());
+    assertTrue(sources.isEmpty(), "root scalar excluded by base key");
+  }
 }
