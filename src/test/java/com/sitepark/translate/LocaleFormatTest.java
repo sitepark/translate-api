@@ -29,6 +29,25 @@ class LocaleFormatTest {
   }
 
   @ParameterizedTest
+  @CsvSource({"en_GB, en-GB, en_GB", "EN-GB, en-GB, en_GB", "zh_hant, zh-Hant, zh_Hant"})
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testFormatNonNormalizedCode(String code, String bcp47, String icu) {
+    assertThat(LocaleFormat.BCP47.format(code)).isEqualTo(bcp47);
+    assertThat(LocaleFormat.ICU.format(code)).isEqualTo(icu);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"", "x", "toolongsubtag-123456789"})
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testFormatInvalidCode(String code) {
+    assertThat(LocaleFormat.LOWERCASE.format(code)).isEqualTo(code);
+    assertThatThrownBy(() -> LocaleFormat.BCP47.format(code))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> LocaleFormat.ICU.format(code))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @ParameterizedTest
   @CsvSource({
     "lowercase, LOWERCASE",
     "LOWERCASE, LOWERCASE",

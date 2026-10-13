@@ -36,7 +36,7 @@ public enum LocaleFormat {
   BCP47 {
     @Override
     public String format(String code) {
-      return ULocale.forLanguageTag(code).toLanguageTag();
+      return toULocale(code).toLanguageTag();
     }
   },
 
@@ -44,11 +44,25 @@ public enum LocaleFormat {
   ICU {
     @Override
     public String format(String code) {
-      return ULocale.forLanguageTag(code).toString();
+      return toULocale(code).toString();
     }
   };
 
+  /**
+   * Formats a provider language code.
+   *
+   * @throws IllegalArgumentException if {@code code} is not a valid language tag (only for {@link
+   *     #BCP47} and {@link #ICU})
+   */
   public abstract String format(String code);
+
+  private static ULocale toULocale(String code) {
+    ULocale locale = ULocale.forLanguageTag(normalize(code));
+    if (locale.getLanguage().isEmpty()) {
+      throw new IllegalArgumentException("'" + code + "' is not a valid language tag");
+    }
+    return locale;
+  }
 
   public static LocaleFormat fromName(String name) {
     Objects.requireNonNull(name, "name is null");
