@@ -1,5 +1,6 @@
 package com.sitepark.translate.cli;
 
+import com.sitepark.translate.LocaleFormat;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.TranslationProviderConfiguration;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("PMD")
 public class TranslateJson {
@@ -28,6 +30,8 @@ public class TranslateJson {
   private SupportedProvider providerType;
 
   private List<String> targetLanguages;
+
+  private LocaleFormat localeFormat;
 
   public static final String COMMAND_NAME = "translate-json";
 
@@ -49,7 +53,23 @@ public class TranslateJson {
     return this.jsonFileListTranslator;
   }
 
-  protected void parseArguments(String... arguments) {
+  protected LocaleFormat getLocaleFormat() {
+    return this.localeFormat;
+  }
+
+  protected List<String> getTargetLanguages() {
+    return this.targetLanguages;
+  }
+
+  protected void parseArguments(String... argv) {
+
+    CliOptions options = CliOptions.parse(Set.of(CliOptions.OUTPUT_LOCALE_FORMAT), argv);
+    this.localeFormat =
+        options
+            .get(CliOptions.OUTPUT_LOCALE_FORMAT)
+            .map(LocaleFormat::fromName)
+            .orElse(LocaleFormat.LOWERCASE);
+    String[] arguments = options.positional();
 
     if (arguments.length < 4) {
       throw new IllegalArgumentException(
@@ -83,6 +103,7 @@ public class TranslateJson {
             .dir(dir)
             .output(output)
             .sourceLang(sourceLang)
+            .localeFormat(this.localeFormat)
             .translatorConfiguration(translatorConfiguration)
             .logger(new ConsoleLogger(true))
             .build();
@@ -146,7 +167,8 @@ public class TranslateJson {
 
   private void usage() {
     System.out.println(
-        "translate translate-json <libre-translate-url> <dir> <source-lang> <output-dir>");
+        "translate translate-json [options] <libre-translate-url> <dir> <source-lang> <output-dir> "
+            + "[target-language]...");
     System.out.println("");
     System.out.println(
         "<url>                   URL to translation server: "
@@ -156,6 +178,17 @@ public class TranslateJson {
     System.out.println("<source-lang>           Language to be translated. This must also be ");
     System.out.println("                        as a directory in <dir>.");
     System.out.println("<output-dir>            directory in which the translations are written");
+    System.out.println(
+        "[target-language]...    languages to translate into (default: all supported)");
+    System.out.println("");
+    System.out.println("Options:");
+    System.out.println("--output-locale-format=<format>");
+    System.out.println(
+        "                        spelling of the locale in output file and directory");
+    System.out.println("                        names (does not affect API requests and caches):");
+    System.out.println("                          lowercase  en-gb, zh-hans, es-419 (default)");
+    System.out.println("                          bcp47      en-GB, zh-Hans, es-419");
+    System.out.println("                          icu        en_GB, zh_Hans, es_419");
     System.out.println("");
     System.out.println("Supported provider-scheme:");
     for (String provider : SupportedProvider.scheme()) {

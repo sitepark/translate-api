@@ -3,6 +3,7 @@ package com.sitepark.translate.translator; // NOPMD by veltrup on 24.05.23, 15:3
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.sitepark.translate.Language;
+import com.sitepark.translate.LocaleFormat;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationLanguage;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +37,6 @@ import java.util.stream.Stream;
 })
 public final class YamlFileTranslator extends Translator {
 
-  private static final String EN_US = "en-us";
   private final Path dir;
   private final Path output;
   private final String sourceLang;
@@ -43,6 +44,7 @@ public final class YamlFileTranslator extends Translator {
   private final String sourceSuffixYml;
   private final Set<String> targetLangList;
   private final Logger logger;
+  private final LocaleFormat localeFormat;
   private List<YamlFile> yamlFiles;
   private List<TranslatableTextNode> translatableTextNodeList;
   private TranslatableTextNodeCollectorExcludes excludes;
@@ -54,6 +56,7 @@ public final class YamlFileTranslator extends Translator {
     this.sourceLang = builder.sourceLang;
     this.targetLangList = builder.targetLangList;
     this.logger = builder.logger;
+    this.localeFormat = builder.localeFormat;
     this.sourceSuffixYaml = "." + this.sourceLang + ".yaml";
     this.sourceSuffixYml = "." + this.sourceLang + ".yml";
   }
@@ -75,18 +78,10 @@ public final class YamlFileTranslator extends Translator {
 
     long tt = System.currentTimeMillis();
 
-    List<String> targetLanguageList;
-    if (targets != null) {
-      targetLanguageList = targets;
-    } else {
-      targetLanguageList = sourceLanguage.getTargets();
-    }
+    List<String> targetLanguageList = TargetLanguages.resolve(targets, sourceLanguage.getTargets());
 
     for (String targetLanguage : targetLanguageList) {
-      if (this.sourceLang.equals(targetLanguage)) {
-        continue;
-      }
-      if (!this.targetLangList.isEmpty() && !this.targetLangList.contains(targetLanguage)) {
+      if (!TargetLanguages.isWanted(this.sourceLang, this.targetLangList, targetLanguage)) {
         continue;
       }
       long t = System.currentTimeMillis();
@@ -103,7 +98,7 @@ public final class YamlFileTranslator extends Translator {
               + duration
               + " seconds.");
       this.write(targetLanguage);
-      if (EN_US.equals(targetLanguage)) {
+      if (TargetLanguages.isEnUs(targetLanguage)) {
         this.write("en");
       }
     }
@@ -131,7 +126,9 @@ public final class YamlFileTranslator extends Translator {
       if (!Files.exists(parent)) {
         Files.createDirectories(parent);
       }
-      Path translatedFile = parent.resolve(basename + "." + lang + "." + yamlFile.extension);
+      Path translatedFile =
+          parent.resolve(
+              basename + "." + this.localeFormat.format(lang) + "." + yamlFile.extension);
       mapper.writerWithDefaultPrettyPrinter().writeValue(translatedFile.toFile(), yamlFile.node);
     }
   }
@@ -272,6 +269,7 @@ public final class YamlFileTranslator extends Translator {
     private Path output;
     private String sourceLang;
     private Logger logger;
+    private LocaleFormat localeFormat = LocaleFormat.LOWERCASE;
 
     private Builder() {}
 
@@ -295,13 +293,26 @@ public final class YamlFileTranslator extends Translator {
 
     public Builder targetLangList(String... targetLangList) {
       Objects.requireNonNull(targetLangList, "targetLangList is null");
-      this.targetLangList.addAll(Arrays.asList(targetLangList));
-      return this;
+      return this.addTargetLangs(Arrays.asList(targetLangList));
     }
 
     public Builder targetLangList(Set<String> targetLangList) {
       Objects.requireNonNull(targetLangList, "targetLangList is null");
-      this.targetLangList.addAll(targetLangList);
+      return this.addTargetLangs(targetLangList);
+    }
+
+    private Builder addTargetLangs(Collection<String> langs) {
+      langs.forEach(lang -> this.targetLangList.add(LocaleFormat.normalize(lang)));
+      return this;
+    }
+
+    /**
+     * Spelling of the locale in output file and directory names. Defaults to {@link
+     * LocaleFormat#LOWERCASE}. API requests and caches always use the provider's code.
+     */
+    public Builder localeFormat(LocaleFormat localeFormat) {
+      Objects.requireNonNull(localeFormat, "localeFormat is null");
+      this.localeFormat = localeFormat;
       return this;
     }
 

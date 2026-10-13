@@ -3,12 +3,14 @@ package com.sitepark.translate.translator;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.sitepark.translate.Language;
+import com.sitepark.translate.LocaleFormat;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
@@ -23,6 +25,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.UseConcurrentHashMap")
+@SuppressWarnings({"PMD.UseConcurrentHashMap", "PMD.ExcessiveImports"})
 class YamlFileTranslatorTest {
 
   @Test
@@ -311,14 +314,144 @@ class YamlFileTranslatorTest {
         "translated file must not be written into the source directory");
   }
 
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testWithIcuLocaleFormat() throws Exception {
+
+    SupportedLanguages supportedLanguages =
+        SupportedLanguages.builder()
+            .language(Language.builder().code("de").name("deutsch").targets("en-gb", "en-us"))
+            .build();
+
+    Map<String, String> dictionary = new HashMap<>();
+    dictionary.put("Hallo", "Hello");
+    List<String> requestedTargets = new ArrayList<>();
+
+    TranslationConfiguration translatorConfiguration =
+        this.createTranslatorConfiguration(supportedLanguages, dictionary, requestedTargets);
+
+    Path resources = Paths.get("src/test/resources/YamlFileTranslator");
+    Path testdir = Paths.get("target/test/YamlFileTranslatorIcu");
+
+    this.clean(testdir);
+    this.copyFiles(resources, testdir);
+
+    YamlFileTranslator yamlFileTranslator =
+        YamlFileTranslator.builder()
+            .dir(testdir)
+            .sourceLang("de")
+            .localeFormat(LocaleFormat.ICU)
+            .translatorConfiguration(translatorConfiguration)
+            .build();
+
+    yamlFileTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
+
+    YAMLMapper mapper = new YAMLMapper();
+    assertEquals(
+        "Hello",
+        mapper.readTree(testdir.resolve("a.en_GB.yaml").toFile()).get("text").asText(),
+        "wrong translation in a.en_GB.yaml");
+    assertTrue(Files.exists(testdir.resolve("a.en_US.yaml")), "en-us must be written as en_US");
+    assertTrue(Files.exists(testdir.resolve("a.en.yaml")), "en-us must also be written as en");
+    assertFalse(Files.exists(testdir.resolve("a.en-gb.yaml")), "provider code must not be used");
+
+    assertEquals(List.of("en-gb", "en-us"), requestedTargets, "provider code must be requested");
+    assertTrue(
+        Files.exists(testdir.resolve(".translation-cache/en-gb")),
+        "cache must stay under the provider code");
+    assertTrue(
+        Files.exists(testdir.resolve(".translation-cache/en-us")),
+        "cache must stay under the provider code");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testWithNonNormalizedExplicitTargets() throws Exception {
+
+    SupportedLanguages supportedLanguages =
+        SupportedLanguages.builder()
+            .language(Language.builder().code("de").name("deutsch").targets("en-gb", "en-us"))
+            .build();
+
+    Map<String, String> dictionary = new HashMap<>();
+    dictionary.put("Hallo", "Hello");
+    List<String> requestedTargets = new ArrayList<>();
+
+    TranslationConfiguration translatorConfiguration =
+        this.createTranslatorConfiguration(supportedLanguages, dictionary, requestedTargets);
+
+    Path resources = Paths.get("src/test/resources/YamlFileTranslator");
+    Path testdir = Paths.get("target/test/YamlFileTranslatorNonNormalizedTargets");
+
+    this.clean(testdir);
+    this.copyFiles(resources, testdir);
+
+    YamlFileTranslator yamlFileTranslator =
+        YamlFileTranslator.builder()
+            .dir(testdir)
+            .sourceLang("de")
+            .translatorConfiguration(translatorConfiguration)
+            .build();
+
+    yamlFileTranslator.translate(SupportedProvider.LIBRE_TRANSLATE, List.of("en_GB", "EN-US"));
+
+    assertEquals(List.of("en-gb", "en-us"), requestedTargets, "provider code must be requested");
+    assertTrue(Files.exists(testdir.resolve("a.en-gb.yaml")), "en_GB must be written as en-gb");
+    assertTrue(Files.exists(testdir.resolve("a.en-us.yaml")), "EN-US must be written as en-us");
+    assertTrue(Files.exists(testdir.resolve("a.en.yaml")), "EN-US must also be written as en");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testWithNonNormalizedTargetLangList() throws Exception {
+
+    SupportedLanguages supportedLanguages =
+        SupportedLanguages.builder()
+            .language(Language.builder().code("de").name("deutsch").targets("en-gb", "fr"))
+            .build();
+
+    Map<String, String> dictionary = new HashMap<>();
+    dictionary.put("Hallo", "Hello");
+
+    TranslationConfiguration translatorConfiguration =
+        this.createTranslatorConfiguration(supportedLanguages, dictionary);
+
+    Path resources = Paths.get("src/test/resources/YamlFileTranslator");
+    Path testdir = Paths.get("target/test/YamlFileTranslatorNonNormalizedFilter");
+
+    this.clean(testdir);
+    this.copyFiles(resources, testdir);
+
+    YamlFileTranslator yamlFileTranslator =
+        YamlFileTranslator.builder()
+            .dir(testdir)
+            .sourceLang("de")
+            .targetLangList("en_GB")
+            .translatorConfiguration(translatorConfiguration)
+            .build();
+
+    yamlFileTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
+
+    assertTrue(Files.exists(testdir.resolve("a.en-gb.yaml")), "en_GB must match en-gb");
+    assertFalse(Files.exists(testdir.resolve("a.fr.yaml")), "fr must be skipped");
+  }
+
   private TranslationConfiguration createTranslatorConfiguration(
       SupportedLanguages supportedLanguages, Map<String, String> dictionary) {
+    return this.createTranslatorConfiguration(supportedLanguages, dictionary, new ArrayList<>());
+  }
+
+  private TranslationConfiguration createTranslatorConfiguration(
+      SupportedLanguages supportedLanguages,
+      Map<String, String> dictionary,
+      List<String> requestedTargets) {
 
     TranslationProvider transporter = mock(TranslationProvider.class);
     when(transporter.translate(any(TranslationRequest.class)))
         .thenAnswer(
             invocationOnMock -> {
               TranslationRequest req = (TranslationRequest) invocationOnMock.getArguments()[0];
+              requestedTargets.add(req.getParameter().getLanguage().getTarget());
               String[] sourceText = req.getSourceText();
               String[] translations = new String[sourceText.length];
               for (int i = 0; i < translations.length; i++) {

@@ -3,6 +3,7 @@ package com.sitepark.translate.translator; // NOPMD by veltrup on 24.05.23, 15:3
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.sitepark.translate.Language;
+import com.sitepark.translate.LocaleFormat;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationLanguage;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -43,6 +45,8 @@ public final class YamlFileListTranslator extends Translator {
 
   private final Logger logger;
 
+  private final LocaleFormat localeFormat;
+
   private Path sourceDir;
 
   private List<YamlFile> yamlFiles;
@@ -58,6 +62,7 @@ public final class YamlFileListTranslator extends Translator {
     this.sourceLang = builder.sourceLang;
     this.targetLangList = builder.targetLangList;
     this.logger = builder.logger;
+    this.localeFormat = builder.localeFormat;
   }
 
   public static Builder builder() {
@@ -79,18 +84,10 @@ public final class YamlFileListTranslator extends Translator {
 
     long tt = System.currentTimeMillis();
 
-    List<String> targetLanguageList;
-    if (targets != null) {
-      targetLanguageList = targets;
-    } else {
-      targetLanguageList = sourceLanguage.getTargets();
-    }
+    List<String> targetLanguageList = TargetLanguages.resolve(targets, sourceLanguage.getTargets());
 
     for (String targetLanguage : targetLanguageList) {
-      if (this.sourceLang.equals(targetLanguage)) {
-        continue;
-      }
-      if (!this.targetLangList.isEmpty() && !this.targetLangList.contains(targetLanguage)) {
+      if (!TargetLanguages.isWanted(this.sourceLang, this.targetLangList, targetLanguage)) {
         continue;
       }
       long t = System.currentTimeMillis();
@@ -260,7 +257,9 @@ public final class YamlFileListTranslator extends Translator {
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private TranslationFileCache createTranslationCache(String targetLang) {
 
-    Path cacheFile = this.getOutputDir(targetLang).resolve(".translation-cache-file");
+    // the cache stays under the provider code, independent of the locale format, so that
+    // switching the format does not invalidate it
+    Path cacheFile = this.output.resolve(targetLang).resolve(".translation-cache-file");
 
     TranslationFileCache cache = new TranslationFileCache(cacheFile);
     try {
@@ -272,7 +271,7 @@ public final class YamlFileListTranslator extends Translator {
   }
 
   private Path getOutputDir(String lang) {
-    return this.output.resolve(lang);
+    return this.output.resolve(this.localeFormat.format(lang));
   }
 
   public static interface Logger {
@@ -303,6 +302,7 @@ public final class YamlFileListTranslator extends Translator {
     private Path output;
     private String sourceLang;
     private Logger logger;
+    private LocaleFormat localeFormat = LocaleFormat.LOWERCASE;
 
     private Builder() {}
 
@@ -326,13 +326,26 @@ public final class YamlFileListTranslator extends Translator {
 
     public Builder targetLangList(String... targetLangList) {
       Objects.requireNonNull(targetLangList, "targetLangList is null");
-      this.targetLangList.addAll(Arrays.asList(targetLangList));
-      return this;
+      return this.addTargetLangs(Arrays.asList(targetLangList));
     }
 
     public Builder targetLangList(Set<String> targetLangList) {
       Objects.requireNonNull(targetLangList, "targetLangList is null");
-      this.targetLangList.addAll(targetLangList);
+      return this.addTargetLangs(targetLangList);
+    }
+
+    private Builder addTargetLangs(Collection<String> langs) {
+      langs.forEach(lang -> this.targetLangList.add(LocaleFormat.normalize(lang)));
+      return this;
+    }
+
+    /**
+     * Spelling of the locale in output file and directory names. Defaults to {@link
+     * LocaleFormat#LOWERCASE}. API requests and caches always use the provider's code.
+     */
+    public Builder localeFormat(LocaleFormat localeFormat) {
+      Objects.requireNonNull(localeFormat, "localeFormat is null");
+      this.localeFormat = localeFormat;
       return this;
     }
 
