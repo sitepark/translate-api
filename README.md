@@ -80,7 +80,7 @@ anywhere on the command line.
 
 | Format | `en-gb` / `zh-hans` / `es-419` | Typical consumers |
 |---|---|---|
-| `lowercase` (default) | `en-gb` / `zh-hans` / `es-419` | unchanged behaviour |
+| `provider` (default) | `en-gb` / `zh-hans` / `es-419` | code as delivered by the provider (DeepL: lowercase), unchanged behaviour |
 | `bcp47` | `en-GB` / `zh-Hans` / `es-419` | i18next, HTML `lang`, HTTP |
 | `icu` | `en_GB` / `zh_Hans` / `es_419` | Symfony, PHP intl, Java |
 

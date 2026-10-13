@@ -92,7 +92,7 @@ class TranslateYamlFileTest {
     translateYamlFile.parseArguments(
         "deepl:https://dummy?authKey=abc", "src/test/resources/translate-yaml", "de");
     assertEquals(
-        LocaleFormat.LOWERCASE, translateYamlFile.getLocaleFormat(), "default format expected");
+        LocaleFormat.PROVIDER, translateYamlFile.getLocaleFormat(), "default format expected");
   }
 
   @Test

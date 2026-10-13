@@ -294,7 +294,7 @@ public final class JsonFileListTranslator extends Translator {
     private Path output;
     private String sourceLang;
     private Logger logger;
-    private LocaleFormat localeFormat = LocaleFormat.LOWERCASE;
+    private LocaleFormat localeFormat = LocaleFormat.PROVIDER;
 
     private Builder() {}
 
@@ -333,7 +333,7 @@ public final class JsonFileListTranslator extends Translator {
 
     /**
      * Spelling of the locale in output file and directory names. Defaults to {@link
-     * LocaleFormat#LOWERCASE}. API requests and caches always use the provider's code.
+     * LocaleFormat#PROVIDER}. API requests and caches always use the provider's code.
      */
     public Builder localeFormat(LocaleFormat localeFormat) {
       Objects.requireNonNull(localeFormat, "localeFormat is null");

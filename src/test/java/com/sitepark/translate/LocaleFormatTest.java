@@ -19,11 +19,13 @@ class LocaleFormatTest {
     "zh-hans, zh-hans, zh-Hans, zh_Hans",
     "zh-hant, zh-hant, zh-Hant, zh_Hant",
     "es-419,  es-419,  es-419,  es_419",
-    "ar,      ar,      ar,      ar"
+    "ar,      ar,      ar,      ar",
+    "pt-BR,   pt-BR,   pt-BR,   pt_BR",
+    "zh-Hans, zh-Hans, zh-Hans, zh_Hans"
   })
   @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testFormat(String code, String lowercase, String bcp47, String icu) {
-    assertThat(LocaleFormat.LOWERCASE.format(code)).isEqualTo(lowercase);
+  void testFormat(String code, String provider, String bcp47, String icu) {
+    assertThat(LocaleFormat.PROVIDER.format(code)).isEqualTo(provider);
     assertThat(LocaleFormat.BCP47.format(code)).isEqualTo(bcp47);
     assertThat(LocaleFormat.ICU.format(code)).isEqualTo(icu);
   }
@@ -40,7 +42,7 @@ class LocaleFormatTest {
   @ValueSource(strings = {"", "x", "toolongsubtag-123456789"})
   @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testFormatInvalidCode(String code) {
-    assertThat(LocaleFormat.LOWERCASE.format(code)).isEqualTo(code);
+    assertThat(LocaleFormat.PROVIDER.format(code)).isEqualTo(code);
     assertThatThrownBy(() -> LocaleFormat.BCP47.format(code))
         .isInstanceOf(IllegalArgumentException.class);
     assertThatThrownBy(() -> LocaleFormat.ICU.format(code))
@@ -49,8 +51,8 @@ class LocaleFormatTest {
 
   @ParameterizedTest
   @CsvSource({
-    "lowercase, LOWERCASE",
-    "LOWERCASE, LOWERCASE",
+    "provider,  PROVIDER",
+    "PROVIDER,  PROVIDER",
     "bcp47,     BCP47",
     "Bcp47,     BCP47",
     "icu,       ICU",
@@ -61,11 +63,11 @@ class LocaleFormatTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"", "symfony", "bcp-47", "icu "})
+  @ValueSource(strings = {"", "symfony", "bcp-47", "icu ", "lowercase"})
   void testFromNameWithUnknownName(String name) {
     assertThatThrownBy(() -> LocaleFormat.fromName(name))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("lowercase, bcp47, icu");
+        .hasMessageContaining("provider, bcp47, icu");
   }
 
   @ParameterizedTest

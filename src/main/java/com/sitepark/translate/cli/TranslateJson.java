@@ -68,7 +68,7 @@ public class TranslateJson {
         options
             .get(CliOptions.OUTPUT_LOCALE_FORMAT)
             .map(LocaleFormat::fromName)
-            .orElse(LocaleFormat.LOWERCASE);
+            .orElse(LocaleFormat.PROVIDER);
     String[] arguments = options.positional();
 
     if (arguments.length < 4) {
@@ -186,7 +186,9 @@ public class TranslateJson {
     System.out.println(
         "                        spelling of the locale in output file and directory");
     System.out.println("                        names (does not affect API requests and caches):");
-    System.out.println("                          lowercase  en-gb, zh-hans, es-419 (default)");
+    System.out.println(
+        "                          provider   as delivered by the provider (default),");
+    System.out.println("                                     DeepL: en-gb, zh-hans, es-419");
     System.out.println("                          bcp47      en-GB, zh-Hans, es-419");
     System.out.println("                          icu        en_GB, zh_Hans, es_419");
     System.out.println("");

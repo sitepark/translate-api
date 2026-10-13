@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
  * LocaleFormat} is applied only when an output path is built.
  *
  * <table>
- *   <caption>Examples</caption>
+ *   <caption>Examples (DeepL codes)</caption>
  *   <tr><th>Format</th><th>{@code en-gb}</th><th>{@code zh-hans}</th><th>{@code es-419}</th></tr>
- *   <tr><td>{@link #LOWERCASE}</td><td>{@code en-gb}</td><td>{@code zh-hans}</td>
+ *   <tr><td>{@link #PROVIDER}</td><td>{@code en-gb}</td><td>{@code zh-hans}</td>
  *       <td>{@code es-419}</td></tr>
  *   <tr><td>{@link #BCP47}</td><td>{@code en-GB}</td><td>{@code zh-Hans}</td>
  *       <td>{@code es-419}</td></tr>
@@ -24,8 +24,11 @@ import java.util.stream.Collectors;
  */
 public enum LocaleFormat {
 
-  /** The code as delivered by the provider (DeepL: lowercase), e.g. {@code en-gb}. Default. */
-  LOWERCASE {
+  /**
+   * The code exactly as delivered by the provider, e.g. {@code en-gb} for DeepL (lowercase). This
+   * is the default and matches the behaviour before {@code LocaleFormat} existed.
+   */
+  PROVIDER {
     @Override
     public String format(String code) {
       return code;
