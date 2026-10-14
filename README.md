@@ -41,7 +41,7 @@ docker pull ghcr.io/sitepark/translate-api:latest
 **Run the container**
 
 ```sh
-docker run -v $(pwd):/app --rm ghcr.io/sitepark/translate-api:latest translate-json translate-json "deepl:XXXXXXXXXX" src/lang de src/lang/de.translated
+docker run -v $(pwd):/app --rm ghcr.io/sitepark/translate-api:latest translate-json "deepl:https://api.deepl.com/v2?authKey=XXXXXXXXXX" src/lang de src/lang/de.translated
 ```
 
 **Use a specific version**
@@ -49,6 +49,57 @@ docker run -v $(pwd):/app --rm ghcr.io/sitepark/translate-api:latest translate-j
 ```sh
 docker pull ghcr.io/sitepark/translate-api:2.3.0
 ```
+
+## Command line
+
+The fat JAR (and the Docker image) provides four commands:
+
+```sh
+java -jar translate-api-jar-with-dependencies.jar <command> [options] <arguments>...
+```
+
+| Command | Source layout | Output |
+|---|---|---|
+| `translate-json <url> <dir> <source-lang> <output-dir> [target-language]...` | `<dir>/de/a.json` | `<output-dir>/en/a.json` |
+| `translate-json-file <url> <dir> <source-lang> [output-dir] [target-language]...` | `<dir>/a.de.json` | `<output-dir>/a.en.json` |
+| `translate-yaml <url> <dir> <source-lang> <output-dir> [target-language]...` | `<dir>/de/a.yaml` | `<output-dir>/en/a.yaml` |
+| `translate-yaml-file <url> <dir> <source-lang> [output-dir] [target-language]...` | `<dir>/a.de.yaml` | `<output-dir>/a.en.yaml` |
+
+- `<url>` addresses the provider: `deepl:https://api.deepl.com/v2?authKey=XXX` or
+  `libretranslate:https://libretranslate.example.com?apiKey=XXX`.
+- `[output-dir]` defaults to `<dir>` for the `-file` commands.
+- Without `[target-language]...` all target languages supported by the provider are translated.
+  Target languages may be given as `en-gb`, `en-GB` or `en_GB`.
+- For the target `en-us` an additional copy is written as `en`.
+- Both `.yaml` and `.yml` are supported by the YAML commands. YAML comments are not preserved.
+
+### Option `--output-locale-format=<format>`
+
+Controls how the locale is spelled in output **file and directory names**. Options may be placed
+anywhere on the command line.
+
+| Format | `en-gb` / `zh-hans` / `es-419` | Typical consumers |
+|---|---|---|
+| `provider` (default) | `en-gb` / `zh-hans` / `es-419` | code as delivered by the provider (DeepL: lowercase), unchanged behaviour |
+| `bcp47` | `en-GB` / `zh-Hans` / `es-419` | i18next, HTML `lang`, HTTP |
+| `icu` | `en_GB` / `zh_Hans` / `es_419` | Symfony, PHP intl, Java |
+
+Symfony compares locales as exact strings: a translator running with `en_GB` silently ignores a
+file named `messages.en-gb.yaml`. For Symfony projects use `--output-locale-format=icu`:
+
+```sh
+java -jar translate-api-jar-with-dependencies.jar translate-yaml-file \
+    --output-locale-format=icu \
+    "deepl:https://api.deepl.com/v2?authKey=XXX" translations de translations.generated
+```
+
+The option only affects output names. API requests and the translation cache keep using the
+provider's language code (e.g. `.translation-cache/en-gb`, `en-gb/.translation-cache-file`), so
+switching the format re-uses the existing cache and does not cause new translation costs. Files
+written with the previous format are not removed automatically.
+
+The library API offers the same via `localeFormat(LocaleFormat.ICU)` on the builders of
+`JsonFileTranslator`, `JsonFileListTranslator`, `YamlFileTranslator` and `YamlFileListTranslator`.
 
 ## How to use
 

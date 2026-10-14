@@ -1,13 +1,16 @@
 package com.sitepark.translate.translator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.sitepark.translate.Language;
+import com.sitepark.translate.LocaleFormat;
 import com.sitepark.translate.SupportedLanguages;
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.TranslationConfiguration;
@@ -284,6 +287,50 @@ class YamlFileListTranslatorTest {
     YAMLMapper mapper = new YAMLMapper();
     String result = mapper.readTree(output.resolve("en/a.yaml").toFile()).get("text").asText();
     assertEquals("Hello", result, "translation should still succeed despite cache error");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testWithIcuLocaleFormat() throws Exception {
+
+    SupportedLanguages supportedLanguages =
+        SupportedLanguages.builder()
+            .language(Language.builder().code("de").name("deutsch").targets("en-gb", "en-us"))
+            .build();
+
+    Map<String, String> dictionary = new HashMap<>();
+    dictionary.put("Hallo", "Hello");
+    dictionary.put("Welt", "World");
+
+    TranslationConfiguration translatorConfiguration =
+        this.createTranslatorConfiguration(supportedLanguages, dictionary);
+
+    Path dir = Paths.get("src/test/resources/YamlFileListTranslator");
+    Path output = Paths.get("target/test/YamlFileListTranslatorIcu/translations");
+    this.clean(output);
+
+    YamlFileListTranslator yamlFileListTranslator =
+        YamlFileListTranslator.builder()
+            .dir(dir)
+            .output(output)
+            .sourceLang("de")
+            .localeFormat(LocaleFormat.ICU)
+            .translatorConfiguration(translatorConfiguration)
+            .build();
+
+    yamlFileListTranslator.translate(SupportedProvider.LIBRE_TRANSLATE);
+
+    YAMLMapper mapper = new YAMLMapper();
+    assertEquals(
+        "World",
+        mapper.readTree(output.resolve("en_GB/b/c.yaml").toFile()).get("d").asText(),
+        "wrong translation in en_GB/b/c.yaml");
+    assertTrue(Files.exists(output.resolve("en_US/a.yaml")), "en-us must be written to en_US");
+    assertTrue(Files.exists(output.resolve("en/a.yaml")), "en_US must be copied to en");
+    assertFalse(Files.exists(output.resolve("en-gb/a.yaml")), "provider code must not be used");
+    assertTrue(
+        Files.exists(output.resolve("en-gb/.translation-cache-file")),
+        "cache must stay under the provider code");
   }
 
   private TranslationConfiguration createTranslatorConfiguration(

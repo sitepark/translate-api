@@ -1,8 +1,10 @@
 package com.sitepark.translate.cli;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.sitepark.translate.LocaleFormat;
 import org.junit.jupiter.api.Test;
 
 class TranslateYamlTest {
@@ -87,5 +89,17 @@ class TranslateYamlTest {
                 "src/test/resources/translate-yaml",
                 "de",
                 "target/test/translate-yaml"));
+  }
+
+  @Test
+  void testParseArgumentsWithLocaleFormat() {
+    TranslateYaml translateYaml = new TranslateYaml();
+    translateYaml.parseArguments(
+        "deepl:https://dummy?authKey=abc",
+        "src/test/resources/translate-yaml",
+        "de",
+        "target/test/translate-yaml",
+        "--output-locale-format=icu");
+    assertEquals(LocaleFormat.ICU, translateYaml.getLocaleFormat(), "icu format expected");
   }
 }
