@@ -65,6 +65,9 @@ public final class JsonFileListTranslator extends Translator {
     this.sourceDir = this.dir.resolve(this.sourceLang);
 
     Language sourceLanguage = this.getSourceLanguage(provider);
+    if (targets != null) {
+      sourceLanguage.requireSupportedTargets(targets);
+    }
     this.loadJsonFiles();
     this.loadExcludeFile();
     this.collectTranslatableText();

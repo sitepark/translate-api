@@ -1,5 +1,8 @@
 package com.sitepark.translate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -135,5 +138,43 @@ class LanguageTest {
           Language.builder().code("de").name("deutsch").build();
         },
         "empty targets should not allowed");
+  }
+
+  @Test
+  void testUnsupportedTargetsAreReturnedInGivenOrder() {
+    Language language =
+        Language.builder().code("de").name("deutsch").targets("en-us", "cs").build();
+
+    assertThat(language.getUnsupportedTargets(List.of("cj", "cs", "cz")))
+        .as("only codes not offered by the provider should be returned")
+        .containsExactly("cj", "cz");
+  }
+
+  @Test
+  void testTargetCheckIsCaseInsensitive() {
+    Language language = Language.builder().code("de").name("deutsch").targets("en-us").build();
+
+    assertThat(language.getUnsupportedTargets(List.of("EN-US")))
+        .as("target language codes should be compared case-insensitively")
+        .isEmpty();
+  }
+
+  @Test
+  void testRequireSupportedTargetsRejectsUnsupportedCodes() {
+    Language language = Language.builder().code("de").name("deutsch").targets("cs").build();
+
+    assertThatThrownBy(() -> language.requireSupportedTargets(List.of("cj", "cs", "cz")))
+        .as("all unsupported codes should be reported at once")
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("[cj, cz]");
+  }
+
+  @Test
+  void testRequireSupportedTargetsAcceptsSupportedCodes() {
+    Language language = Language.builder().code("de").name("deutsch").targets("cs", "en").build();
+
+    assertThatNoException()
+        .as("supported codes should be accepted")
+        .isThrownBy(() -> language.requireSupportedTargets(List.of("cs", "en")));
   }
 }
