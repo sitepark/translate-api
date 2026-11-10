@@ -73,6 +73,9 @@ public final class YamlFileListTranslator extends Translator {
     this.sourceDir = this.dir.resolve(this.sourceLang);
 
     Language sourceLanguage = this.getSourceLanguage(provider);
+    if (targets != null) {
+      sourceLanguage.requireSupportedTargets(targets);
+    }
     this.loadYamlFiles();
     this.loadExcludeFile();
     this.collectTranslatableText();

@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @JsonDeserialize(builder = Language.Builder.class)
 public final class Language {
@@ -37,6 +41,41 @@ public final class Language {
 
   public List<String> getTargets() {
     return this.targets;
+  }
+
+  /**
+   * Returns the given target languages that are not supported for this source language. The
+   * comparison is case-insensitive.
+   *
+   * @param targets target language codes to check
+   * @return the unsupported codes in the given order, empty if all are supported
+   */
+  public List<String> getUnsupportedTargets(Collection<String> targets) {
+    Objects.requireNonNull(targets, "targets is null");
+    Set<String> supported =
+        this.targets.stream().map(t -> t.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
+    return targets.stream()
+        .filter(t -> !supported.contains(t.toLowerCase(Locale.ROOT)))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Ensures that all given target languages are supported for this source language.
+   *
+   * @param targets target language codes to check
+   * @throws IllegalArgumentException listing all unsupported codes and the supported ones
+   */
+  public void requireSupportedTargets(Collection<String> targets) {
+    List<String> unsupported = this.getUnsupportedTargets(targets);
+    if (!unsupported.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Unsupported target languages for source language '"
+              + this.code
+              + "': "
+              + unsupported
+              + ". Supported: "
+              + this.targets);
+    }
   }
 
   public Builder toBuilder() {
