@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Arguments of the directory based translate commands ({@code translate-json}, {@code
@@ -39,24 +41,31 @@ public final class CommandArguments {
 
   private final TranslationProviderConfiguration providerConfiguration;
 
-  private final Path dir;
+  private final List<Directory> directories;
 
   private final String sourceLang;
-
-  private final Path output;
 
   private final List<String> targetLanguages;
 
   private CommandArguments(
       String url,
-      Path dir,
+      List<Directory> directories,
       String sourceLang,
-      Path output,
       List<String> targetLanguages,
       Path userConfigFile) {
 
-    if (!Files.exists(dir.resolve(sourceLang))) {
-      throw new IllegalArgumentException("source-dir " + dir.resolve(sourceLang) + " not exists");
+    List<Path> missing = new ArrayList<>();
+    for (Directory directory : directories) {
+      Path sourceDir = directory.getDir().resolve(sourceLang);
+      if (!Files.exists(sourceDir)) {
+        missing.add(sourceDir);
+      }
+    }
+    if (!missing.isEmpty()) {
+      throw new IllegalArgumentException(
+          (missing.size() == 1 ? "source-dir " : "source-dirs ")
+              + missing.stream().map(Path::toString).collect(Collectors.joining(", "))
+              + " not exists");
     }
 
     URI uri = parseUri(url);
@@ -67,9 +76,8 @@ public final class CommandArguments {
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException("url " + url + " invalid: " + e.getMessage(), e);
     }
-    this.dir = dir;
+    this.directories = Collections.unmodifiableList(new ArrayList<>(directories));
     this.sourceLang = sourceLang;
-    this.output = output;
     this.targetLanguages =
         targetLanguages == null || targetLanguages.isEmpty()
             ? null
@@ -99,9 +107,11 @@ public final class CommandArguments {
     }
     return new CommandArguments(
         arguments[0],
-        workDir.resolve(arguments[1]).normalize(),
+        List.of(
+            new Directory(
+                workDir.resolve(arguments[1]).normalize(),
+                workDir.resolve(arguments[3]).normalize())),
         arguments[2],
-        workDir.resolve(arguments[3]).normalize(),
         targets,
         userConfigFile);
   }
@@ -135,11 +145,43 @@ public final class CommandArguments {
 
     return new CommandArguments(
         requiredText(config, "url", configFile),
-        baseDir.resolve(requiredText(config, "dir", configFile)).normalize(),
+        directories(config, baseDir, configFile),
         requiredText(config, "sourceLang", configFile),
-        baseDir.resolve(requiredText(config, "output", configFile)).normalize(),
         targets,
         userConfigFile);
+  }
+
+  private static List<Directory> directories(JsonNode config, Path baseDir, Path configFile) {
+    JsonNode directoriesNode = config.get("directories");
+    if (directoriesNode == null) {
+      return List.of(
+          new Directory(
+              baseDir.resolve(requiredText(config, "dir", configFile)).normalize(),
+              baseDir.resolve(requiredText(config, "output", configFile)).normalize()));
+    }
+    if (config.has("dir") || config.has("output")) {
+      throw new IllegalArgumentException(
+          configFile + ": use either 'directories' or 'dir'/'output', not both");
+    }
+    if (!directoriesNode.isArray() || directoriesNode.isEmpty()) {
+      throw new IllegalArgumentException(
+          configFile + ": directories must be a non-empty list of entries with 'dir' and 'output'");
+    }
+    List<Directory> directories = new ArrayList<>();
+    for (JsonNode entry : directoriesNode) {
+      if (!entry.isObject()) {
+        throw new IllegalArgumentException(
+            configFile + ": directories entry '" + entry.asText() + "' must contain 'dir'");
+      }
+      Path dir = baseDir.resolve(requiredText(entry, "dir", configFile)).normalize();
+      JsonNode outputNode = entry.get("output");
+      Path output =
+          outputNode == null || outputNode.isNull() || outputNode.asText().isBlank()
+              ? dir
+              : baseDir.resolve(outputNode.asText()).normalize();
+      directories.add(new Directory(dir, output));
+    }
+    return directories;
   }
 
   static Path defaultUserConfigFile() {
@@ -261,16 +303,12 @@ public final class CommandArguments {
     return this.providerConfiguration;
   }
 
-  public Path getDir() {
-    return this.dir;
+  public List<Directory> getDirectories() {
+    return this.directories;
   }
 
   public String getSourceLang() {
     return this.sourceLang;
-  }
-
-  public Path getOutput() {
-    return this.output;
   }
 
   /**
@@ -279,6 +317,49 @@ public final class CommandArguments {
    */
   public List<String> getTargetLanguages() {
     return this.targetLanguages;
+  }
+
+  /** A directory with language specific subfolders and the directory the translations go to. */
+  public static final class Directory {
+
+    private final Path dir;
+
+    private final Path output;
+
+    Directory(Path dir, Path output) {
+      this.dir = dir;
+      this.output = output;
+    }
+
+    public Path getDir() {
+      return this.dir;
+    }
+
+    public Path getOutput() {
+      return this.output;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (!(o instanceof Directory)) {
+        return false;
+      }
+      Directory other = (Directory) o;
+      return this.dir.equals(other.dir) && this.output.equals(other.output);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(this.dir, this.output);
+    }
+
+    @Override
+    public String toString() {
+      return this.dir + " -> " + this.output;
+    }
   }
 
   static void printUsage(String command) {
@@ -303,6 +384,12 @@ public final class CommandArguments {
     System.out.println("  sourceLang: de");
     System.out.println("  output: src/lang");
     System.out.println("  targetLanguages: [en, fr]   # optional");
+    System.out.println("");
+    System.out.println("Instead of dir and output several directories can be given:");
+    System.out.println("  directories:");
+    System.out.println("    - dir: module-a/src/lang");
+    System.out.println("    - dir: module-b/lang");
+    System.out.println("      output: module-b/out   # optional, default: dir");
     System.out.println("");
     System.out.println("If the url contains no key, it is read from " + defaultUserConfigFile());
     System.out.println("  deepl:");

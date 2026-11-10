@@ -5,12 +5,13 @@ import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.translator.JsonFileListTranslator;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("PMD")
 public class TranslateJson {
 
-  private JsonFileListTranslator jsonFileListTranslator;
+  private List<JsonFileListTranslator> translators;
 
   private SupportedProvider providerType;
 
@@ -32,8 +33,8 @@ public class TranslateJson {
     }
   }
 
-  protected JsonFileListTranslator getTranslator() {
-    return this.jsonFileListTranslator;
+  protected List<JsonFileListTranslator> getTranslators() {
+    return this.translators;
   }
 
   protected void parseArguments(String... arguments) {
@@ -54,19 +55,25 @@ public class TranslateJson {
             .translationProviderConfiguration(args.getProviderConfiguration())
             .build();
 
-    this.jsonFileListTranslator =
-        JsonFileListTranslator.builder()
-            .dir(args.getDir())
-            .output(args.getOutput())
-            .sourceLang(args.getSourceLang())
-            .translatorConfiguration(translatorConfiguration)
-            .logger(new ConsoleLogger(true))
-            .build();
+    List<JsonFileListTranslator> list = new ArrayList<>();
+    for (CommandArguments.Directory directory : args.getDirectories()) {
+      list.add(
+          JsonFileListTranslator.builder()
+              .dir(directory.getDir())
+              .output(directory.getOutput())
+              .sourceLang(args.getSourceLang())
+              .translatorConfiguration(translatorConfiguration)
+              .logger(new ConsoleLogger(true))
+              .build());
+    }
+    this.translators = List.copyOf(list);
   }
 
   protected void run() throws IOException {
-    assert this.jsonFileListTranslator != null : "jsonFileListTranslator is null";
-    this.jsonFileListTranslator.translate(this.providerType, this.targetLanguages);
+    assert this.translators != null : "translators is null";
+    for (JsonFileListTranslator translator : this.translators) {
+      translator.translate(this.providerType, this.targetLanguages);
+    }
   }
 
   private void usage() {

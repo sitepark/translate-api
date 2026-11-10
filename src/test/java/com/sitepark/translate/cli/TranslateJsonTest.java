@@ -1,6 +1,6 @@
 package com.sitepark.translate.cli;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ class TranslateJsonTest {
         "src/test/resources/translate-json",
         "de",
         "target/test/translate-json");
-    assertNotNull(translateJson.getTranslator(), "translator expected");
+    assertEquals(1, translateJson.getTranslators().size(), "one translator expected");
   }
 
   @Test
@@ -25,6 +25,6 @@ class TranslateJsonTest {
         "src/test/resources/translate-json",
         "de",
         "target/test/translate-json");
-    assertNotNull(translateJson.getTranslator(), "translator expected");
+    assertEquals(1, translateJson.getTranslators().size(), "one translator expected");
   }
 }

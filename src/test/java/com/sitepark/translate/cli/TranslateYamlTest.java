@@ -1,6 +1,6 @@
 package com.sitepark.translate.cli;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ class TranslateYamlTest {
         "src/test/resources/translate-yaml",
         "de",
         "target/test/translate-yaml");
-    assertNotNull(translateYaml.getTranslator(), "translator expected");
+    assertEquals(1, translateYaml.getTranslators().size(), "one translator expected");
   }
 
   @Test
@@ -26,7 +26,7 @@ class TranslateYamlTest {
         "src/test/resources/translate-yaml",
         "de",
         "target/test/translate-yaml");
-    assertNotNull(translateYaml.getTranslator(), "translator expected");
+    assertEquals(1, translateYaml.getTranslators().size(), "one translator expected");
   }
 
   @Test
@@ -37,7 +37,7 @@ class TranslateYamlTest {
         "src/test/resources/translate-yaml",
         "de",
         "target/test/translate-yaml");
-    assertNotNull(translateYaml.getTranslator(), "translator expected");
+    assertEquals(1, translateYaml.getTranslators().size(), "one translator expected");
   }
 
   @Test
@@ -50,7 +50,7 @@ class TranslateYamlTest {
         "target/test/translate-yaml",
         "en",
         "fr");
-    assertNotNull(translateYaml.getTranslator(), "translator expected");
+    assertEquals(1, translateYaml.getTranslators().size(), "one translator expected");
   }
 
   @Test

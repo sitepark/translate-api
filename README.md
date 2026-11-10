@@ -74,6 +74,19 @@ targetLanguages:
   - fr
 ```
 
+To translate several directories with the same settings, replace `dir` and `output` with a
+list of `directories`. `output` is optional and defaults to `dir`.
+
+```yaml
+url: deepl:https://api.deepl.com
+sourceLang: de
+targetLanguages: [en, fr]
+directories:
+  - dir: module-a/src/lang
+  - dir: module-b/lang
+    output: module-b/out
+```
+
 If the url contains no key (`?authKey=...` for DeepL, `?apiKey=...` for LibreTranslate), it is
 read from `${XDG_CONFIG_HOME:-~/.config}/translate-api/config.yaml`:
 

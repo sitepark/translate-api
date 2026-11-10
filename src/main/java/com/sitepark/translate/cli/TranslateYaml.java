@@ -5,12 +5,13 @@ import com.sitepark.translate.TranslationConfiguration;
 import com.sitepark.translate.translator.YamlFileListTranslator;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("PMD")
 public class TranslateYaml {
 
-  private YamlFileListTranslator yamlFileListTranslator;
+  private List<YamlFileListTranslator> translators;
 
   private SupportedProvider providerType;
 
@@ -32,8 +33,8 @@ public class TranslateYaml {
     }
   }
 
-  protected YamlFileListTranslator getTranslator() {
-    return this.yamlFileListTranslator;
+  protected List<YamlFileListTranslator> getTranslators() {
+    return this.translators;
   }
 
   protected void parseArguments(String... arguments) {
@@ -54,19 +55,25 @@ public class TranslateYaml {
             .translationProviderConfiguration(args.getProviderConfiguration())
             .build();
 
-    this.yamlFileListTranslator =
-        YamlFileListTranslator.builder()
-            .dir(args.getDir())
-            .output(args.getOutput())
-            .sourceLang(args.getSourceLang())
-            .translatorConfiguration(translatorConfiguration)
-            .logger(new ConsoleLogger(true))
-            .build();
+    List<YamlFileListTranslator> list = new ArrayList<>();
+    for (CommandArguments.Directory directory : args.getDirectories()) {
+      list.add(
+          YamlFileListTranslator.builder()
+              .dir(directory.getDir())
+              .output(directory.getOutput())
+              .sourceLang(args.getSourceLang())
+              .translatorConfiguration(translatorConfiguration)
+              .logger(new ConsoleLogger(true))
+              .build());
+    }
+    this.translators = List.copyOf(list);
   }
 
   protected void run() throws IOException {
-    assert this.yamlFileListTranslator != null : "yamlFileListTranslator is null";
-    this.yamlFileListTranslator.translate(this.providerType, this.targetLanguages);
+    assert this.translators != null : "translators is null";
+    for (YamlFileListTranslator translator : this.translators) {
+      translator.translate(this.providerType, this.targetLanguages);
+    }
   }
 
   private void usage() {

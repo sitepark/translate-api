@@ -2,6 +2,7 @@ package com.sitepark.translate.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.sitepark.translate.SupportedProvider;
 import com.sitepark.translate.provider.deepl.DeeplTranslationProviderConfiguration;
@@ -49,7 +50,7 @@ class CommandArgumentsTest {
   void testArgumentsResolveDirRelativeToWorkDir() {
     CommandArguments args = this.parseArguments("deepl:https://dummy?authKey=abc");
 
-    assertThat(args.getDir())
+    assertThat(args.getDirectories().get(0).getDir())
         .as("dir argument should be resolved against the working directory")
         .isEqualTo(this.workDir.resolve("src/lang"));
   }
@@ -152,9 +153,9 @@ class CommandArgumentsTest {
             List.of(
                 args.getProviderType(),
                 deepl(args).getAuthKey(),
-                args.getDir(),
+                args.getDirectories().get(0).getDir(),
                 args.getSourceLang(),
-                args.getOutput(),
+                args.getDirectories().get(0).getOutput(),
                 args.getTargetLanguages()))
         .as("all values should be taken from translate.yaml and the key from the user config")
         .containsExactly(
@@ -213,6 +214,94 @@ class CommandArgumentsTest {
         .as("unquoted 'no' is read as boolean by YAML and should be rejected")
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("not a string");
+  }
+
+  @Test
+  void testProjectConfigWithDirectories() throws IOException {
+    Files.createDirectories(this.workDir.resolve("module/lang/de"));
+    this.writeProjectConfig(
+        """
+        url: deepl:https://dummy?authKey=abc
+        sourceLang: de
+        directories:
+          - dir: src/lang
+            output: out
+          - dir: module/lang
+        """);
+
+    CommandArguments args = CommandArguments.parse(this.workDir, this.userConfig);
+
+    assertThat(args.getDirectories())
+        .as("each entry should be resolved against translate.yaml, output defaults to dir")
+        .extracting(CommandArguments.Directory::getDir, CommandArguments.Directory::getOutput)
+        .containsExactly(
+            tuple(this.workDir.resolve("src/lang"), this.workDir.resolve("out")),
+            tuple(this.workDir.resolve("module/lang"), this.workDir.resolve("module/lang")));
+  }
+
+  @Test
+  void testProjectConfigWithDirectoriesEntryWithoutDirIsRejected() throws IOException {
+    this.writeProjectConfig(
+        """
+        url: deepl:https://dummy?authKey=abc
+        sourceLang: de
+        directories:
+          - output: out
+        """);
+
+    assertThatThrownBy(() -> CommandArguments.parse(this.workDir, this.userConfig))
+        .as("directories entry without dir should be rejected")
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("'dir'");
+  }
+
+  @Test
+  void testProjectConfigWithEmptyDirectoriesIsRejected() throws IOException {
+    this.writeProjectConfig(
+        """
+        url: deepl:https://dummy?authKey=abc
+        sourceLang: de
+        directories: []
+        """);
+
+    assertThatThrownBy(() -> CommandArguments.parse(this.workDir, this.userConfig))
+        .as("empty directories should be rejected")
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("non-empty list");
+  }
+
+  @Test
+  void testProjectConfigWithDirectoriesAndDirIsRejected() throws IOException {
+    this.writeProjectConfig(
+        """
+        url: deepl:https://dummy?authKey=abc
+        sourceLang: de
+        dir: src/lang
+        directories:
+          - dir: src/lang
+        """);
+
+    assertThatThrownBy(() -> CommandArguments.parse(this.workDir, this.userConfig))
+        .as("directories together with dir should be rejected")
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("not both");
+  }
+
+  @Test
+  void testProjectConfigWithMissingSourceDirInDirectoriesIsRejected() throws IOException {
+    this.writeProjectConfig(
+        """
+        url: deepl:https://dummy?authKey=abc
+        sourceLang: de
+        directories:
+          - dir: src/lang
+          - dir: missing/lang
+        """);
+
+    assertThatThrownBy(() -> CommandArguments.parse(this.workDir, this.userConfig))
+        .as("a directory without source language folder should be rejected")
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining(this.workDir.resolve("missing/lang/de").toString());
   }
 
   @Test
