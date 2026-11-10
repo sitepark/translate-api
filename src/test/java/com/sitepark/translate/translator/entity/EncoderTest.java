@@ -39,4 +39,12 @@ class EncoderTest {
         Encoder.encodeXml("A & B <x> {val}"),
         "Unexpected XML escaping");
   }
+
+  @Test
+  void testEncodeXmlWithMustachePlaceholder() {
+    assertEquals(
+        "Gültig bis <x>{{data.expiresAt}}</x> Uhr.",
+        Encoder.encodeXml("Gültig bis {{data.expiresAt}} Uhr."),
+        "The whole Mustache tag must be protected");
+  }
 }

@@ -43,11 +43,36 @@ class Scanner {
         }
         break;
       case '{':
-        entity('}');
+        if (match('{')) {
+          mustache();
+        } else {
+          entity('}');
+        }
         break;
       default:
         string();
         break;
+    }
+  }
+
+  /**
+   * A Mustache tag such as {@code {{data.name}}}, {@code {{{html}}}} or {@code {{#section}}}, which
+   * must stay as one entity: protecting only its inner {@code {data.name}} lets the translation
+   * change the outer braces. Anything that does not close as a tag is a string.
+   */
+  private void mustache() {
+    boolean triple = match('{');
+    match('#');
+    match('^');
+    match('/');
+    match('&');
+    while (!isAtEnd() && (isIdentifierChar(peek()) || peek() == ' ')) {
+      advance();
+    }
+    if (match('}') && match('}') && (!triple || match('}'))) {
+      addToken(TokenType.ENTITY);
+    } else {
+      string();
     }
   }
 
