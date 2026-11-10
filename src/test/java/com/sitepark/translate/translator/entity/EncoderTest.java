@@ -55,4 +55,20 @@ class EncoderTest {
         Encoder.encodeXml("{value, number, ::.#} kB"),
         "ICU typed argument should be encoded via IcuMessageEncoder");
   }
+
+  @Test
+  void testEncodeXmlWithMustachePlaceholder() {
+    assertEquals(
+        "Gültig bis <x>{{data.expiresAt}}</x> Uhr.",
+        Encoder.encodeXml("Gültig bis {{data.expiresAt}} Uhr."),
+        "The whole Mustache tag must be protected");
+  }
+
+  @Test
+  void testEncodeXmlWithMustacheSectionAndTripleMustache() {
+    assertEquals(
+        "<x>{{#data.items}}</x><x>{{{ data.text }}}</x><x>{{/data.items}}</x>",
+        Encoder.encodeXml("{{#data.items}}{{{ data.text }}}{{/data.items}}"),
+        "Mustache tags must not be taken for ICU MessageFormat");
+  }
 }

@@ -111,4 +111,39 @@ class ScannerTest {
     assertEquals(TokenType.ENTITY, t4.type);
     assertEquals("{0}", t4.lexeme);
   }
+
+  @Test
+  void testMustacheVariable() {
+    Scanner scanner = new Scanner("bis {{data.expiresAt}} Uhr");
+    List<Token> token = scanner.scanTokens();
+    assertEquals("{{data.expiresAt}}", token.get(1).lexeme);
+  }
+
+  @Test
+  void testMustacheVariableIsEntity() {
+    Scanner scanner = new Scanner("bis {{data.expiresAt}} Uhr");
+    List<Token> token = scanner.scanTokens();
+    assertEquals(TokenType.ENTITY, token.get(1).type);
+  }
+
+  @Test
+  void testMustacheTripleWithSpaces() {
+    Scanner scanner = new Scanner("{{{ data.text }}}");
+    List<Token> token = scanner.scanTokens();
+    assertEquals("{{{ data.text }}}", token.get(0).lexeme);
+  }
+
+  @Test
+  void testMustacheSection() {
+    Scanner scanner = new Scanner("{{#data.items}}x{{/data.items}}");
+    List<Token> token = scanner.scanTokens();
+    assertEquals("{{/data.items}}", token.get(2).lexeme);
+  }
+
+  @Test
+  void testUnclosedMustacheIsString() {
+    Scanner scanner = new Scanner("{{data.x");
+    List<Token> token = scanner.scanTokens();
+    assertEquals(TokenType.STRING, token.get(0).type);
+  }
 }
