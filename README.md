@@ -50,6 +50,40 @@ docker run -v $(pwd):/app --rm ghcr.io/sitepark/translate-api:latest translate-j
 docker pull ghcr.io/sitepark/translate-api:2.3.0
 ```
 
+## CLI configuration
+
+The commands `translate-json` and `translate-yaml` take their parameters either from the
+command line
+
+```sh
+translate-json <url> <dir> <source-lang> <output-dir> [target-lang]...
+```
+
+or, if called without arguments, from a `translate.yaml` in the current directory. This file
+contains no credentials and can be committed. Relative paths are resolved against the directory
+of the file.
+
+```yaml
+url: deepl:https://api.deepl.com
+dir: src/lang
+sourceLang: de
+output: src/lang
+# optional, default: all languages supported by the provider
+targetLanguages:
+  - en
+  - fr
+```
+
+If the url contains no key (`?authKey=...` for DeepL, `?apiKey=...` for LibreTranslate), it is
+read from `${XDG_CONFIG_HOME:-~/.config}/translate-api/config.yaml`:
+
+```yaml
+deepl:
+  authKey: <your-deepl-auth-key>
+libretranslate:
+  apiKey: <your-libretranslate-api-key>
+```
+
 ## How to use
 
 Maven-Dependency
