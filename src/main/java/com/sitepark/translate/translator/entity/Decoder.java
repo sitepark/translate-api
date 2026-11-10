@@ -6,10 +6,13 @@ import java.util.regex.Pattern;
 
 public final class Decoder {
 
+  // DOTALL so a placeholder that spans newlines (e.g. a multi-line ICU MessageFormat string from a
+  // folded YAML scalar) is still matched and unwrapped.
   private static final Pattern HTML_ENTITY_PATTERN =
-      Pattern.compile("(<span data-encoded-entity=\"true\" translate=\"no\">)(.*?)(</span>)");
+      Pattern.compile(
+          "(<span data-encoded-entity=\"true\" translate=\"no\">)(.*?)(</span>)", Pattern.DOTALL);
 
-  private static final Pattern XML_ENTITY_PATTERN = Pattern.compile("<x>(.*?)</x>");
+  private static final Pattern XML_ENTITY_PATTERN = Pattern.compile("<x>(.*?)</x>", Pattern.DOTALL);
 
   private Decoder() {}
 

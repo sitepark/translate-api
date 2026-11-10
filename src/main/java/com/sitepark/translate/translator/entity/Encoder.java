@@ -39,6 +39,9 @@ public final class Encoder {
   }
 
   public static String encodeXml(String text) {
+    if (!text.contains("${") && IcuMessageEncoder.isIcu(text)) {
+      return IcuMessageEncoder.encodeXml(text);
+    }
     List<Token> tokens = new Scanner(text).scanTokens();
     if (tokens.stream().noneMatch(t -> t.type == TokenType.ENTITY)) {
       return text;

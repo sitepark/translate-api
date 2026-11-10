@@ -31,30 +31,34 @@ public class TranslatableTextNodeCollector {
   public List<TranslatableTextNode> collect(List<JsonNode> jsonList) {
     List<TranslatableTextNode> translatableTextNodeList = new ArrayList<>();
     for (JsonNode json : jsonList) {
-      this.filterTextNodes(null, null, json, translatableTextNodeList::add);
+      this.filterTextNodes(null, null, null, json, translatableTextNodeList::add);
     }
     return translatableTextNodeList;
   }
 
   public List<TranslatableTextNode> collect(JsonNode json) {
     List<TranslatableTextNode> translatableTextNodeList = new ArrayList<>();
-    this.filterTextNodes(null, null, json, translatableTextNodeList::add);
+    this.filterTextNodes(null, null, null, json, translatableTextNodeList::add);
     return translatableTextNodeList;
   }
 
   private void filterTextNodes(
-      JsonNode parent, Object nodeKey, JsonNode node, Consumer<TranslatableTextNode> consumer) {
+      JsonNode parent,
+      Object nodeKey,
+      String parentPath,
+      JsonNode node,
+      Consumer<TranslatableTextNode> consumer) {
+    String path = this.appendPath(parentPath, nodeKey);
     if (node instanceof ObjectNode) {
       node.fields()
-          .forEachRemaining(e -> filterTextNodes(node, e.getKey(), e.getValue(), consumer));
+          .forEachRemaining(e -> filterTextNodes(node, e.getKey(), path, e.getValue(), consumer));
     } else if (node instanceof ArrayNode arrayNode) {
       Iterator<JsonNode> it = arrayNode.elements();
       for (int i = 0; it.hasNext(); i++) {
-        this.filterTextNodes(node, i, it.next(), consumer);
+        this.filterTextNodes(node, i, path, it.next(), consumer);
       }
     } else if (node instanceof TextNode) {
-      String absoluteKeys = this.getAbsoluteKey(nodeKey);
-      if (this.excludesNodes != null && this.excludesNodes.contains(absoluteKeys)) {
+      if (this.isExcluded(path, nodeKey)) {
         return;
       }
       TranslatableTextNode updatableTextNode =
@@ -63,13 +67,39 @@ public class TranslatableTextNodeCollector {
     }
   }
 
-  private String getAbsoluteKey(Object nodeKey) {
+  /**
+   * A leaf is excluded if the excludes file contains its full nested-path key (e.g. {@code
+   * <fileKey>.format.file_size.unit.ZB}) or, for backward compatibility, its leaf-only key (e.g.
+   * {@code <fileKey>.ZB}).
+   */
+  private boolean isExcluded(String path, Object nodeKey) {
+    if (this.excludesNodes == null) {
+      return false;
+    }
+    String fullPathKey = this.withFileKey(path);
+    String leafOnlyKey = this.withFileKey(nodeKey == null ? null : nodeKey.toString());
+    return this.excludesNodes.contains(fullPathKey) || this.excludesNodes.contains(leafOnlyKey);
+  }
+
+  /** Appends a node key to the accumulated within-file path (null-safe). */
+  private String appendPath(String parentPath, Object nodeKey) {
     if (nodeKey == null) {
+      return parentPath;
+    }
+    if (parentPath == null || parentPath.isEmpty()) {
+      return nodeKey.toString();
+    }
+    return parentPath + "." + nodeKey;
+  }
+
+  /** Prefixes a within-file path (or leaf key) with the file base key. */
+  private String withFileKey(String suffix) {
+    if (suffix == null) {
       return this.key;
     }
     if (this.key == null) {
-      return nodeKey.toString();
+      return suffix;
     }
-    return this.key + "." + nodeKey;
+    return this.key + "." + suffix;
   }
 }

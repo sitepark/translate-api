@@ -20,6 +20,10 @@ public final class Main {
       TranslateJson.execute(arguments);
     } else if (TranslateJsonFile.COMMAND_NAME.equals(command)) {
       TranslateJsonFile.execute(arguments);
+    } else if (TranslateYaml.COMMAND_NAME.equals(command)) {
+      TranslateYaml.execute(arguments);
+    } else if (TranslateYamlFile.COMMAND_NAME.equals(command)) {
+      TranslateYamlFile.execute(arguments);
     } else {
       System.err.println("unknown command: " + command);
     }

@@ -1,6 +1,7 @@
 package com.sitepark.translate.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -44,5 +45,21 @@ class MainTest {
         "unknown command: test" + System.lineSeparator(),
         this.errContent.toString(StandardCharsets.UTF_8),
         "unexprected message");
+  }
+
+  @Test
+  void testTranslateYamlCommand() {
+    Main.main(TranslateYaml.COMMAND_NAME);
+    assertTrue(
+        this.errContent.toString(StandardCharsets.UTF_8).startsWith("ERROR: "),
+        "expected translate-yaml to be dispatched");
+  }
+
+  @Test
+  void testTranslateYamlFileCommand() {
+    Main.main(TranslateYamlFile.COMMAND_NAME);
+    assertTrue(
+        this.errContent.toString(StandardCharsets.UTF_8).startsWith("ERROR: "),
+        "expected translate-yaml-file to be dispatched");
   }
 }

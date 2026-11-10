@@ -24,6 +24,11 @@ public final class TranslatableTextNodeCollectorExcludes {
     return new TranslatableTextNodeCollectorExcludes(excludes);
   }
 
+  /** Builds excludes from a set of keys (one key per entry), primarily for testing. */
+  public static TranslatableTextNodeCollectorExcludes of(Set<String> excludes) {
+    return new TranslatableTextNodeCollectorExcludes(new HashSet<>(excludes));
+  }
+
   public boolean contains(String key) {
     return this.excludes.contains(key);
   }

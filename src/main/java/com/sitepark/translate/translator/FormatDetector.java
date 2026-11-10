@@ -2,6 +2,7 @@ package com.sitepark.translate.translator;
 
 import com.sitepark.translate.Format;
 import com.sitepark.translate.translator.entity.Encoder;
+import com.sitepark.translate.translator.entity.IcuMessageEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,7 @@ public final class FormatDetector {
   }
 
   public static boolean containsPlaceholder(String text) {
-    return Encoder.hasPlaceholder(text);
+    return Encoder.hasPlaceholder(text) || IcuMessageEncoder.isIcu(text);
   }
 
   public static Format detect(String text) {

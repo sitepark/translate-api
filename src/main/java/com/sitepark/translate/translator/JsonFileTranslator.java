@@ -107,13 +107,8 @@ public final class JsonFileTranslator extends Translator {
     ObjectMapper mapper = new ObjectMapper();
 
     for (JsonFile jsonFile : this.jsonFiles) {
-      Path parent = jsonFile.sourceFile.getParent();
-      if (parent == null) {
-        parent = this.dir;
-      }
-      if (parent == null) {
-        throw new IllegalStateException("parent is null");
-      }
+      Path relativeParent = jsonFile.sourceFile.getParent();
+      Path parent = relativeParent == null ? this.output : this.output.resolve(relativeParent);
 
       Path filenamePath = jsonFile.sourceFile.getFileName();
       if (filenamePath == null) {

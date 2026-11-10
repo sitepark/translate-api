@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 
 public abstract class TranslatableTextNode extends TranslatableText {
@@ -16,7 +15,6 @@ public abstract class TranslatableTextNode extends TranslatableText {
     this.node = node;
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public TextNode getNode() {
     return this.node;
   }
